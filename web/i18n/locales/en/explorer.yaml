@@ -1,0 +1,84 @@
+# i18n/locales/en/explorer.yaml
+#
+# The keys the explorer components call. An app that defines none of them still
+# renders: useTranslate falls back to the key.
+
+home:
+  value: "Home"
+  description: "First breadcrumb, the root of the tree"
+up:
+  value: "Up"
+  description: "The .. tile in any folder below the root"
+more:
+  value: "More"
+  description: "A tile's context menu button, screen-reader label"
+loading:
+  value: "Loading folder"
+  description: "Names Explorer's first-load skeleton, a grid of blank tiles that announces
+    as nothing"
+empty:
+  value: "This folder is empty"
+  description: "Explorer with nothing in the open folder"
+newFolder:
+  value: "New folder"
+  description: "Toolbar action, and the create dialog's title"
+renameFolder:
+  value: "Rename folder"
+  description: "Toolbar action, context menu entry, and the rename dialog's title"
+deleteFolder:
+  value: "Delete folder"
+  description: "Context menu entry: the folder goes, its contents do not"
+deleteFolderAll:
+  value: "Delete with contents"
+  description: "Context menu entry: the folder and everything inside it"
+confirmDelete:
+  value: "Delete this folder?"
+  description: "Confirm title before deleting a folder"
+confirmDeleteAll:
+  value: "Delete this folder and everything in it?"
+  description: "Confirm title before deleting a folder with its contents"
+folderName:
+  value: "Name"
+  description: "Folder dialog's name field"
+nameRequired:
+  value: "A name is required."
+  description: "Folder dialog with an empty name"
+accent:
+  value: "Colour"
+  description: "Folder dialog's tint picker"
+accentDefault:
+  value: "Default"
+  description: "The first swatch: the theme accent rather than a chosen tint"
+folderIcon:
+  value: "Icon"
+  description: "Folder dialog's icon picker, shown only where the app turned the field
+    on"
+folderImage:
+  value: "Image URL"
+  description: "Folder dialog's cover field, shown only where the app turned the field
+    on"
+selected:
+  value: "{count} selected"
+  description: "Explorer toolbar, how many tiles are picked"
+  placeholders:
+    count:
+      type: integer
+clearSelection:
+  value: "Clear selection"
+  description: "Explorer toolbar, drops every picked tile. Screen-reader label"
+maxDepth:
+  value: "Folders cannot nest any deeper."
+  description: "Why the new folder action is disabled at the depth cap"
+dragging:
+  value: "{count} items"
+  description: "The drag ghost when a selection of several tiles is being dragged"
+  placeholders:
+    count:
+      type: integer
+pin:
+  value: "Pin"
+  description: "Context menu entry: keep this node at the front of its folder. s99ab.explorer.pin
+    overrides it per app"
+unpin:
+  value: "Unpin"
+  description: "Context menu entry: stop keeping this node at the front"

@@ -1,0 +1,216 @@
+// web/src/styles/_root.scss
+//
+// Emits each _config.scss knob as a custom property, so an app can retune the
+// layer at runtime. Same names and order as _config.scss; tests/tokens.spec.ts
+// fails on a missing one.
+
+@use 'config' as *;
+
+:root {
+  // ---------------------------------------------------------------- type ---
+  --s99ab-font-sans: #{$font-sans};
+  --s99ab-font-mono: #{$font-mono};
+
+  --s99ab-font-size: #{$font-size};
+  --s99ab-label-size: #{$label-size};
+  --s99ab-label-track: #{$label-track};
+  --s99ab-measure: #{$measure};
+
+  --s99ab-stat-value-size: #{$stat-value-size};
+  --s99ab-stat-value-lh: #{$stat-value-lh};
+  --s99ab-stat-unit-size: #{$stat-unit-size};
+  --s99ab-stat-hint-size: #{$stat-hint-size};
+  --s99ab-page-title-size: #{$page-title-size};
+  --s99ab-page-lead-size: #{$page-lead-size};
+  --s99ab-bar-title-size: #{$bar-title-size};
+  --s99ab-nav-item-size: #{$nav-item-size};
+  --s99ab-meta-size: #{$meta-size};
+  --s99ab-lead-size: #{$lead-size};
+
+  // --------------------------------------------------------------- shape ---
+  --s99ab-radius: #{$radius};
+  --s99ab-chip-radius: #{$chip-radius};
+  --s99ab-container: #{$container};
+  --s99ab-rail-w: #{$rail-w};
+  --s99ab-nav-prepend-w: #{$nav-prepend-w};
+  --s99ab-nav-pad-block: #{$nav-pad-block};
+  --s99ab-nav-pad-inline: #{$nav-pad-inline};
+  --s99ab-tally-cell: #{$tally-cell};
+  --s99ab-tally-gap: #{$tally-gap};
+
+  // ------------------------------------------------------------ nav trail ---
+  --s99ab-nav-trail-row: #{$nav-trail-row};
+  --s99ab-nav-trail-head: #{$nav-trail-head};
+  --s99ab-nav-trail-row-gap: #{$nav-trail-row-gap};
+  --s99ab-nav-trail-group-above: #{$nav-trail-group-above};
+  --s99ab-nav-trail-group-bare: #{$nav-trail-group-bare};
+  --s99ab-nav-trail-group-below: #{$nav-trail-group-below};
+  --s99ab-nav-trail-indent: #{$nav-trail-indent};
+  --s99ab-nav-trail-x: #{$nav-trail-x};
+  --s99ab-nav-trail-bend: #{$nav-trail-bend};
+  --s99ab-nav-trail-stroke: #{$nav-trail-stroke};
+  --s99ab-nav-trail-reach: #{$nav-trail-reach};
+  --s99ab-nav-trail-rest: #{$nav-trail-rest};
+  --s99ab-nav-trail-done: #{$nav-trail-done};
+  --s99ab-nav-trail-dash: #{$nav-trail-dash};
+  --s99ab-nav-trail-halo: #{$nav-trail-halo};
+  --s99ab-nav-trail-lit-weight: #{$nav-trail-lit-weight};
+  --s99ab-nav-trail-gap: #{$nav-trail-gap};
+  --s99ab-nav-trail-dot: #{$nav-trail-dot};
+
+  // ------------------------------------------------------------- spacing ---
+  --s99ab-gap: #{$gap};
+  --s99ab-pad: #{$pad};
+  --s99ab-pad-tight: #{$pad-tight};
+  --s99ab-page-y: #{$page-y};
+  --s99ab-page-defer-size: #{$page-defer-size};
+  --s99ab-control-gap: #{$control-gap};
+  --s99ab-strip-pad-y: #{$strip-pad-y};
+  --s99ab-strip-pad-x: #{$strip-pad-x};
+  --s99ab-form-control-w: #{$form-control-w};
+  --s99ab-bar-h: #{$bar-h};
+  --s99ab-bar-logo-size: #{$bar-logo-size};
+
+  // ------------------------------------------------------------ controls ---
+  --s99ab-strip-h: #{$strip-h};
+  --s99ab-control-h: #{$control-h};
+  --s99ab-control-h-dense: #{$control-h-dense};
+  --s99ab-icon: #{$icon};
+  --s99ab-text-btn-rest: #{$text-btn-rest};
+
+  // -------------------------------------------------------------- fields ---
+  --s99ab-field-w: #{$field-w};
+  --s99ab-field-label-overhang: #{$field-label-overhang};
+  --s99ab-field-error-hover-mix: #{$field-error-hover-mix};
+
+  // ---------------------------------------------------------------- auth ---
+  --s99ab-auth-w: #{$auth-w};
+  --s99ab-auth-rise: #{$auth-rise};
+
+  // --------------------------------------------------------------- glass ---
+  --s99ab-flow-opacity: #{$flow-opacity};
+  --s99ab-flow-opacity-dark: #{$flow-opacity-dark};
+  --s99ab-glass: #{$glass};
+  --s99ab-glass-chrome: #{$glass-chrome};
+
+  // -------------------------------------------------------------- motion ---
+  --s99ab-motion-fast: #{$motion-fast};
+  --s99ab-motion-base: #{$motion-base};
+  --s99ab-motion-slow: #{$motion-slow};
+  --s99ab-motion-easing: #{$motion-easing};
+  --s99ab-motion-enter: #{$motion-enter};
+  --s99ab-motion-exit: #{$motion-exit};
+  --s99ab-motion-shift: #{$motion-shift};
+  --s99ab-motion-shift-x: #{$motion-shift-x};
+  --s99ab-motion-scale: #{$motion-scale};
+  --s99ab-swap-in: #{$swap-in};
+  --s99ab-swap-out: #{$swap-out};
+  --s99ab-spin-period: #{$spin-period};
+  --s99ab-spin-period-reduced: #{$spin-period-reduced};
+
+  // Runtime state with no knob, declared as a starting value for _motion.scss.
+
+  // Travel distance multiplier. 0 for reduced motion.
+  --s99ab-motion-travel: 1;
+
+  // Travel direction, set by the container (a top stack enters from above).
+  --s99ab-motion-dir: 1;
+
+  // ---------------------------------------------------- theme transition ---
+  // Used when the app sets none; runThemeTransition writes it only when configured.
+  --s99ab-vt-easing: #{$vt-easing};
+  --s99ab-vt-cover-z: #{$vt-cover-z};
+  --s99ab-vt-cover-in: #{$vt-cover-in};
+  --s99ab-vt-cover-hold: #{$vt-cover-hold};
+  --s99ab-vt-cover-seed: #{$vt-cover-seed};
+
+  // -------------------------------------------------------------- toasts ---
+  --s99ab-toast-w: #{$toast-w};
+  --s99ab-toast-z: #{$toast-z};
+  --s99ab-toast-top: #{$toast-top};
+  --s99ab-toast-bottom: #{$toast-bottom};
+  --s99ab-toast-enter: #{$toast-enter};
+  --s99ab-toast-leave: #{$toast-leave};
+  --s99ab-toast-move: #{$toast-move};
+  --s99ab-toast-travel: #{$toast-travel};
+  --s99ab-toast-exit-travel: #{$toast-exit-travel};
+  --s99ab-toast-gap: #{$toast-gap};
+  --s99ab-toast-marker-size: #{$toast-marker-size};
+  --s99ab-toast-marker-pad: #{$toast-marker-pad};
+  --s99ab-toast-bar-h: #{$toast-bar-h};
+  --s99ab-toast-lines: #{$toast-lines};
+  --s99ab-toast-text-size: #{$toast-text-size};
+  --s99ab-toast-text-lh: #{$toast-text-lh};
+
+  // -------------------------------------------------------------- states ---
+  --s99ab-skeleton-rest: #{$skeleton-rest};
+  --s99ab-skeleton-peak: #{$skeleton-peak};
+  --s99ab-goo-size: #{$goo-size};
+  --s99ab-goo-size-dense: #{$goo-size-dense};
+  --s99ab-goo-size-btn: #{$goo-size-btn};
+  --s99ab-goo-period: #{$goo-period};
+  --s99ab-state-icon: #{$state-icon};
+  --s99ab-state-title-size: #{$state-title-size};
+  --s99ab-state-title-lh: #{$state-title-lh};
+
+  // ------------------------------------------------------------ backdrop ---
+  --s99ab-backdrop-opacity: #{$backdrop-opacity};
+  --s99ab-backdrop-opacity-dark: #{$backdrop-opacity-dark};
+  --s99ab-backdrop-under-flow: #{$backdrop-under-flow};
+  --s99ab-backdrop-drift: #{$backdrop-drift};
+  --s99ab-backdrop-bleed: #{$backdrop-bleed};
+
+  // --------------------------------------------------------------- menus ---
+  --s99ab-menu-row: #{$menu-row};
+  --s99ab-menu-pad-block: #{$menu-pad-block};
+  --s99ab-menu-prepend-w: #{$menu-prepend-w};
+  --s99ab-menu-size: #{$menu-size};
+
+  // ------------------------------------------------------------ explorer ---
+  --s99ab-tile-min: #{$tile-min};
+  --s99ab-tile-gap: #{$tile-gap};
+  --s99ab-tile-aspect: #{$tile-aspect};
+  --s99ab-tile-radius: #{$tile-radius};
+  --s99ab-tile-pad: #{$tile-pad};
+  --s99ab-tile-icon: #{$tile-icon};
+  --s99ab-tile-icon-item: #{$tile-icon-item};
+  --s99ab-tile-glyph: #{$tile-glyph};
+  --s99ab-tile-lines: #{$tile-lines};
+  --s99ab-tile-glyph-gap: #{$tile-glyph-gap};
+  --s99ab-tile-pick: #{$tile-pick};
+  --s99ab-tile-glyph-pad: #{$tile-glyph-pad};
+  --s99ab-tile-title: #{$tile-title};
+  --s99ab-tile-badge: #{$tile-badge};
+  --s99ab-tile-bar: #{$tile-bar};
+  --s99ab-tile-more: #{$tile-more};
+  --s99ab-tile-corner: #{$tile-corner};
+  --s99ab-tile-badge-pad: #{$tile-badge-pad};
+  --s99ab-tile-tint: #{$tile-tint};
+  --s99ab-tile-tint-target: #{$tile-tint-target};
+  --s99ab-tile-ring: #{$tile-ring};
+  --s99ab-tile-lift: #{$tile-lift};
+  --s99ab-tile-scrim: #{$tile-scrim};
+  --s99ab-tile-off: #{$tile-off};
+
+  // ------------------------------------------------------------ textures ---
+  // Knobs only. Each texture's mask, tile and weight are set in _textures.scss.
+  --s99ab-tex-gain: #{$tex-gain};
+  --s99ab-tex-scale: #{$tex-scale};
+  --s99ab-tex-ground: #{$tex-ground};
+  --s99ab-tex-chrome: #{$tex-chrome};
+  --s99ab-tex-well: #{$tex-well};
+  --s99ab-tex-overlay: #{$tex-overlay};
+  --s99ab-tex-port: #{$tex-port};
+}
+
+/* The stylesheet half of useFlow's `data-ground`: under the shader the washes
+   are scaled down, with no ground they are hidden. Both variants are set. */
+:root[data-ground='flow'] {
+  --s99ab-backdrop-opacity: calc(#{$backdrop-opacity} * #{$backdrop-under-flow});
+  --s99ab-backdrop-opacity-dark: calc(#{$backdrop-opacity-dark} * #{$backdrop-under-flow});
+}
+
+:root[data-ground='none'] {
+  --s99ab-backdrop-opacity: 0;
+  --s99ab-backdrop-opacity-dark: 0;
+}

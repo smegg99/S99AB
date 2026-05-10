@@ -1,0 +1,232 @@
+// web/src/styles/_states.scss
+//
+// What a screen shows instead of content: waiting, failed, empty. Uses the
+// toast's shell (tinted ground, hairline, kind-coloured icon, same type scale)
+// without the blur, since a state sits in an opaque well.
+
+.s99ab-state {
+  // Fallback for a state that names no kind.
+  --s99ab-state-kind: var(--v-theme-neutral);
+
+  // The first-line band, at the dense control height, so the icon, the title
+  // and a Retry or dismiss share one centreline. A wrapped message grows down.
+  --s99ab-state-lead: var(--s99ab-control-h-dense);
+
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s99ab-control-gap);
+  overflow: hidden;
+  padding: var(--s99ab-pad);
+  border: 1px solid rgb(var(--v-theme-edge));
+  border-radius: var(--s99ab-radius);
+  background: color-mix(in srgb, rgb(var(--s99ab-state-kind)) 10%, rgb(var(--v-theme-chrome)));
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-state--error { --s99ab-state-kind: var(--v-theme-error); }
+.s99ab-state--loading { --s99ab-state-kind: var(--v-theme-accent); }
+
+/// Centred, for a state that fills an empty region (a table's no-results
+/// block, a blank page). min-height, so a box without a height sizes to content.
+.s99ab-state--center {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding-block: calc(2 * var(--s99ab-pad));
+  text-align: center;
+
+  // No frame or ground: the state is the empty region.
+  border: 0;
+  background: none;
+}
+
+// The glyph is quieter than the message.
+.s99ab-state--center .s99ab-state__icon {
+  opacity: 0.5;
+}
+
+// Stacked and centred, the body does not stretch, or the text would sit at the
+// top of a centred box. No lead offset, since there is no control band.
+.s99ab-state--center .s99ab-state__body {
+  flex: 0 0 auto;
+}
+
+.s99ab-state--center .s99ab-state__title {
+  padding-block-start: 0;
+}
+
+/* One line tall with the glyph centred, so the icon matches the first line
+   whether the message wraps or not. */
+.s99ab-state__icon {
+  flex: 0 0 auto;
+  height: var(--s99ab-state-lead);
+  color: rgb(var(--s99ab-state-kind));
+}
+
+/* Sized from one token for every state. */
+.s99ab-state--center .s99ab-state__icon {
+  margin-block-start: 0;
+  margin-block-end: var(--s99ab-control-gap);
+  font-size: var(--s99ab-state-icon);
+  height: var(--s99ab-state-icon);
+  width: var(--s99ab-state-icon);
+}
+
+.s99ab-state__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-height: var(--s99ab-state-lead);
+  min-width: 0;
+}
+
+/* The same first-line offset as the toast message. */
+.s99ab-state__title {
+  padding-block-start: max(0px, calc((var(--s99ab-state-lead) - 1lh) / 2));
+  font-size: var(--s99ab-state-title-size);
+  font-weight: 650;
+  line-height: var(--s99ab-state-title-lh);
+}
+
+.s99ab-state__text {
+  // The toast's message measure.
+  margin: 0;
+  color: rgb(var(--v-theme-ink2));
+  font-size: 0.9rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/// Field codes from an error envelope; they do not wrap.
+.s99ab-state__details {
+  margin: var(--s99ab-control-gap) 0 0;
+  padding-inline-start: 1.1em;
+  color: rgb(var(--v-theme-ink2));
+  font-size: 0.86rem;
+}
+
+.s99ab-state__details code {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The action box is a row, so a state can offer two actions. */
+.s99ab-state__act {
+  display: flex;
+  flex: 0 0 auto;
+  align-self: center;
+  gap: var(--s99ab-control-gap);
+}
+
+.s99ab-state--center .s99ab-state__act {
+  margin-block-start: var(--s99ab-pad-tight);
+}
+
+// ------------------------------------------------------------------- goo ----
+
+// The merge geometry and filter are in Goo.vue.
+/* The default size. Goo's `size` prop lands as a width attribute, which an
+   explicit CSS width would override, so it is only stated here. */
+.s99ab-goo {
+  display: block;
+  overflow: visible;
+}
+
+.s99ab-goo:not([width]) {
+  width: var(--s99ab-goo-size);
+  height: calc(var(--s99ab-goo-size) / 2.5);
+}
+
+.s99ab-goo--dense:not([width]) {
+  width: var(--s99ab-goo-size-dense);
+  height: calc(var(--s99ab-goo-size-dense) / 2.5);
+}
+
+/* Inside a button, in em of the button's text so it follows `size`. Only the
+   height is set; the viewBox keeps the ratio. */
+.v-btn .s99ab-goo:not([width]) {
+  width: auto;
+  height: var(--s99ab-goo-size-btn);
+}
+
+/* The button's own ink, since a busy button is not a state. */
+.v-btn .s99ab-goo__ball {
+  fill: currentColor;
+}
+
+/* Centres the loader, which Vuetify positions absolutely and stretches. */
+.s99ab-btn__loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The fallback is needed: outside .s99ab-state the kind variable is undefined,
+   and an SVG with no fill renders black. */
+.s99ab-goo__ball {
+  fill: rgb(var(--s99ab-state-kind, var(--v-theme-ink3)));
+  transform-box: view-box;
+  transform-origin: center;
+  animation: s99ab-goo var(--s99ab-goo-period) ease-in-out infinite;
+}
+
+// Half a cycle apart, so they meet in the middle.
+.s99ab-goo__ball--b {
+  animation-name: s99ab-goo-b;
+}
+
+// Direction only; the distance comes from Goo.vue's geometry.
+@keyframes s99ab-goo {
+  0%,
+  100% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(var(--s99ab-goo-travel)) scale(0.78); }
+}
+
+@keyframes s99ab-goo-b {
+  0%,
+  100% { transform: translateX(0) scale(1); }
+  50% { transform: translateX(calc(-1 * var(--s99ab-goo-travel))) scale(0.78); }
+}
+
+// ------------------------------------------------------------- reduced ----
+
+// Movement stops; the balls keep a fade so the loader does not look finished.
+@media (prefers-reduced-motion: reduce) {
+  .s99ab-goo__ball {
+    animation: s99ab-state-breathe var(--s99ab-goo-period) ease-in-out infinite;
+  }
+}
+
+@keyframes s99ab-state-breathe {
+  0%,
+  100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+// -------------------------------------------------------------- skeleton ----
+
+/* Vuetify's skeleton on the layer's palette, using the same two knobs as
+   UiLoadingState's bars. */
+.v-skeleton-loader {
+  background: transparent;
+}
+
+.v-skeleton-loader .v-skeleton-loader__bone {
+  background: rgba(var(--v-theme-neutral), var(--s99ab-skeleton-rest));
+}
+
+/* Composite types wrap bones in a bone; only the leaves are painted. */
+.v-skeleton-loader .v-skeleton-loader__bone:has(.v-skeleton-loader__bone) {
+  background: transparent;
+}
+
+.v-skeleton-loader .v-skeleton-loader__bone::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(var(--v-theme-neutral), var(--s99ab-skeleton-peak)),
+    transparent
+  );
+}

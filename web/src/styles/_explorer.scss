@@ -1,0 +1,164 @@
+// web/src/styles/_explorer.scss
+//
+// The explorer's look. Colours are theme tokens.
+
+@use 'config' as *;
+@use 'sass:map';
+
+// One custom property per $folder-accents entry, generated so adding a colour
+// is one line in _config.scss.
+:root {
+@each $name, $rgb in $folder-accents {
+  --s99ab-accent-#{$name}: #{triplet($name)};
+}
+}
+
+// The fallback tint. :where() has no specificity, so data-accent always wins.
+:where(.s99ab-tile, .s99ab-explorer__crumb, .s99ab-explorer-ghost, .s99ab-swatch) {
+  --s99ab-tile-accent: var(--v-theme-accent);
+}
+
+@each $name, $rgb in $folder-accents {
+  [data-accent='#{$name}'] { --s99ab-tile-accent: var(--s99ab-accent-#{$name}); }
+}
+
+/* Fills its parent's box and scrolls inside. The parent must have a height, or
+   it collapses to its content. */
+.s99ab-explorer {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+/* The bar uses the shared strip height and insets. */
+.s99ab-explorer__bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--s99ab-control-gap);
+  min-height: var(--s99ab-strip-h);
+  padding: var(--s99ab-strip-pad-y) var(--s99ab-pad-tight);
+  background: rgb(var(--v-theme-chrome2));
+  border-bottom: 1px solid rgb(var(--v-theme-line));
+}
+
+.s99ab-explorer__scroll {
+  /* The rubber band is drawn here so it can start below the last tile. */
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s99ab-pad);
+  /* Reserved so the grid does not reflow when it becomes scrollable. */
+  scrollbar-gutter: stable;
+  /* A rubber band drag must not select text. */
+  user-select: none;
+}
+
+/* An empty folder centres its message in the space under the up tile.
+   .s99ab-state--center asks for 100% of this box, so the remainder is passed here. */
+.s99ab-explorer__scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+.s99ab-explorer__scroll > .s99ab-explorer__grid {
+  flex: 0 0 auto;
+}
+
+.s99ab-explorer__scroll > .s99ab-state--center {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* The path scrolls sideways and never wraps. The native scrollbar is hidden. */
+.s99ab-explorer__crumbs {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  /* Half a control gap, so the path reads as one run. */
+  gap: calc(var(--s99ab-control-gap) / 2);
+  min-width: 0;
+  /* Offsets the first crumb's padding so its label lines up with the panel title. */
+  margin-inline-start: calc(var(--s99ab-control-gap) * -1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.s99ab-explorer__crumbs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fades whichever end has hidden crumbs. #000 is an alpha stop in the mask. */
+.s99ab-explorer__crumbs--fade-start.s99ab-explorer__crumbs--fade-end {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--s99ab-pad),
+    #000 calc(100% - var(--s99ab-pad)),
+    transparent
+  );
+}
+
+.s99ab-explorer__crumbs--fade-start:not(.s99ab-explorer__crumbs--fade-end) {
+  mask-image: linear-gradient(to right, transparent, #000 var(--s99ab-pad));
+}
+
+.s99ab-explorer__crumbs--fade-end:not(.s99ab-explorer__crumbs--fade-start) {
+  mask-image: linear-gradient(to left, transparent, #000 var(--s99ab-pad));
+}
+
+.s99ab-explorer__crumb {
+  flex: 0 0 auto;
+  border-radius: var(--s99ab-radius);
+}
+
+.s99ab-explorer__crumb .v-btn {
+  min-width: 0;
+  /* The strip's dense control height, matching the action buttons. */
+  height: var(--s99ab-control-h);
+  padding-inline: var(--s99ab-control-gap);
+  /* Folder names keep their case. */
+  text-transform: none;
+}
+
+/* A tinted folder's crumb takes the tint. */
+.s99ab-explorer__crumb[data-accent] .v-btn {
+  color: rgb(var(--s99ab-tile-accent));
+}
+
+/* The current folder looks like a normal button but is not clickable. */
+.s99ab-explorer__crumb--current .v-btn {
+  pointer-events: none;
+}
+
+.s99ab-explorer__sep {
+  flex: 0 0 auto;
+  opacity: 0.4;
+}
+
+/* The actions never wrap. Height, gap and square icons come from .s99ab-controls. */
+.s99ab-explorer__actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+.s99ab-explorer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--s99ab-tile-min), 1fr));
+  gap: var(--s99ab-tile-gap);
+  align-content: start;
+}
+
+/* Above every tile, and inert so it does not take the pointer events it measures. */
+.s99ab-explorer__band {
+  position: absolute;
+  z-index: 4;
+  border: 1px solid rgb(var(--v-theme-accent));
+  background-color: rgba(var(--v-theme-accent), 0.12);
+  pointer-events: none;
+}
+

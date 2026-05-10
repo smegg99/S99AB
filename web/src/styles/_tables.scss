@@ -1,0 +1,93 @@
+// web/src/styles/_tables.scss
+//
+// Tables. The head is chrome, the body is the well, and the footer is a chrome
+// strip like a panel head.
+
+/* Same two planes a panel uses. */
+.v-table > .v-table__wrapper > table > thead > tr > th {
+  background: rgb(var(--v-theme-chrome2));
+  border-bottom: 1px solid rgb(var(--v-theme-line));
+  color: rgb(var(--v-theme-ink3));
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.v-table > .v-table__wrapper > table > tbody > tr > td {
+  border-bottom: 1px solid rgb(var(--v-theme-lineSoft));
+}
+
+
+/* The footer matches a panel head. Vuetify's 8px block padding is dropped so
+   the min-height applies. */
+.v-data-table-footer {
+  min-height: var(--s99ab-strip-h);
+  padding: var(--s99ab-strip-pad-y) var(--s99ab-strip-pad-x);
+}
+
+/* Pager arrows squared to the strip's control height, since an icon button
+   takes its box from --v-btn-height. */
+.v-data-table-footer .v-btn--icon {
+  height: var(--s99ab-control-h);
+}
+
+/* The per-page select is drawn as a menu trigger: value and chevron, with the
+   outline shown on hover. */
+.v-data-table-footer .v-field--variant-outlined .v-field__outline {
+  --v-field-border-width: 0;
+  --v-field-border-opacity: 0;
+}
+
+.v-data-table-footer .v-field {
+  border-radius: var(--s99ab-radius);
+  transition: background-color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+.v-data-table-footer .v-field:hover,
+.v-data-table-footer .v-field--focused {
+  background: rgba(var(--v-theme-on-surface), 0.06);
+}
+
+.v-data-table-footer .v-field__append-inner {
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* A steady table reserves a full page of rows so the footer does not move
+   between pages. A floor, from Vuetify's density variables. */
+.s99ab-table--steady .v-table__wrapper {
+  min-height: calc(
+    var(--v-table-header-height) + var(--s99ab-table-rows, 0) * var(--v-table-row-height)
+  );
+
+  /* Animates the height change when the page size drops. */
+  transition: min-height var(--s99ab-motion-slow) var(--s99ab-motion-easing);
+}
+
+/* An empty table's message cell takes the height of a full page of rows. */
+.s99ab-table--steady .v-data-table-rows-no-data > td {
+  height: calc(var(--s99ab-table-rows, 0) * var(--v-table-row-height));
+  transition: height var(--s99ab-motion-slow) var(--s99ab-motion-easing);
+}
+
+/* The state is positioned against the cell, because a percentage height inside
+   a table cell does not resolve. The floor covers tables with no reserve. */
+.v-data-table-rows-no-data > td {
+  position: relative;
+  min-height: calc(4 * var(--v-table-row-height));
+}
+
+.v-data-table-rows-no-data > td > .s99ab-state--center {
+  position: absolute;
+  inset: 0;
+}
+
+/* No rule under the last row of an empty table. */
+.v-data-table-rows-no-data > td {
+  border-bottom: none;
+}
+
+/* No hover wash on the empty-state row. */
+.v-table.v-table--hover > .v-table__wrapper > table > tbody > tr.v-data-table-rows-no-data:hover > td::after {
+  content: none;
+}

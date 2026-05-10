@@ -1,0 +1,81 @@
+// web/src/styles/_fields.scss
+//
+// Fields. Vuetify's outline is currentColor at 0.38 opacity, too faint on these
+// grounds, so it gets its own colour at full opacity.
+
+/* One custom property per outline and label state, so an app retunes a state
+   without out-specifying a selector. `edge` because `line` is too faint at
+   control size. */
+.v-field {
+  --s99ab-field-line: rgb(var(--v-theme-edge));
+  --s99ab-field-line-hover: rgb(var(--v-theme-ink3));
+  --s99ab-field-line-focus: rgb(var(--v-theme-accent));
+  --s99ab-field-line-error: rgb(var(--v-theme-error));
+
+  /* An invalid field stays red on hover, mixed toward the ink so the step is
+     visible on both variants. The ratio is --s99ab-field-error-hover-mix. */
+  --s99ab-field-line-error-hover: color-mix(
+    in srgb,
+    rgb(var(--v-theme-error)) var(--s99ab-field-error-hover-mix),
+    rgb(var(--v-theme-ink))
+  );
+
+  /* Full strength in both cases: the label is text. */
+  --s99ab-field-label-focus: rgb(var(--v-theme-accent));
+  --s99ab-field-label-error: rgb(var(--v-theme-error));
+}
+
+/* Colour changes follow the motion token and stop when motion is off. */
+.v-field__outline,
+.v-field .v-label {
+  transition: color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+.v-field__outline {
+  --v-field-border-opacity: 1;
+
+  color: var(--s99ab-field-line);
+}
+
+/* Vuetify's hover raises an opacity that is already 1, so the step comes from colour. */
+.v-field:hover .v-field__outline {
+  color: var(--s99ab-field-line-hover);
+}
+
+.v-field--focused .v-field__outline,
+.v-field--focused:hover .v-field__outline {
+  color: var(--s99ab-field-line-focus);
+}
+
+.v-field--focused .v-label {
+  color: var(--s99ab-field-label-focus);
+}
+
+/* Error outranks hover and focus, so each pair is spelled out to carry both classes. */
+.v-input--error .v-field .v-field__outline {
+  color: var(--s99ab-field-line-error);
+}
+
+.v-input--error .v-field .v-label,
+.v-input--error .v-field--focused .v-label {
+  color: var(--s99ab-field-label-error);
+}
+
+.v-input--error .v-field:hover .v-field__outline,
+.v-input--error .v-field--focused .v-field__outline,
+.v-input--error .v-field--focused:hover .v-field__outline {
+  color: var(--s99ab-field-line-error-hover);
+}
+
+/* Clearance between stacked inputs. An outlined field's floating label sits
+   above its box and Vuetify reserves no room for it. */
+:where(.v-input) + :where(.v-input) {
+  margin-block-start: var(--s99ab-gap);
+}
+
+/* The search box, at the width _controls.scss gives a field in a control row.
+   min-width 0 lets a flex row shrink it. */
+.s99ab-search {
+  width: var(--s99ab-field-w);
+  min-width: 0;
+}

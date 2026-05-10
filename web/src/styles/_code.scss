@@ -1,0 +1,24 @@
+// web/src/styles/_code.scss
+//
+// Inline and block code, without a box that competes with the surrounding text.
+
+code:not(pre code) {
+  padding: 0.1em 0.36em;
+  border: 1px solid rgba(var(--v-theme-line), 0.5);
+  border-radius: 2px;
+  background: rgba(var(--v-theme-well), 0.55);
+  color: rgb(var(--v-theme-ink2));
+  font-size: 0.88em;
+}
+
+pre {
+  margin: 0;
+  padding: var(--s99ab-pad-tight) var(--s99ab-pad);
+  overflow-x: auto;
+  border: 1px solid rgb(var(--v-theme-lineSoft));
+  border-radius: var(--s99ab-radius);
+  background: rgb(var(--v-theme-well));
+  color: rgb(var(--v-theme-ink2));
+  font-size: 0.84rem;
+  line-height: 1.55;
+}

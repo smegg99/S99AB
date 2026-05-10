@@ -1,0 +1,64 @@
+# contracts/probe.yaml
+#
+# Probe document: `just contracts` checks the shared fragments resolve, bundle
+# and lint.
+
+openapi: 3.1.0
+
+info:
+  title: s99ab contract probe
+  version: 1.0.0
+  description: Compile target for the shared fragments. Never served.
+
+servers:
+  - url: https://example.invalid/api/v1
+
+security: []
+
+paths:
+  /items:
+    get:
+      summary: List items
+      operationId: listItems
+      description: Exercises the shared pagination parameters and page shape.
+      parameters:
+        - $ref: "./parameters/pagination.yaml#/Page"
+        - $ref: "./parameters/pagination.yaml#/Limit"
+        - $ref: "./parameters/pagination.yaml#/Sort"
+        - $ref: "./parameters/pagination.yaml#/Query"
+      responses:
+        "200":
+          description: A page of items.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ItemPage" }
+        "422":
+          description: Invalid query.
+          content:
+            application/json:
+              schema: { $ref: "./schemas/error.yaml#/Error" }
+        default:
+          description: Any other failure, same envelope.
+          content:
+            application/json:
+              schema: { $ref: "./schemas/error.yaml#/Error" }
+
+components:
+  schemas:
+    Item:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+
+    # PageBase supplies total; the app supplies typed items.
+    ItemPage:
+      allOf:
+        - $ref: "./schemas/pagination.yaml#/PageBase"
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Item" }

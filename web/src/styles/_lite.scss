@@ -1,0 +1,25 @@
+// web/src/styles/_lite.scss
+//
+// Lite mode: drops backdrop blur, the washed ground, textures and drift for
+// low-power GPUs and WebKitGTK. Colours are unchanged. Opt in with
+// `s99ab.performance.lite`; the plugin sets `data-s99ab-lite` before first paint.
+:root[data-s99ab-lite] {
+  // No blur, and opaque chrome.
+  --s99ab-glass: none;
+  --s99ab-glass-chrome: 100%;
+
+  // Opaque content slabs.
+  --s99ab-tex-port: 100%;
+
+  // A solid background token instead of the washed ground.
+  --s99ab-backdrop-opacity: 0;
+  --s99ab-backdrop-opacity-dark: 0;
+
+  // No texture masks.
+  --s99ab-tex-gain: 0;
+}
+
+// Stop the drift even if the backdrop element is still mounted.
+:root[data-s99ab-lite] .s99ab-backdrop {
+  animation: none;
+}

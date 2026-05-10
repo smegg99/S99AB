@@ -1,0 +1,89 @@
+// web/src/styles/_markdown.scss
+//
+// Prose emitted by the markdown renderer, used by UiMarkdown in any context.
+
+/* Prose is held to a measure. */
+.s99ab-md {
+  max-width: var(--s99ab-measure);
+  line-height: 1.6;
+}
+
+.s99ab-md > :first-child {
+  margin-top: 0;
+}
+
+.s99ab-md p,
+.s99ab-md__list {
+  margin: 0 0 0.8em;
+  color: rgb(var(--v-theme-ink2));
+  font-size: 0.92rem;
+}
+
+/* Two heading levels: a heading, and a label for sections inside it. The
+   ancestor class is needed to out-specify _type.scss's `.v-application h1..h4`. */
+.s99ab-md .s99ab-md__heading {
+  margin: 1.5em 0 0.5em;
+  color: rgb(var(--v-theme-ink));
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+  line-height: 1.25;
+}
+
+.s99ab-md .s99ab-md__heading--label {
+  margin-top: 1.8em;
+  color: rgb(var(--v-theme-ink3));
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* A bold run leading a line ("Linux x86_64:") is a label and takes the brighter ink. */
+.s99ab-md strong {
+  color: rgb(var(--v-theme-ink));
+  font-weight: 650;
+}
+
+.s99ab-md__list {
+  padding-inline-start: 1.2em;
+}
+
+.s99ab-md__list li {
+  margin-bottom: 0.3em;
+}
+
+.s99ab-md__list li::marker {
+  color: rgb(var(--v-theme-accent));
+}
+
+.s99ab-md__pre {
+  margin: 0 0 0.85em;
+  padding: var(--s99ab-pad-tight) var(--s99ab-pad);
+  overflow-x: auto;
+  border: 1px solid rgb(var(--v-theme-lineSoft));
+  border-radius: var(--s99ab-radius);
+  background: rgb(var(--v-theme-well));
+  font-family: var(--s99ab-font-mono);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.s99ab-md__pre code {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+/* Indented and tinted, without an accent bar down the left edge. */
+.s99ab-md__quote {
+  margin: 0 0 0.85em;
+  padding: var(--s99ab-pad-tight) var(--s99ab-pad);
+  border-radius: var(--s99ab-radius);
+  background: rgba(var(--v-theme-on-surface), 0.04);
+  color: rgb(var(--v-theme-ink2));
+}
+
+.s99ab-md a {
+  color: rgb(var(--v-theme-accent));
+}

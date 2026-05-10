@@ -1,0 +1,92 @@
+// web/src/styles/_type.scss
+//
+// The family, body size, heading scale and the two label forms.
+
+html,
+body,
+.v-application {
+  font-family: var(--s99ab-font-sans);
+}
+
+/* 15.5px, in rem so the browser font setting still scales it. */
+.v-application {
+  font-size: var(--s99ab-font-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+code,
+kbd,
+pre,
+samp,
+.text-mono,
+.font-mono {
+  font-family: var(--s99ab-font-mono);
+}
+
+/* Redrawn digits (counters, timings, sizes) keep a fixed width. */
+.text-num,
+.num,
+.v-data-table td,
+.v-list-item__append .v-chip {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The heading scale. Tracking tightens as size goes up. */
+.v-application h1,
+.v-application h2,
+.v-application h3,
+.v-application h4 {
+  color: rgb(var(--v-theme-ink));
+  line-height: 1.18;
+  font-weight: 650;
+}
+
+.v-application h1 {
+  font-size: clamp(1.5rem, 2.6vw, 1.85rem);
+  letter-spacing: -0.022em;
+}
+
+.v-application h2 {
+  font-size: 1.32rem;
+  letter-spacing: -0.016em;
+}
+
+.v-application h3 {
+  font-size: 1.08rem;
+  letter-spacing: -0.008em;
+  font-weight: 600;
+}
+
+.v-application h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Small tracked capitals for a panel head or section label. Vuetify's
+   .text-overline is 0.75rem/2 with looser tracking. */
+.s99ab-eyebrow {
+  display: block;
+  color: rgb(var(--v-theme-ink3));
+  font-size: var(--s99ab-label-size);
+  font-weight: 700;
+  letter-spacing: var(--s99ab-label-track);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* Text drawn directly on the ground, which an app can make arbitrarily busy:
+   full-strength ink, including descendants that set a quieter one. */
+.s99ab-on-ground,
+.s99ab-on-ground .s99ab-eyebrow {
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-measure {
+  max-width: var(--s99ab-measure);
+}
+
+.text-break-all {
+  word-break: break-all;
+}

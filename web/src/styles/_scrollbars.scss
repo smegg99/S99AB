@@ -1,0 +1,29 @@
+// web/src/styles/_scrollbars.scss
+//
+// Thin scrollbars, drawn in the ink at low alpha so they work on either variant.
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--v-theme-neutral), 0.4) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: rgba(var(--v-theme-neutral), 0.4);
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--v-theme-neutral), 0.65);
+  background-clip: content-box;
+}

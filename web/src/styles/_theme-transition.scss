@@ -1,0 +1,192 @@
+// web/src/styles/_theme-transition.scss
+//
+// Animated appearance change. Each shape is a clip-path over the two snapshots
+// the browser takes; the new snapshot already has the new colours, so one rule
+// serves both directions.
+
+/* Off by default, since Chrome cross-fades the root on every theme change. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-name: none;
+
+  /* Hold the last frame, or the clip reverts to unclipped before teardown.
+     Longhand only: the `animation` shorthand resets fill-mode. */
+  animation-fill-mode: both;
+  /* Stacked instead of the default `plus-lighter` blend. */
+  mix-blend-mode: normal;
+}
+
+/* The cover sheet: an ordinary element scaled up, which Chromium runs on the
+   compositor. `bg` resolves live, so the change happens on its face. See runCover. */
+.s99ab-vt-cover {
+  position: fixed;
+  z-index: var(--s99ab-vt-cover-z);
+  background: rgb(var(--v-theme-bg));
+  pointer-events: none;
+  /* Keeps one layer for the whole animation. */
+  will-change: transform, opacity;
+  /* Keeps its layout box from growing the scroll region. */
+  contain: strict;
+}
+
+/* Exactly the viewport. Used by `veil` and the wipes. */
+.s99ab-vt-cover--sheet {
+  inset: 0;
+}
+
+/* Seeded small and scaled up; runCover sets its box. */
+.s99ab-vt-cover--disc {
+  border-radius: 50%;
+}
+
+/* Layer promotion hint for clip-path shapes. It does not make the animation
+   composited; the cover shapes are for that. */
+:root[data-s99ab-vt='circle']::view-transition-new(root),
+:root[data-s99ab-vt='circle-in']::view-transition-old(root),
+:root[data-s99ab-vt^='sweep']::view-transition-new(root),
+:root[data-s99ab-vt='split']::view-transition-new(root) {
+  will-change: clip-path;
+}
+
+/* Opens from the button over a static old screen. */
+:root[data-s99ab-vt='circle']::view-transition-old(root) {
+  animation-name: none;
+  z-index: 0;
+}
+
+:root[data-s99ab-vt='circle']::view-transition-new(root) {
+  z-index: 1;
+  animation-name: s99ab-vt-circle;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+/* Both radii are lengths: `farthest-corner` is invalid in circle() and keywords
+   do not interpolate. The end radius is measured in JS. */
+@keyframes s99ab-vt-circle {
+  from { clip-path: circle(0 at var(--s99ab-vt-x) var(--s99ab-vt-y)); }
+  to { clip-path: circle(var(--s99ab-vt-r) at var(--s99ab-vt-x) var(--s99ab-vt-y)); }
+}
+
+/* The old appearance shrinks onto the point. */
+:root[data-s99ab-vt='circle-in']::view-transition-new(root) {
+  animation-name: none;
+  z-index: 0;
+}
+
+:root[data-s99ab-vt='circle-in']::view-transition-old(root) {
+  z-index: 1;
+  animation-name: s99ab-vt-circle-in;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+@keyframes s99ab-vt-circle-in {
+  from { clip-path: circle(var(--s99ab-vt-r) at var(--s99ab-vt-x) var(--s99ab-vt-y)); }
+  to { clip-path: circle(0 at var(--s99ab-vt-x) var(--s99ab-vt-y)); }
+}
+
+/* The blinds: an inset() strip growing from one edge. */
+:root[data-s99ab-vt^='sweep']::view-transition-old(root) {
+  animation-name: none;
+  z-index: 0;
+}
+
+:root[data-s99ab-vt^='sweep']::view-transition-new(root) {
+  z-index: 1;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+:root[data-s99ab-vt='sweep']::view-transition-new(root) { animation-name: s99ab-vt-sweep-down; }
+:root[data-s99ab-vt='sweep-up']::view-transition-new(root) { animation-name: s99ab-vt-sweep-up; }
+
+/* Start and end follow the writing direction; inset() is physical, so rtl swaps the pair. */
+:root[data-s99ab-vt='sweep-start']::view-transition-new(root) { animation-name: s99ab-vt-sweep-ltr; }
+:root[data-s99ab-vt='sweep-end']::view-transition-new(root) { animation-name: s99ab-vt-sweep-rtl; }
+
+:root:dir(rtl)[data-s99ab-vt='sweep-start']::view-transition-new(root) { animation-name: s99ab-vt-sweep-rtl; }
+:root:dir(rtl)[data-s99ab-vt='sweep-end']::view-transition-new(root) { animation-name: s99ab-vt-sweep-ltr; }
+
+@keyframes s99ab-vt-sweep-down {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes s99ab-vt-sweep-up {
+  from { clip-path: inset(100% 0 0 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes s99ab-vt-sweep-ltr {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
+}
+
+@keyframes s99ab-vt-sweep-rtl {
+  from { clip-path: inset(0 0 0 100%); }
+  to { clip-path: inset(0); }
+}
+
+/* Opens outward from the middle line. */
+:root[data-s99ab-vt='split']::view-transition-old(root) {
+  animation-name: none;
+  z-index: 0;
+}
+
+:root[data-s99ab-vt='split']::view-transition-new(root) {
+  z-index: 1;
+  animation-name: s99ab-vt-split;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+@keyframes s99ab-vt-split {
+  from { clip-path: inset(0 50% 0 50%); }
+  to { clip-path: inset(0); }
+}
+
+/* The fade, which `reduced` resolves every shape to. Both layers animate. */
+:root[data-s99ab-vt='fade']::view-transition-old(root) {
+  animation-name: s99ab-vt-out;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+:root[data-s99ab-vt='fade']::view-transition-new(root) {
+  animation-name: s99ab-vt-in;
+  animation-duration: var(--s99ab-vt-duration);
+  animation-timing-function: var(--s99ab-vt-easing);
+}
+
+@keyframes s99ab-vt-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes s99ab-vt-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Wide enough for the longest name. */
+.s99ab-transition-picker {
+  min-width: 12rem;
+}
+
+/* `none`: transitions are held for one frame while the new colours apply.
+   The ripple is excluded, since freezing its transitions leaves a static blob. */
+:root[data-s99ab-vt-instant] *:not(.v-ripple__animation),
+:root[data-s99ab-vt-instant] *:not(.v-ripple__animation)::before,
+:root[data-s99ab-vt-instant] *:not(.v-ripple__animation)::after {
+  transition: none !important;
+}
+
+/* The OS setting wins, including one changed after load and transitions the
+   layer did not start. */
+@media (prefers-reduced-motion: reduce) {
+  :root[data-s99ab-vt]::view-transition-old(root),
+  :root[data-s99ab-vt]::view-transition-new(root) {
+    animation-duration: 1ms;
+  }
+}

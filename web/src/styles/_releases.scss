@@ -1,0 +1,109 @@
+// web/src/styles/_releases.scss
+//
+// The download card and the changelog. Colours are theme tokens only.
+
+/* ------------------------------------------------------ download card ---- */
+
+/* A chrome strip, the same height as a panel head and the tabs under it. It is
+   also listed in _strips.scss, which makes its controls dense. */
+.s99ab-downloads__head {
+  min-height: var(--s99ab-strip-h);
+  padding: var(--s99ab-strip-pad-y) var(--s99ab-pad-tight);
+  background: rgb(var(--v-theme-sunk));
+  border-bottom: 1px solid rgb(var(--v-theme-line));
+}
+
+.s99ab-downloads__version {
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.s99ab-downloads__tabs {
+  background: rgb(var(--v-theme-sunk));
+  border-bottom: 1px solid rgb(var(--v-theme-line));
+}
+
+/* Four platforms do not fit a phone: v-tabs scrolls, and this keeps words from breaking. */
+.s99ab-downloads__tabs .v-tab {
+  min-width: auto;
+}
+
+/* A label for the detected system; clicking it must not select a tab. */
+.s99ab-downloads__sys {
+  pointer-events: none;
+}
+
+.s99ab-downloads__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--s99ab-control-gap);
+}
+
+/* ---------------------------------------------------------- asset row ---- */
+
+.s99ab-asset {
+  display: flex;
+  align-items: center;
+  gap: var(--s99ab-gap);
+  padding: var(--s99ab-pad-tight);
+  border: 1px solid transparent;
+  border-radius: var(--s99ab-radius);
+}
+
+.s99ab-asset:hover {
+  background: rgba(var(--v-theme-on-surface), 0.03);
+}
+
+/* The format offered first for this platform. Tinted, so it does not compete with the button. */
+.s99ab-asset--primary {
+  background: rgba(var(--v-theme-accent), 0.07);
+  border-color: rgba(var(--v-theme-accent), 0.25);
+}
+
+.s99ab-asset__text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* A filename is long and has no spaces to break at. */
+.s99ab-asset__file {
+  word-break: break-all;
+  line-height: 1.3;
+}
+
+/* Quiet next to the download button. */
+.s99ab-asset__digest {
+  align-self: flex-start;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+}
+
+/* ----------------------------------------------------------- changelog ---- */
+
+.s99ab-changelog__entry + .s99ab-changelog__entry {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgb(var(--v-theme-lineSoft));
+}
+
+/* Version and date on one baseline, with the date quiet so versions are easy to scan. */
+.s99ab-changelog__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s99ab-control-gap);
+  margin-bottom: var(--s99ab-pad-tight);
+}
+
+.s99ab-changelog__version {
+  font-size: 1.15rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}

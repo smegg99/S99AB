@@ -1,0 +1,22 @@
+# i18n/locales/en/error.yaml
+
+unknown:
+  value: "Something went wrong."
+  description: "Fallback when a thrown value carries no error envelope"
+
+# httpmw and apierr emit these four. A library declares the keys it emits, or
+# every app has to discover them from a raw key in a dialog.
+
+rateLimited:
+  value: "Too many requests. Wait a moment and try again."
+
+requestTooLarge:
+  value: "That request is too large."
+
+badRequest:
+  value: "The request could not be read."
+
+internal:
+  value: "Something went wrong on our side."
+  description: "What apierr.Cause turns an unmapped error into: 500, with the real
+    cause kept off the wire"

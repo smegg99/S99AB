@@ -1,0 +1,214 @@
+// web/src/styles/_textures.scss
+//
+// A texture is an SVG mask over a flat fill of one theme token. A mask carries
+// only alpha, so both variants and any accent apply; an SVG image cannot read
+// custom properties. Textures are static. The files are in public/textures,
+// with drawing rules in its README.
+
+@use 'sass:map';
+@use 'config' as *;
+
+/// The catalogue. `tile` is the natural square size before --s99ab-tex-scale,
+/// `weight` normalises strength around 1, `repeat` is `no-repeat` for a texture
+/// that scales to the surface. Must match public/textures and
+/// src/composables/appearance/useTexture.ts; three tests check it.
+$textures: (
+  // Grain: turbulence, with no geometry.
+  'grain': (tile: 180px, weight: 1.3, repeat: repeat),
+  'paper': (tile: 220px, weight: 1.2, repeat: repeat),
+  'static': (tile: 120px, weight: 0.9, repeat: repeat),
+
+  // Print: halftone and press effects on a flat tone.
+  'newsprint': (tile: 4px, weight: 1.1, repeat: repeat),
+  'halftone': (tile: 10px, weight: 0.9, repeat: repeat),
+  'riso': (tile: 12px, weight: 0.9, repeat: repeat),
+
+  // Line: low weights, since a hairline reads stronger than its coverage.
+  'hatch': (tile: 6px, weight: 0.9, repeat: repeat),
+  'crosshatch': (tile: 8px, weight: 0.8, repeat: repeat),
+  'pinstripe': (tile: 5px, weight: 0.9, repeat: repeat),
+  'scanline': (tile: 3px, weight: 0.9, repeat: repeat),
+  'corduroy': (tile: 8px, weight: 1.0, repeat: repeat),
+  'engrave': (tile: 10px, weight: 0.9, repeat: repeat),
+  'bars': (tile: 24px, weight: 0.5, repeat: repeat),
+  'wave': (tile: 32px, weight: 0.9, repeat: repeat),
+  'zigzag': (tile: 16px, weight: 0.8, repeat: repeat),
+  // Broken strokes at a steep angle; sparser, so weighted higher.
+  'rain': (tile: 40px, weight: 1.2, repeat: repeat),
+
+  // Grid.
+  'dots': (tile: 16px, weight: 1.1, repeat: repeat),
+  'grid': (tile: 16px, weight: 0.9, repeat: repeat),
+  'graph': (tile: 100px, weight: 0.9, repeat: repeat),
+  'crosses': (tile: 24px, weight: 1.0, repeat: repeat),
+  'ticks': (tile: 32px, weight: 1.1, repeat: repeat),
+  'mesh': (tile: 12px, weight: 0.9, repeat: repeat),
+  'perforate': (tile: 16px, weight: 0.9, repeat: repeat),
+
+  // Geometric shapes.
+  'check': (tile: 12px, weight: 0.45, repeat: repeat),
+) !default;
+
+/// The four planes and the surfaces each covers. `placed` lists surfaces that
+/// position themselves and must not be given a position.
+$tex-planes: (
+  'ground': (placed: ('.s99ab-backdrop')),
+  'chrome': (
+    selectors: (
+      '.panel__head', '.panel__foot', '.table__top',
+      '.s99ab-explorer__bar',
+      '.v-data-table-footer', '.v-toolbar__content',
+    ),
+    placed: ('.s99ab-glass'),
+  ),
+  'well': (selectors: ('.s99ab-slab', '.s99ab-tile', '.s99ab-downloads__card')),
+  // Vuetify places menu content at a computed offset, so it must not get a position.
+  'overlay': (
+    selectors: ('.v-overlay .v-card'),
+    placed: ('.v-menu > .v-overlay__content'),
+  ),
+) !default;
+
+:root {
+  /* A theme token, so the ink follows the variant and accent. */
+  --s99ab-tex-ink: rgb(var(--v-theme-ink));
+}
+
+/* The texture is read through var() fallbacks at the point of use, never
+   declared on :root, which would beat these zero-specificity :where() rules.
+   Values are literal: a var() inside a custom property freezes where declared.
+   The attribute selects app-wide, the class for one subtree. */
+@each $name, $spec in $textures {
+  :where(:root[data-texture='#{$name}']) {
+    --s99ab-tex-mask: url('#{$tex-base}#{$name}.svg');
+    --s99ab-tex-tile: #{map.get($spec, tile)};
+    --s99ab-tex-weight: #{map.get($spec, weight)};
+    --s99ab-tex-repeat: #{map.get($spec, repeat)};
+  }
+}
+
+/* The catalogue as a class. It writes separate local names, read first, so a
+   component override beats any plane attribute. */
+@each $name, $spec in $textures {
+  .s99ab-tex--#{$name} {
+    --s99ab-tex-local-mask: url('#{$tex-base}#{$name}.svg');
+    --s99ab-tex-local-tile: #{map.get($spec, tile)};
+    --s99ab-tex-local-weight: #{map.get($spec, weight)};
+    --s99ab-tex-local-repeat: #{map.get($spec, repeat)};
+  }
+}
+
+/* The catalogue once per plane, so a texture belongs to a kind of surface. The
+   values are restated per plane because a var() reference would resolve at :root. */
+@each $plane, $ignored in $tex-planes {
+  @each $name, $spec in $textures {
+    :where(:root[data-tex-#{$plane}='#{$name}']) {
+      --s99ab-tex-#{$plane}-mask: url('#{$tex-base}#{$name}.svg');
+      --s99ab-tex-#{$plane}-tile: #{map.get($spec, tile)};
+      --s99ab-tex-#{$plane}-weight: #{map.get($spec, weight)};
+      --s99ab-tex-#{$plane}-repeat: #{map.get($spec, repeat)};
+    }
+  }
+}
+
+/* The layer a plane wears: absolute so it stays out of flow, z-index 0 with
+   the content lifted. Falls back from the plane's texture to the global one. */
+@mixin tex-layer($plane, $position: relative) {
+  @if $position {
+    position: $position;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    /* The plane sets its own texture and ink, each falling back to the global
+       value. Both size dimensions are given, since an SVG image has no intrinsic
+       size. Resolved on this element, not :root. */
+    --s99ab-tex-tile-now:
+      var(--s99ab-tex-local-tile, var(--s99ab-tex-#{$plane}-tile, var(--s99ab-tex-tile, 0px)));
+
+    --s99ab-tex-size:
+      calc(var(--s99ab-tex-tile-now) * var(--s99ab-tex-scale))
+      calc(var(--s99ab-tex-tile-now) * var(--s99ab-tex-scale));
+
+    background: var(--s99ab-tex-ink);
+
+    /* Prefixed too, for WebKitGTK. */
+    -webkit-mask-image: var(--s99ab-tex-local-mask, var(--s99ab-tex-#{$plane}-mask, var(--s99ab-tex-mask, none)));
+    mask-image: var(--s99ab-tex-local-mask, var(--s99ab-tex-#{$plane}-mask, var(--s99ab-tex-mask, none)));
+    -webkit-mask-size: var(--s99ab-tex-size);
+    mask-size: var(--s99ab-tex-size);
+    -webkit-mask-repeat: var(--s99ab-tex-local-repeat, var(--s99ab-tex-#{$plane}-repeat, var(--s99ab-tex-repeat, repeat)));
+    mask-repeat: var(--s99ab-tex-local-repeat, var(--s99ab-tex-#{$plane}-repeat, var(--s99ab-tex-repeat, repeat)));
+
+    opacity: calc(
+      var(--s99ab-tex-#{$plane})
+      * var(--s99ab-tex-local-weight, var(--s99ab-tex-#{$plane}-weight, var(--s99ab-tex-weight, 1)))
+      * var(--s99ab-tex-gain)
+    );
+  }
+}
+
+/* The planes. `placed` surfaces get no position: these unlayered rules would
+   override Vuetify's fixed, layout and computed positions. */
+@each $plane, $spec in $tex-planes {
+  $own: map.get($spec, selectors);
+  $placed: map.get($spec, placed);
+
+  @if $own {
+    #{$own} {
+      @include tex-layer($plane, relative);
+    }
+  }
+
+  @if $placed {
+    #{$placed} {
+      @include tex-layer($plane, null);
+    }
+  }
+}
+
+/* Children of a textured plane are positioned, so they paint above the ::before
+   layer instead of under it. */
+.s99ab-slab > *,
+.panel__head > *,
+.panel__foot > *,
+.table__top > *,
+.s99ab-explorer__bar > *,
+.v-data-table-footer > *,
+.v-toolbar__content > *,
+.s99ab-tile > *,
+.s99ab-downloads__card > *,
+.v-overlay .v-card > *,
+.v-menu > .v-overlay__content > * {
+  position: relative;
+}
+
+/* A slab as a window: the well goes translucent and the blur shows the ground
+   through it. */
+.s99ab-port {
+  background: color-mix(in srgb, rgb(var(--v-theme-well)) var(--s99ab-tex-port), transparent);
+  backdrop-filter: var(--s99ab-glass);
+}
+
+/* High contrast turns textures off. */
+:root[data-contrast='high'] {
+  --s99ab-tex-gain: 0;
+}
+
+/* And makes port surfaces opaque again; port mode spends the ground's opacity,
+   so a gain of zero does not cover it. */
+:root[data-contrast='high'] .s99ab-port {
+  background: rgb(var(--v-theme-well));
+  backdrop-filter: none;
+}
+
+@media print {
+  :root {
+    --s99ab-tex-gain: 0;
+  }
+}

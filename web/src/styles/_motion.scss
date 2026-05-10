@@ -1,0 +1,145 @@
+// web/src/styles/_motion.scss
+//
+// The transition classes UiMotion renders. Timings and distances are $motion-*
+// and $swap-* in _config.scss. The reduced level sets --s99ab-motion-travel to 0.
+
+.motion-fade-enter-active { transition: opacity var(--s99ab-motion-base) var(--s99ab-motion-enter); }
+.motion-fade-leave-active { transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-exit); }
+.motion-fade-enter-from,
+.motion-fade-leave-to { opacity: 0; }
+
+.motion-slide-up-enter-active,
+.motion-slide-up-move { transition: opacity var(--s99ab-motion-base) var(--s99ab-motion-enter), transform var(--s99ab-motion-base) var(--s99ab-motion-enter); }
+.motion-slide-up-leave-active { transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-exit), transform var(--s99ab-motion-fast) var(--s99ab-motion-exit); }
+.motion-slide-up-enter-from,
+.motion-slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(calc(var(--s99ab-motion-shift) * var(--s99ab-motion-travel) * var(--s99ab-motion-dir)));
+}
+
+.motion-slide-end-enter-active { transition: opacity var(--s99ab-motion-base) var(--s99ab-motion-enter), transform var(--s99ab-motion-base) var(--s99ab-motion-enter); }
+.motion-slide-end-leave-active { transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-exit), transform var(--s99ab-motion-fast) var(--s99ab-motion-exit); }
+.motion-slide-end-enter-from,
+.motion-slide-end-leave-to {
+  opacity: 0;
+  transform: translateX(calc(var(--s99ab-motion-shift-x) * var(--s99ab-motion-travel) * var(--s99ab-motion-dir)));
+}
+
+.motion-scale-enter-active { transition: opacity var(--s99ab-motion-base) var(--s99ab-motion-enter), transform var(--s99ab-motion-base) var(--s99ab-motion-enter); }
+.motion-scale-leave-active { transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-exit), transform var(--s99ab-motion-fast) var(--s99ab-motion-exit); }
+.motion-scale-enter-from,
+.motion-scale-leave-to {
+  opacity: 0;
+  transform: scale(calc(1 - var(--s99ab-motion-scale) * var(--s99ab-motion-travel)));
+}
+
+/* One thing replacing another in place. Slower, and asymmetric: the old leaves
+   quickly, the new arrives slowly. */
+.motion-swap-enter-active { transition: opacity var(--s99ab-swap-in) var(--s99ab-motion-enter), transform var(--s99ab-swap-in) var(--s99ab-motion-enter); }
+.motion-swap-leave-active { transition: opacity var(--s99ab-swap-out) var(--s99ab-motion-exit), transform var(--s99ab-swap-out) var(--s99ab-motion-exit); }
+.motion-swap-enter-from,
+.motion-swap-leave-to {
+  opacity: 0;
+  transform: translateY(calc(6px * var(--s99ab-motion-travel))) scale(calc(1 - 0.02 * var(--s99ab-motion-travel)));
+}
+
+/* The toast preset: enters along the block axis with a small scale, leaves with
+   a fade and a short lean toward its pinned edge. No -move class: ToastHost
+   places toasts itself, and a move class would make Vue apply FLIP transforms. */
+.motion-toast-enter-active { transition: opacity var(--s99ab-toast-enter) var(--s99ab-motion-enter), transform var(--s99ab-toast-enter) var(--s99ab-motion-enter); }
+
+.motion-toast-enter-from {
+  opacity: 0;
+  transform:
+    translateY(calc(var(--s99ab-toast-travel) * var(--s99ab-motion-travel) * var(--s99ab-motion-dir)))
+    scale(calc(1 - 0.03 * var(--s99ab-motion-travel)));
+}
+
+/* Fade on the decelerating curve, lean on the accelerating one. Spacing between
+   toasts is useToast's job, since a delay here would hold the class. */
+.motion-toast-leave-active {
+  transition:
+    opacity var(--s99ab-toast-leave) var(--s99ab-motion-enter),
+    transform var(--s99ab-toast-leave) var(--s99ab-motion-exit);
+}
+
+.motion-toast-leave-to {
+  opacity: 0;
+  transform: translate(
+    calc(var(--s99ab-toast-exit-travel) * var(--s99ab-motion-travel) * var(--s99ab-toast-out-x, 0)),
+    calc(var(--s99ab-toast-exit-travel) * var(--s99ab-motion-travel) * var(--s99ab-toast-out-y, 0))
+  );
+}
+
+/* The inline end flips in RTL. */
+.motion-toast-leave-to:dir(rtl) {
+  transform: translate(
+    calc(var(--s99ab-toast-exit-travel) * var(--s99ab-motion-travel) * var(--s99ab-toast-out-x, 0) * -1),
+    calc(var(--s99ab-toast-exit-travel) * var(--s99ab-motion-travel) * var(--s99ab-toast-out-y, 0))
+  );
+}
+
+/* A grouped list's box closes at the list's settle speed. Presets without
+   their own timing use AutoHeight's fallback. */
+.motion-auto--swap { --autoheight-duration: var(--s99ab-swap-in); }
+
+/* Lets the rows' travel past the box edge on both sides. */
+.motion-auto { --autoheight-bleed: calc(2 * var(--s99ab-motion-shift)); }
+
+/* A leaving child is taken out of flow at once, so the remaining ones can move.
+   Block flow, since an out-of-flow flex child jumps to the container's start.
+   Vertical lists only. */
+.motion-group {
+  /* Row gap; set --motion-gap: 0 for none. */
+  --motion-gap: var(--s99ab-control-gap);
+
+  position: relative;
+  display: block;
+  /* Cancels the last child's gap. */
+  margin-block-end: calc(-1 * var(--motion-gap));
+}
+
+/* The gap sits on every child, so dismissing the first does not strand it. */
+.motion-group > * {
+  margin-block-end: var(--motion-gap);
+}
+
+.motion-group > [class*='-leave-active'] {
+  position: absolute;
+  inset-inline: 0;
+}
+
+/* Reduced keeps the fade and drops the travel. */
+:root[data-motion='reduced'] { --s99ab-motion-travel: 0; }
+
+/* Also stops Vuetify's and app transitions. .s99ab-spin is exempt: it is the
+   only indicator that a retry or refresh is still running. */
+:root[data-motion='off'] *:not(.s99ab-spin),
+:root[data-motion='off'] *:not(.s99ab-spin)::before,
+:root[data-motion='off'] *:not(.s99ab-spin)::after {
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-motion='system'] { --s99ab-motion-travel: 0; }
+}
+
+/* ------------------------------------------------------------------ spin ---- */
+
+/* Spins the element that names the action (a retry, a refresh, a probe). Turns
+   at every motion level; an OS reduced-motion request slows it, below. */
+.s99ab-spin {
+  animation: s99ab-spin var(--s99ab-spin-period) linear infinite;
+}
+
+@keyframes s99ab-spin {
+  to { transform: rotate(1turn); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s99ab-spin {
+    animation-duration: var(--s99ab-spin-period-reduced);
+  }
+}

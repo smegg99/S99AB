@@ -1,0 +1,25 @@
+# i18n/locales/en/inspect.yaml
+#
+# UiKratosInspector: the Kratos flow, as it came back. Field names rather
+# than sentences - this is a readout, and every word is a label on a value.
+
+flow:
+  value: "flow"
+  description: "UiKratosInspector: which flow this is - login, registration, recovery"
+id:
+  value: "id"
+  description: "UiKratosInspector: the flow's id, shortened. What a Kratos log line
+    is searched by"
+expires:
+  value: "expires"
+  description: "UiKratosInspector: minutes left on the flow"
+expired:
+  value: "expired"
+  description: "UiKratosInspector: shown where the flow is already past its expiry"
+method:
+  value: "method"
+  description: "UiKratosInspector: the form's HTTP method, as the flow states it"
+unsupported:
+  value: "not rendered"
+  description: "UiKratosInspector: a node the renderer could not draw. The screen
+    looks finished and cannot be finished"

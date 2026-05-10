@@ -1,0 +1,459 @@
+// web/src/styles/_config.scss
+//
+// Every knob the layer has. Each $foo-bar is emitted as --s99ab-foo-bar by
+// _root.scss in the same order; tests/tokens.spec.ts lists the two exceptions.
+//
+// Override at runtime with the custom property (`:root { --s99ab-strip-h: 52px; }`),
+// or at build time with `@use '@smegg99/s99ab/styles' with ($strip-h: 52px)`
+// when the value feeds a media query, `math.div` or a loop. The build-time path
+// must drop this layer's `css` entry, or both sets load.
+//
+// Colour lives in src/theme/palette.ts, because Vuetify builds --v-theme-*
+// from a palette object.
+
+@use 'sass:list';
+@use 'sass:map';
+
+// ------------------------------------------------------------------ type ----
+
+$font-sans:
+  'Overpass Variable',
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  roboto,
+  sans-serif !default;
+$font-mono:
+  ui-monospace,
+  'SF Mono',
+  'JetBrains Mono',
+  'Cascadia Code',
+  menlo,
+  consolas,
+  monospace !default;
+
+/// 15.5px, in rem so the browser font setting still scales it.
+$font-size: 0.96875rem !default;
+
+/// Small tracked capitals: panel titles, nav group labels, section headings.
+$label-size: 0.8rem !default;
+$label-track: 0.08em !default;
+
+$measure: 62ch !default;
+
+/// Single-component sizes, kept here so an app can reach them.
+$stat-value-size: 1.5rem !default;
+$stat-value-lh: 1.15 !default;
+$stat-unit-size: 0.8rem !default;
+$stat-hint-size: 0.78rem !default;
+$page-title-size: clamp(1.45rem, 2.4vw, 1.8rem) !default;
+$page-lead-size: 0.92rem !default;
+$bar-title-size: 0.98rem !default;
+$nav-item-size: 0.86rem !default;
+$meta-size: 0.78rem !default;
+$lead-size: 0.86rem !default;
+
+// ----------------------------------------------------------------- shape ----
+
+$radius: 3px !default;
+
+/// The only pill in the layer; a chip squared to $radius reads as a disabled button.
+$chip-radius: 999px !default;
+
+/// The page container. Prose is capped separately by $measure.
+$container: 1720px !default;
+
+/// UiNavDrawer reads it through useCssNumber, because Vuetify takes the width as a prop.
+$rail-w: 236px !default;
+
+/// The rail's prepend column, aligning a label with the group heading above it.
+$nav-prepend-w: 26px !default;
+
+/// The drawer's inset. The block side is larger to clear the app bar.
+$nav-pad-block: 16px !default;
+$nav-pad-inline: 8px !default;
+
+/// One tally strip cell and the seam between two.
+$tally-cell: 14px !default;
+$tally-gap: 3px !default;
+
+// ------------------------------------------------------------- nav trail ----
+
+// UiNavTrail draws its rail path from these lengths.
+
+/// A destination row. 36 + 2 gap matches a v-list-item's 38.
+$nav-trail-row: 36px !default;
+
+/// A group heading row.
+$nav-trail-head: 28px !default;
+
+/// Between rows. Past about 4 the rows read as separate buttons.
+$nav-trail-row-gap: 2px !default;
+
+/// Extra space above a group heading; the first heading does not get it.
+$nav-trail-group-above: 12px !default;
+
+/// The same for a group without a label. 0 so an unlabelled nav reads as one run.
+$nav-trail-group-bare: 0 !default;
+
+/// Below a group heading, before its first row.
+$nav-trail-group-below: 4px !default;
+
+/// One nesting level: how far the rail and the whole button step sideways.
+$nav-trail-indent: 16px !default;
+
+/// The top-level rail's x, from the drawer's inset.
+$nav-trail-x: 14px !default;
+
+/// The S-bend radius where depth changes. The component caps it at half the
+/// available room, which is 8 at the default indent.
+$nav-trail-bend: 8px !default;
+
+$nav-trail-stroke: 2px !default;
+
+/// How far the rail runs past the end rows, as a fraction of their half-height.
+/// 0 stops on the end buttons' centres, 1 on their outer edges.
+$nav-trail-reach: 0 !default;
+
+/// Opacity ratio of the rail the disc has not reached.
+$nav-trail-rest: 1 !default;
+
+/// Opacity ratio of the rail behind the disc. 0 for a nav that is not a sequence.
+$nav-trail-done: 1 !default;
+
+/// Dash and gap length on the untravelled rail. 0 is solid.
+$nav-trail-dash: 0 !default;
+
+/// Accent ring around the disc. 0 is none.
+$nav-trail-halo: 0 !default;
+
+/// The current row's weight when `bare` removes its face.
+$nav-trail-lit-weight: 650 !default;
+
+/// Between the disc's edge and the row beside it.
+$nav-trail-gap: 8px !default;
+
+/// The travelling disc's diameter.
+$nav-trail-dot: 11px !default;
+
+// The disc's travel uses --s99ab-motion-base and --s99ab-motion-easing.
+
+// --------------------------------------------------------------- spacing ----
+
+// Every structural inset and gap is one of these.
+
+/// Between two panels on a page, or two stacked fields.
+$gap: 16px !default;
+/// The inset inside a body: a panel, a dialog, a grid.
+$pad: 16px !default;
+/// The inset inside a chrome strip.
+$pad-tight: 12px !default;
+/// A page's top and bottom space.
+$page-y: 24px !default;
+
+/// Placeholder height of an unrendered panel under UiAppShell's `defer`, until
+/// `contain-intrinsic-size: auto` records the real one.
+$page-defer-size: 480px !default;
+/// Between two controls in a row.
+$control-gap: 8px !default;
+/// A chrome strip's block inset, for a head that wraps. $strip-h sets the height.
+$strip-pad-y: 4px !default;
+
+/// A chrome strip's inline inset. Equal to $pad so a head or foot lines up with
+/// its body; tighter insets (toast, menu row, code block) use $pad-tight.
+$strip-pad-x: $pad !default;
+
+/// UiFormRow's control column, so every control in a settings column shares one right edge.
+$form-control-w: 24rem !default;
+
+/// The app bar's height, separate from $strip-h. Only the app bar reads it.
+$bar-h: 54px !default;
+
+/// The brand mark's height inside the bar.
+$bar-logo-size: 30px !default;
+
+// -------------------------------------------------------------- controls ----
+
+/// One height for every chrome strip. Must keep ($strip-h - $control-h-dense) / 2
+/// above 9px, or a dense field's floating label lands on the border.
+$strip-h: 44px !default;
+
+/// v-btn's default, so a button lines up with a field beside it.
+$control-h: 36px !default;
+
+/// A control inside a strip, a toast or a list row.
+$control-h-dense: 28px !default;
+
+/// Set explicitly: Vuetify sizes an unsized v-icon at 1.5em of its inherited font.
+$icon: 18px !default;
+
+/// A text button's label opacity at rest. This is its only hover change; the overlay is off.
+$text-btn-rest: 0.78 !default;
+
+// ---------------------------------------------------------------- fields ----
+
+/// A field in a control row. A flex row shrinks an unsized field to a stub.
+$field-w: 240px !default;
+
+/// Room an outlined field's floating label needs above its box. Vuetify reserves
+/// none, so a clipping parent cuts the label.
+$field-label-overhang: 10px !default;
+
+/// Error colour kept when an invalid field is hovered; the rest is `ink`. 100% is no hover.
+$field-error-hover-mix: 58% !default;
+
+// ------------------------------------------------------------------ auth ----
+
+/// The credential card's width; narrow enough for a full-width submit.
+$auth-w: 380px !default;
+
+/// How far above centre the card sits.
+$auth-rise: 6vh !default;
+
+// ----------------------------------------------------------------- glass ----
+
+/// How much of the WebGL ground shows. Kept low so text on it stays readable;
+/// dark takes less.
+$flow-opacity: 0.30 !default;
+$flow-opacity-dark: 0.16 !default;
+
+/// One frosting for every surface over the backdrop. `saturate` picks up its colour.
+$glass: blur(24px) saturate(1.6) !default;
+
+/// How much ground the bar, the rail and a toast keep. Lower it and the blur must rise.
+$glass-chrome: 76% !default;
+
+// ---------------------------------------------------------------- motion ----
+
+$motion-fast: 120ms !default;
+$motion-base: 200ms !default;
+$motion-slow: 320ms !default;
+$motion-easing: cubic-bezier(0.2, 0, 0, 1) !default;
+$motion-enter: cubic-bezier(0, 0, 0, 1) !default;
+$motion-exit: cubic-bezier(0.3, 0, 1, 1) !default;
+
+/// Slide-up preset travel. A grouped list's box must allow twice this or it clips.
+/// --s99ab-motion-travel is the runtime multiplier on it.
+$motion-shift: 8px !default;
+
+/// Sideways preset travel.
+$motion-shift-x: 16px !default;
+
+/// How far the scale preset shrinks, as a fraction.
+$motion-scale: 0.04 !default;
+
+/// The swap preset (one thing replacing another in place). Slower than
+/// $motion-base so a retry that fails the same way is still visible.
+$swap-out: 220ms !default;
+$swap-in: 360ms !default;
+
+/// The spinner turns at every motion level; reduced motion slows it.
+$spin-period: 900ms !default;
+$spin-period-reduced: 2.4s !default;
+
+// ------------------------------------------------------- theme transition ----
+
+/// The view transition curve. --s99ab-vt-x, -y, -r and -duration are set at runtime.
+$vt-easing: cubic-bezier(0, 0, 0.2, 1) !default;
+
+/// Above every layout item, overlay and toast, so nothing stays the old colour.
+$vt-cover-z: 3000 !default;
+
+/// Fraction of a cover shape's duration spent arriving. Below about 0.5 it reads as a flash.
+$vt-cover-in: 0.6 !default;
+
+/// The cover disc's size before scaling. Small to avoid rastering a texture
+/// twice the window's diagonal.
+$vt-cover-seed: 240px !default;
+
+/// How long the sheet holds full cover; the theme swap happens inside this window.
+$vt-cover-hold: 140ms !default;
+
+// ---------------------------------------------------------------- toasts ----
+
+/// The stack's fixed width. Shrink-to-fit would resize every toast as others come and go.
+$toast-w: 420px !default;
+
+/// Above Vuetify's v-overlay layer at 2400.
+$toast-z: 2500 !default;
+
+/// A top-pinned stack's start, clearing the app bar. A shell without a bar can set $pad.
+$toast-top: calc(#{$strip-h} + #{$pad}) !default;
+$toast-bottom: $pad !default;
+
+$toast-enter: 420ms !default;
+$toast-leave: 260ms !default;
+/// Moving within the stack. Slower than enter so the stack settles after an arrival.
+$toast-move: 460ms !default;
+$toast-travel: 24px !default;
+$toast-exit-travel: 10px !default;
+$toast-gap: $control-gap !default;
+
+/// The repeat count and the "+N still waiting" marker.
+$toast-marker-size: 0.72rem !default;
+$toast-marker-pad: 1px 6px !default;
+
+/// The countdown bar on the toast's edge.
+$toast-bar-h: 2px !default;
+
+/// Lines of a message before it scrolls.
+$toast-lines: 8 !default;
+
+/// A toast's first line; the leading icon is centred against it.
+$toast-text-size: 0.9rem !default;
+$toast-text-lh: 1.45 !default;
+
+// The pause between toasts is s99ab.toast.stagger in app config.
+
+// ---------------------------------------------------------------- states ----
+
+// What a screen draws while waiting, failed or empty.
+
+/// The skeleton bar's opacity at rest and at the sweep's crest.
+$skeleton-rest: 0.10 !default;
+$skeleton-peak: 0.18 !default;
+
+/// The gooey loader's width; height follows at 2:5. UiGoo's `size` prop overrides it.
+$goo-size: 120px !default;
+/// The loader in a row of ordinary height.
+$goo-size-dense: 64px !default;
+/// The loader inside a button, in em so it follows the button's text size.
+$goo-size-btn: 1.15em !default;
+$goo-period: 1800ms !default;
+
+/// The glyph a state leads with.
+$state-icon: 32px !default;
+
+/// A state's first line.
+$state-title-size: 0.95rem !default;
+$state-title-lh: 1.35 !default;
+
+// -------------------------------------------------------------- backdrop ----
+
+/// Wash opacity per variant for `ground: 'wash'`. Under the shader they are
+/// scaled by $backdrop-under-flow.
+$backdrop-opacity: 0.34 !default;
+$backdrop-opacity-dark: 0.22 !default;
+
+/// The washes' remaining fraction under the WebGL ground.
+$backdrop-under-flow: 0.45 !default;
+/// One drift cycle.
+$backdrop-drift: 52s !default;
+/// How far past the viewport it extends, so its edge never shows while drifting.
+$backdrop-bleed: 12% !default;
+
+// ---------------------------------------------------------------- menus ----
+
+/// Menu metrics, derived from the dense control, strip and nav values instead of
+/// Vuetify's 40px rows.
+$menu-row: $control-h-dense !default;
+$menu-pad-block: $strip-pad-y !default;
+$menu-prepend-w: $nav-prepend-w !default;
+$menu-size: $nav-item-size !default;
+
+// -------------------------------------------------------------- explorer ----
+
+/// The smallest tile before the grid drops a column. Mirrored by useExplorerConfig's `tileMin`.
+$tile-min: 104px !default;
+/// The seam between two tiles.
+$tile-gap: $control-gap !default;
+
+/// Width over height. Mirrored by useExplorerConfig's `tile.aspect`.
+$tile-aspect: 1 !default;
+
+/// The tile's corner, separate from $radius.
+$tile-radius: $radius !default;
+$tile-pad: $control-gap !default;
+
+/// A folder's glyph in a card, and a leaf's fallback glyph.
+$tile-icon: 40px !default;
+$tile-icon-item: 36px !default;
+
+/// The glyph, or a preview's longest side, in the icon variant.
+$tile-glyph: 48px !default;
+
+/// Lines of name in the icon variant before it is cut.
+$tile-lines: 2 !default;
+
+/// Between an icon's glyph and its name.
+$tile-glyph-gap: 6px !default;
+
+/// The plate behind a picked tile's glyph, and its padding.
+$tile-pick: 0.24 !default;
+$tile-glyph-pad: 5px !default;
+
+$tile-title: 0.8125rem !default;
+$tile-badge: 0.6875rem !default;
+
+/// The tint bar across a folder's top. 0 removes it.
+$tile-bar: 3px !default;
+
+/// The ... trigger's square.
+$tile-more: 24px !default;
+
+/// Inset of the corner marks (the ... trigger, the pick tick) from the tile's edge.
+$tile-corner: 2px !default;
+
+/// The count chip's inline padding.
+$tile-badge-pad: 6px !default;
+
+/// Accent alpha under the pointer and on an armed drop target.
+$tile-tint: 0.06 !default;
+$tile-tint-target: 0.16 !default;
+
+/// The ring on a drop target and a picked tile.
+$tile-ring: 2px !default;
+
+/// How far a tile rises on hover with `lift`. Off by default to avoid a layer per tile.
+$tile-lift: 2px !default;
+
+/// The scrim over a cover when the name is drawn on it. Below about 0.4 a white photo hides the name.
+$tile-scrim: 0.55 !default;
+
+/// A disabled tile's opacity.
+$tile-off: 0.45 !default;
+
+/// Folder tints as rgb triplets, so one value serves rgb() and rgba(). Build time
+/// only: _explorer.scss loops over it.
+$folder-accents: (
+  'red': (229, 57, 53),
+  'orange': (251, 140, 0),
+  'amber': (255, 179, 0),
+  'green': (67, 160, 71),
+  'teal': (0, 137, 123),
+  'blue': (30, 136, 229),
+  'indigo': (57, 73, 171),
+  'purple': (142, 36, 170),
+  'pink': (216, 27, 96),
+  'slate': (84, 110, 122),
+) !default;
+
+/// A triplet as the comma string a custom property holds.
+@function triplet($name) {
+  $rgb: map.get($folder-accents, $name);
+  @return #{list.nth($rgb, 1)}, #{list.nth($rgb, 2)}, #{list.nth($rgb, 3)};
+}
+
+// -------------------------------------------------------------- textures ----
+
+// An SVG mask over a flat fill of one theme token, on four planes at four
+// strengths. The catalogue is _textures.scss and public/textures.
+
+/// Where the mask files are served from. Build time only, because url() cannot
+/// take a concatenated custom property; listed in tests/tokens.spec.ts.
+$tex-base: '/s99ab/textures/' !default;
+
+/// Multiplier over every plane's strength. 0 turns texture off.
+$tex-gain: 1 !default;
+
+/// Multiplies every texture's natural tile.
+$tex-scale: 1 !default;
+
+/// Ink each plane's texture keeps: most on the ground, least on the well.
+$tex-ground: 0.16 !default;
+$tex-chrome: 0.09 !default;
+$tex-well: 0.06 !default;
+$tex-overlay: 0.08 !default;
+
+/// How much ground a port surface keeps. Lower it and the blur must rise.
+$tex-port: 62% !default;

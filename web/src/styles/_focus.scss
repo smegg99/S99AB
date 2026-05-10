@@ -1,0 +1,21 @@
+// web/src/styles/_focus.scss
+//
+// Focus rings. Vuetify's overlay tint disappears on a bordered flat surface.
+
+/* Drawn outside the element so it never shifts layout. Inputs are left out:
+   a field shows focus through its own outline. */
+:where(a, button, [role='button'], .v-btn, .v-list-item, .v-tab):focus-visible {
+  outline: 2px solid rgb(var(--v-theme-accent));
+  outline-offset: 2px;
+}
+
+/* Removes the browser's own ring on a focused input, which crosses an outlined
+   field's label gap. Both DOM shapes: text fields and textareas carry the class
+   on the control, a select wraps one in an element carrying it. */
+.v-field__input:focus,
+.v-field__input:focus-visible,
+.v-field__input:focus-within,
+.v-field__input :is(input, textarea, select):focus,
+.v-field__input :is(input, textarea, select):focus-visible {
+  outline: none;
+}

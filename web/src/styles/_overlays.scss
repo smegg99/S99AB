@@ -1,0 +1,129 @@
+// web/src/styles/_overlays.scss
+//
+// Overlay chrome. Vuetify teleports overlays to the end of <body>, so they are
+// styled globally.
+
+/* The scrim stays Vuetify's black; only its strength is set, as
+   `overlay-opacity` in src/theme/index.ts. */
+.v-overlay .v-card {
+  background: rgb(var(--v-theme-chrome));
+  border: 1px solid rgb(var(--v-theme-line));
+}
+
+.v-menu > .v-overlay__content,
+.v-menu > .v-overlay__content > .v-list,
+.v-select__content > .v-list,
+.v-autocomplete__content > .v-list {
+  background: rgb(var(--v-theme-chrome));
+  border: 1px solid rgb(var(--v-theme-line));
+}
+
+/* The menu draws the border, so its list must not draw a second one. */
+.v-menu > .v-overlay__content > .v-list {
+  border: 0;
+}
+
+/* ----------------------------------------------------------------- menus ---
+
+   Menu, select and autocomplete metrics, taken from the dense control, strip
+   inset, nav glyph column and nav row type. */
+/* Descendant: a select wraps its list in a card and a menu does not. */
+.v-menu .v-list,
+.v-select__content .v-list,
+.v-autocomplete__content .v-list {
+  padding-block: var(--s99ab-menu-pad-block);
+}
+
+.v-menu .v-list-item,
+.v-select__content .v-list-item,
+.v-autocomplete__content .v-list-item {
+  min-height: var(--s99ab-menu-row);
+  padding-inline: var(--s99ab-pad-tight);
+}
+
+.v-menu .v-list-item-title,
+.v-select__content .v-list-item-title,
+.v-autocomplete__content .v-list-item-title {
+  font-size: var(--s99ab-menu-size);
+  letter-spacing: 0;
+  line-height: 1.3;
+}
+
+/* Vuetify's prepend column is sized for a 24px icon plus margin. */
+.v-menu .v-list-item__prepend,
+.v-select__content .v-list-item__prepend,
+.v-autocomplete__content .v-list-item__prepend {
+  width: var(--s99ab-menu-prepend-w);
+  margin-inline-end: 0;
+}
+
+.v-menu .v-list-item__prepend > .v-icon,
+.v-select__content .v-list-item__prepend > .v-icon,
+.v-autocomplete__content .v-list-item__prepend > .v-icon {
+  font-size: var(--s99ab-icon);
+  opacity: 0.85;
+}
+
+/* The column above already provides the inset. */
+.v-menu .v-list-item__spacer,
+.v-select__content .v-list-item__spacer,
+.v-autocomplete__content .v-list-item__spacer {
+  width: 0;
+}
+
+/* The `row` token on hover, so menus and tables match. */
+.v-menu .v-list-item:hover > .v-list-item__overlay,
+.v-select__content .v-list-item:hover > .v-list-item__overlay,
+.v-autocomplete__content .v-list-item:hover > .v-list-item__overlay {
+  opacity: 0;
+}
+
+.v-menu .v-list-item:hover,
+.v-select__content .v-list-item:hover,
+.v-autocomplete__content .v-list-item:hover {
+  background: rgb(var(--v-theme-row));
+}
+
+/* A separator in the seam colour, with the list's block inset around it. */
+.v-menu .v-divider,
+.v-select__content .v-divider,
+.v-autocomplete__content .v-divider {
+  margin-block: var(--s99ab-menu-pad-block);
+  border-color: rgb(var(--v-theme-line));
+  opacity: 1;
+}
+
+.v-tooltip > .v-overlay__content {
+  background: rgb(var(--v-theme-chrome));
+  border: 1px solid rgb(var(--v-theme-line));
+  color: rgb(var(--v-theme-ink));
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+
+/* Card sections use one inset. The title wraps, at a smaller size than
+   Vuetify's 1.25rem/2 nowrap. */
+.v-overlay .v-card-title {
+  padding: var(--s99ab-pad) var(--s99ab-pad) 4px;
+  color: rgb(var(--v-theme-ink));
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+  white-space: normal;
+}
+
+.v-overlay .v-card-subtitle {
+  padding-inline: var(--s99ab-pad);
+}
+
+.v-overlay .v-card-text {
+  padding: var(--s99ab-pad-tight) var(--s99ab-pad) 4px;
+}
+
+/* Dialog actions keep full-height buttons (--s99ab-control-h). */
+.v-overlay .v-card-actions {
+  padding: var(--s99ab-pad-tight) var(--s99ab-pad) var(--s99ab-pad);
+  gap: var(--s99ab-control-gap);
+}

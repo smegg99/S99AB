@@ -1,0 +1,119 @@
+# i18n/locales/en/release.yaml
+#
+# The keys the download card, changelog and update banner call. An app that
+# defines none of them still renders: useTranslate falls back.
+
+download:
+  value: "Download"
+  description: "Every asset row's button"
+latest:
+  value: "Latest"
+  description: "Chip beside the newest version in the download card's header"
+yourSystem:
+  value: "Your system"
+  description: "Marks the platform tab matching the visitor's own OS"
+allReleases:
+  value: "All releases"
+  description: "Falls back to the repository's releases page"
+onGithub:
+  value: "On GitHub"
+  description: "Link from a changelog entry to that release"
+downloads:
+  value: "Downloads"
+  description: "Title of the download dialog"
+copied:
+  value: "Copied"
+  description: "The checksum button, just after it was clicked"
+copyHash:
+  value: "Copy checksum"
+  description: "The checksum button at rest"
+olderBuild:
+  value: "This build is older than the newest release."
+  description: "Why an asset row carries a version of its own"
+noneTitle:
+  value: "No downloads yet"
+  description: "No release is published, or GitHub could not be reached"
+noneText:
+  value: "Nothing has been published for this repository."
+  description: "Shown under noneTitle"
+noHistory:
+  value: "No releases yet"
+  description: "Changelog with nothing published. Its own key, not noneTitle: that
+    one names files to download, which a changelog does not list."
+notTranslated:
+  value: "These notes are not available in your language yet."
+  description: "The release body carried no section for the reader's language"
+updateTitle:
+  value: "A newer version is available"
+  description: "Update banner heading"
+updateBody:
+  value: "You have {current}. The newest is {latest}."
+  description: "Update banner's line under the heading. Both versions are in the message:
+    joining them with an arrow reads as \"right arrow\" aloud and fixes which one
+    comes first."
+  placeholders:
+    current: {type: string}
+    latest: {type: string}
+getUpdate:
+  value: "Get it"
+  description: "Update banner's action"
+later:
+  value: "Later"
+  description: "Dismisses the update banner for this visit"
+starOnGithub:
+  value: "GitHub"
+  description: "Label on the star and fork counter"
+starsLabel:
+  value: "GitHub: {stars} stars"
+  description: "RepoStat's whole accessible name with its fork count hidden. The counts
+    are in the message because a language inflects the noun by the number and need
+    not put it after."
+  placeholders:
+    stars: {type: integer}
+starsForksLabel:
+  value: "GitHub: {stars} stars, {forks} forks"
+  description: "RepoStat's whole accessible name, both readings. Separator and order
+    included: a list joined in the component is one no translator can reorder."
+  placeholders:
+    stars: {type: integer}
+    forks: {type: integer}
+
+platforms:
+  linux:
+    value: "Linux"
+  windows:
+    value: "Windows"
+  macos:
+    value: "macOS"
+  android:
+    value: "Android"
+  ios:
+    value: "iOS"
+  extras:
+    value: "Other files"
+    description: "Source archives, checksums and signatures: not an OS build"
+
+# Package formats. A dot is a path step in vue-i18n, so tar.gz is targz.
+kinds:
+  appimage:
+    value: "AppImage"
+  deb:
+    value: "Debian package"
+  rpm:
+    value: "RPM package"
+  pkgtarzst:
+    value: "Arch package"
+  targz:
+    value: "Archive"
+  installer:
+    value: "Installer"
+  exe:
+    value: "Portable"
+  msix:
+    value: "MSIX package"
+  zip:
+    value: "Archive"
+  dmg:
+    value: "Disk image"
+  binary:
+    value: "Binary"

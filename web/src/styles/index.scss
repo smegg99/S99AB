@@ -1,0 +1,46 @@
+// web/src/styles/index.scss
+//
+// The layer's stylesheet entry and load order. Every rule here is unlayered, so
+// it beats Vuetify's @layer vuetify-* rules without !important, while Vuetify
+// utilities that carry !important still win. Colour is always a theme token.
+
+// Forwarded so an app can configure the layer here; see _config.scss.
+@forward 'config';
+
+// The knobs as custom properties. Loaded first because everything else reads them.
+@use 'root';
+
+// Shape, type and focus.
+@use 'type';
+@use 'surfaces';
+// After surfaces, so textures can clip to the radius of the planes they sit on.
+@use 'textures';
+@use 'controls';
+@use 'strips';
+@use 'fields';
+@use 'focus';
+
+// Vuetify components.
+@use 'states';
+@use 'lists';
+@use 'nav';
+@use 'tables';
+@use 'overlays';
+@use 'scrollbars';
+
+// Page furniture.
+@use 'layout';
+@use 'code';
+
+// Feature stylesheets.
+@use 'motion';
+@use 'toasts';
+@use 'explorer';
+@use 'tiles';
+@use 'theme-transition';
+@use 'auth';
+@use 'markdown';
+@use 'releases';
+
+// Opt-in lite overrides, last.
+@use 'lite';

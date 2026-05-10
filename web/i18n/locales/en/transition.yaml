@@ -1,0 +1,36 @@
+# i18n/locales/en/transition.yaml
+#
+# The names UiTransitionPicker offers. What the screen does, not what the
+# technique is called: a reader picking one is choosing how the change looks,
+# and "view transition" tells them nothing about that.
+
+label:
+  value: "Theme transition"
+  description: "UiTransitionPicker's accessible name"
+circle:
+  value: "Circle out"
+  description: "The new appearance opening from the button that was pressed"
+circleIn:
+  value: "Circle in"
+  description: "The old appearance closing onto the button that was pressed"
+sweep:
+  value: "Sweep down"
+  description: "The new appearance drawn down over the old, like a blind"
+sweepUp:
+  value: "Sweep up"
+  description: "The same blind, rising from the bottom edge"
+sweepStart:
+  value: "Sweep from start"
+  description: "The blind from the edge the text starts at - left in English"
+sweepEnd:
+  value: "Sweep from end"
+  description: "The blind from the edge the text ends at - right in English"
+split:
+  value: "Split"
+  description: "Parting on the middle line and opening outward"
+fade:
+  value: "Fade"
+  description: "The old screen dissolving into the new one"
+none:
+  value: "None"
+  description: "The change applied with no animation at all"

@@ -1,0 +1,69 @@
+# i18n/locales/pl/common.yaml
+
+confirm:
+  value: "Zatwierdź"
+  description: "ConfirmDialog's accept button"
+cancel:
+  value: "Anuluj"
+  description: "ConfirmDialog and PromptDialog's dismiss button"
+close:
+  value: "Zamknij"
+  description: "ToastHost and ShortcutHelp's close button"
+copy:
+  value: "Kopiuj"
+  description: "UiCode's copy button, before it is pressed"
+copied:
+  value: "Skopiowano"
+  description: "UiCode's copy button, for the moment after"
+retry:
+  value: "Ponów"
+  description: "ErrorState's retry action"
+noResults:
+  value: "Brak wyników"
+  description: "DataTable with an active filter and nothing matching"
+noResultsHint:
+  value: "Spróbuj innego wyszukiwania."
+  description: "Shown under noResults"
+toggleTheme:
+  value: "Przełącz motyw"
+  description: "ThemeToggle's accessible name and tooltip"
+menu:
+  value: "Menu"
+  description: "AppBar's navigation toggle, shown below the rail's breakpoint"
+language:
+  value: "Język"
+  description: "LocaleMenu's accessible name and tooltip"
+repeatedCount:
+  value: "Powtórzone {count} razy"
+  description: "Names the toast repeat marker, which is drawn as a bare number. The
+    count is in the message because its place in the sentence is not the same in every
+    language."
+  placeholders:
+    count: {type: integer}
+search:
+  value: "Szukaj"
+  description: "SearchField's label, and any screen that needs the word"
+clear:
+  value: "Wyczyść"
+  description: "Clears the search in UiDataTable's strip"
+loading:
+  value: "Wczytywanie"
+  description: "LoadingState's live region, whose own content - bare bars, or an aria-hidden
+    goo - announces as nothing"
+value:
+  value: "Wartość"
+  description: "PromptDialog's field label where the caller names none. Not its placeholder:
+    a label that vanishes on the first keystroke is no label."
+linkNewTab:
+  value: "{text} (otwiera się w nowej karcie)"
+  description: "A MarkdownInline link's whole accessible name. Those links always
+    open a new tab, and the author-written prose around them cannot be relied on to
+    say so. The link text is a slot so the warning's position and bracketing are the
+    translator's."
+  placeholders:
+    text: {type: string}
+
+highContrast:
+  value: "Wysoki kontrast"
+  description: "UiContrastToggle's accessible name and tooltip. The same in both states;
+    aria-pressed carries which one it is in"

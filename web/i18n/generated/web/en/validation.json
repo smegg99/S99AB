@@ -1,0 +1,1 @@
+{"validation":{"email":"Not an email address","format":"Not a valid format","invalid":"Invalid","invalidValue":"Not one of the allowed values","required":"Required","step":"Must be a multiple of {divisor}","tooBig":"At most {max}","tooSmall":"At least {min}"}}

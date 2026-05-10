@@ -1,0 +1,34 @@
+# i18n/locales/pl/validation.yaml
+
+required:
+  value: "Wymagane"
+  description: "invalid_type - the field is empty and the schema does not allow it"
+tooSmall:
+  value: "Co najmniej {min}"
+  description: "too_small - a minimum length, or a minimum number"
+  placeholders:
+    min: {type: integer}
+tooBig:
+  value: "Najwyżej {max}"
+  description: "too_big - a maximum length, or a maximum number"
+  placeholders:
+    max: {type: integer}
+format:
+  value: "Niepoprawny format"
+  description: "invalid_format - an email, a URL, a regex"
+invalidValue:
+  value: "Wartość spoza dozwolonych"
+  description: "invalid_value - outside an enum"
+step:
+  value: "Musi być wielokrotnością {divisor}"
+  description: "not_multiple_of - zod puts the factor on the issue's divisor, not
+    its minimum"
+  placeholders:
+    divisor: {type: integer}
+invalid:
+  value: "Niepoprawne"
+  description: "custom, and the fallback for any code with no message of its own"
+email:
+  value: "To nie adres e-mail"
+  description: "A Kratos field typed email. Its own key rather than validation.format,
+    which names no shape"

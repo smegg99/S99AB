@@ -1,0 +1,68 @@
+// web/src/styles/_lists.scss
+//
+// Lists, and the nav rail's list at the end. Vuetify list internals are styled
+// here instead of through :deep() in the drawer.
+
+/* A list takes the ground of the surface holding it. A menu's list gets one below. */
+.v-list {
+  background: transparent;
+}
+
+/* The active item takes the accent. Vuetify's own tint is close to invisible here. */
+.v-list-item--active > .v-list-item__overlay {
+  opacity: 0;
+}
+
+.v-list-item--active {
+  background: color-mix(in srgb, rgb(var(--v-theme-accent)) 16%, transparent);
+  color: rgb(var(--v-theme-ink));
+}
+
+.v-list-item--active .v-list-item-title {
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------- nav rail ---- */
+
+/* Rail rows: strip control height, ink2 for unlit destinations. The :not()
+   keeps this from tying with the active rule above on specificity. */
+.nav__list .v-list-item {
+  min-height: var(--s99ab-control-h);
+  margin-block: 1px;
+  padding-inline: var(--s99ab-control-gap);
+  font-weight: 500;
+}
+
+/* Nesting as padding, so hover and focus faces keep the rail's full width.
+   --nav-depth is set inline by UiNavList. */
+.nav__list .nav__row {
+  padding-inline-start: calc(
+    var(--s99ab-control-gap) + var(--nav-depth, 0) * var(--s99ab-nav-trail-indent)
+  );
+}
+
+.nav__list .v-list-item:not(.v-list-item--active) {
+  color: rgb(var(--v-theme-ink2));
+}
+
+/* Below body size and without Vuetify's list tracking. */
+.nav__list .v-list-item-title {
+  font-size: var(--s99ab-nav-item-size);
+  letter-spacing: 0;
+}
+
+/* Sized to --s99ab-icon so a label lines up with the group heading above it. */
+.nav__list .v-list-item__prepend {
+  width: var(--s99ab-nav-prepend-w);
+  margin-inline-end: 0;
+}
+
+.nav__list .v-list-item__prepend .v-icon {
+  font-size: var(--s99ab-icon);
+  opacity: 0.85;
+}
+
+/* The active row's icon keeps full weight. */
+.nav__list .v-list-item--active .v-icon {
+  opacity: 1;
+}

@@ -1,0 +1,17 @@
+// web/src/styles/_strips.scss
+//
+// The rule shared by every chrome strip (app bar, panel head and foot, toolbar,
+// table search and footer, download card version strip). The height itself is
+// $strip-h, applied by whatever draws the strip.
+
+/* Controls in a strip are dense. The strip is sized for a 28px control, and a
+   36px one would overflow the room the floating label needs. */
+.panel__head,
+.panel__foot,
+.table__top,
+.s99ab-explorer__bar,
+.s99ab-downloads__head,
+.v-toolbar__content,
+.v-data-table-footer {
+  --s99ab-control-h: var(--s99ab-control-h-dense);
+}

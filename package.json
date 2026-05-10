@@ -1,0 +1,72 @@
+{
+  "name": "@smegg99/s99ab",
+  "version": "1.0.0",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "description": "Shared Nuxt layer: dialogs, toasts, tables, motion, shortcuts, async states.",
+  "main": "./web/nuxt.config.ts",
+  "files": [
+    "web",
+    "contracts"
+  ],
+  "exports": {
+    ".": "./web/nuxt.config.ts",
+    "./styles": "./web/src/styles/index.scss",
+    "./types": "./web/src/types.ts",
+    "./theme": "./web/src/theme/index.ts",
+    "./appearance": "./web/src/appearance.ts",
+    "./i18n": "./web/i18n/index.ts"
+  },
+  "peerDependencies": {
+    "@firecms/neat": "^0.8.0 || ^1.0.0",
+    "@pinia/colada": "^1.3.0",
+    "nuxt": "^4.0.0",
+    "pinia": "^3.0.0 || ^4.0.0",
+    "vue": "^3.5.0",
+    "vuetify": "^4.0.0",
+    "zod": "^4.0.0"
+  },
+  "packageManager": "pnpm@11.3.0",
+  "devDependencies": {
+    "@nuxt/eslint-config": "^1.16.0",
+    "@pinia/colada": "^1.3.1",
+    "@types/node": "^26.1.2",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.8.0",
+    "happy-dom": "^20.11.1",
+    "nuxt": "^4.4.8",
+    "pinia": "^4.0.2",
+    "sass-embedded": "^1.100.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.10",
+    "vue": "^3.5.39",
+    "vue-i18n": "^11.4.8",
+    "vue-router": "^5.2.0",
+    "vue-tsc": "^3.3.8",
+    "vuetify": "^4.1.4",
+    "yaml": "^2.9.0",
+    "zod": "^4.4.3"
+  },
+  "scripts": {
+    "typecheck": "vue-tsc --noEmit -p web/tsconfig.json",
+    "test": "cd web && vitest run",
+    "test:watch": "cd web && vitest",
+    "lint": "eslint .",
+    "locales": "loc build -c web/i18n/config.cue"
+  },
+  "peerDependenciesMeta": {
+    "@firecms/neat": {
+      "optional": true
+    },
+    "zod": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@fontsource-variable/overpass": "^5.3.0",
+    "@material/material-color-utilities": "^0.4.0"
+  }
+}

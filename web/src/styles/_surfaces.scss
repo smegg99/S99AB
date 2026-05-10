@@ -1,0 +1,92 @@
+// web/src/styles/_surfaces.scss
+//
+// Vuetify surfaces whose defaults fight a flat bordered design, plus the layer's
+// glass and slab planes at the end.
+
+/* One radius for every surface family. :where() keeps specificity at zero so an
+   app's `rounded-*` utility still wins. Chips are left out and keep a pill. */
+:where(
+  .v-card,
+  .v-sheet,
+  .v-btn,
+  .v-alert,
+  .v-field,
+  .v-field__outline__start,
+  .v-list-item,
+  .v-menu > .v-overlay__content,
+  .v-tooltip > .v-overlay__content,
+  .v-overlay__content > .v-card,
+  .v-skeleton-loader
+) {
+  border-radius: var(--s99ab-radius);
+}
+
+/* Chips keep the pill, stated explicitly. */
+:where(.v-chip) {
+  border-radius: var(--s99ab-chip-radius);
+}
+
+/* The outline's leading and trailing pieces carry the corners. */
+:where(.v-field__outline__start) {
+  border-radius: var(--s99ab-radius) 0 0 var(--s99ab-radius);
+}
+
+:where(.v-field__outline__end) {
+  border-radius: 0 var(--s99ab-radius) var(--s99ab-radius) 0;
+}
+
+/* A flat button with no colour is drawn as a key (hairline face on the raised
+   ground) instead of Vuetify's `surface`. A coloured one carries bg-<color>. */
+.v-btn--variant-flat:not([class*='bg-']) {
+  background: rgb(var(--v-theme-raised));
+  border: 1px solid rgb(var(--v-theme-edge));
+  color: rgb(var(--v-theme-ink2));
+}
+
+.v-btn--variant-flat:not([class*='bg-']).v-btn--disabled {
+  border-color: rgb(var(--v-theme-lineSoft));
+}
+
+/* Button labels at panel title weight. */
+.v-btn {
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Icon-only buttons are square, at --s99ab-control-h so they follow the row
+   levelling. `aspect-ratio` makes the square, so a component setting its own
+   height still gets one. */
+.v-btn--icon:not(.v-tab) {
+  width: auto;
+  height: var(--s99ab-control-h);
+  /* Drops the min-height from _controls.scss, which a height cannot override. */
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1;
+  border-radius: var(--s99ab-radius);
+}
+
+/* One frosting for everything floating over the backdrop. Each surface states
+   its own border edge. */
+.s99ab-glass {
+  background: color-mix(in srgb, rgb(var(--v-theme-chrome)) var(--s99ab-glass-chrome), transparent);
+  backdrop-filter: var(--s99ab-glass);
+}
+
+/* The content surface for panels and tables: a hairline frame around the well.
+   overflow: hidden clips a head strip's ground to the radius. */
+.s99ab-slab {
+  overflow: hidden;
+  border: 1px solid rgb(var(--v-theme-line));
+  border-radius: var(--s99ab-radius);
+  background: rgb(var(--v-theme-well));
+}
+
+/* An alert's leading icon uses the `*-lit` partner token: a graphic needs 3:1
+   contrast, while the text keeps 4.5:1. Both high-contrast variants define the
+   pair identically. */
+.v-alert.text-success .v-alert__prepend .v-icon { color: rgb(var(--v-theme-ok-lit)); }
+.v-alert.text-error .v-alert__prepend .v-icon { color: rgb(var(--v-theme-danger-lit)); }
+.v-alert.text-warning .v-alert__prepend .v-icon { color: rgb(var(--v-theme-warn-lit)); }
+.v-alert.text-info .v-alert__prepend .v-icon { color: rgb(var(--v-theme-info-lit)); }

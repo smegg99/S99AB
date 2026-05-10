@@ -1,0 +1,19 @@
+# i18n/locales/pl/error.yaml
+
+unknown:
+  value: "Coś poszło nie tak."
+  description: "Fallback when a thrown value carries no error envelope"
+
+rateLimited:
+  value: "Zbyt wiele żądań. Odczekaj chwilę i spróbuj ponownie."
+
+requestTooLarge:
+  value: "Żądanie jest zbyt duże."
+
+badRequest:
+  value: "Nie udało się odczytać żądania."
+
+internal:
+  value: "Po naszej stronie wystąpił błąd."
+  description: "What apierr.Cause turns an unmapped error into: 500, with the real
+    cause kept off the wire"

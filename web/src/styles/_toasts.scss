@@ -1,0 +1,201 @@
+// web/src/styles/_toasts.scss
+//
+// The toast stacks. .s99ab-toasts .motion-group overrides _motion.scss on
+// specificity, so the load order does not matter.
+
+/* A fixed width for every stack and toast. The stack only pins an edge; each
+   toast is placed against it individually. All six stay mounted. The z-index
+   is $toast-z. */
+.s99ab-toasts {
+  width: min(var(--s99ab-toast-w), calc(100vw - 2 * var(--s99ab-pad)));
+  pointer-events: none;
+  position: fixed;
+  z-index: var(--s99ab-toast-z);
+}
+
+/* No flow gap: each toast carries its own distance from the edge. Set on the
+   group, since .motion-group sets the same variable on itself. */
+.s99ab-toasts .motion-group {
+  --motion-gap: 0px;
+}
+
+/* Every toast starts on the pinned edge at full width; its lift separates it. */
+.s99ab-toast-slot {
+  position: absolute;
+  inset-inline: 0;
+}
+
+.s99ab-toasts--up .s99ab-toast-slot { inset-block-end: 0; --s99ab-toast-lift-dir: -1; }
+.s99ab-toasts--down .s99ab-toast-slot { inset-block-start: 0; --s99ab-toast-lift-dir: 1; }
+
+/* The block inset is $toast-top, which clears the app bar. --s99ab-toast-out-*
+   is the nearest way off screen, read by the leave animation. */
+.s99ab-toasts--top-start { inset-block-start: var(--s99ab-toast-top); inset-inline-start: var(--s99ab-pad); --s99ab-toast-out-x: -1; }
+.s99ab-toasts--top { inset-block-start: var(--s99ab-toast-top); inset-inline-start: 50%; transform: translateX(-50%); --s99ab-toast-out-y: -1; }
+.s99ab-toasts--top-end { inset-block-start: var(--s99ab-toast-top); inset-inline-end: var(--s99ab-pad); --s99ab-toast-out-x: 1; }
+
+.s99ab-toasts--bottom-start { inset-block-end: var(--s99ab-toast-bottom); inset-inline-start: var(--s99ab-pad); --s99ab-toast-out-x: -1; }
+.s99ab-toasts--bottom { inset-block-end: var(--s99ab-toast-bottom); inset-inline-start: 50%; transform: translateX(-50%); --s99ab-toast-out-y: 1; }
+.s99ab-toasts--bottom-end { inset-block-end: var(--s99ab-toast-bottom); inset-inline-end: var(--s99ab-pad); --s99ab-toast-out-x: 1; }
+
+/* A toast enters from its pinned edge. */
+.s99ab-toasts--top-start,
+.s99ab-toasts--top,
+.s99ab-toasts--top-end { --s99ab-motion-dir: -1; }
+
+/* ---------------------------------------------------------------- toast ---- */
+
+/* Frosted chrome like the bar and the rail, tinted by kind. `edge` border so it
+   holds against whatever is underneath. The lift (distance from the pinned edge)
+   is a transitioned transform on this element; enter and leave own the
+   transform on the slot. */
+.s99ab-toast {
+  --s99ab-toast-ground: color-mix(in srgb, rgb(var(--s99ab-toast-kind)) 10%, rgb(var(--v-theme-chrome)));
+
+  position: relative;
+  overflow: hidden;
+  transform: translateY(calc(var(--s99ab-toast-lift, 0px) * var(--s99ab-toast-lift-dir, -1)));
+  transition: transform var(--s99ab-toast-move) var(--s99ab-motion-easing);
+  pointer-events: auto;
+  border: 1px solid rgb(var(--v-theme-edge));
+  border-radius: var(--s99ab-radius);
+  background: color-mix(in srgb, var(--s99ab-toast-ground) var(--s99ab-glass-chrome), transparent);
+  backdrop-filter: var(--s99ab-glass);
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-toast--success { --s99ab-toast-kind: var(--v-theme-success); }
+.s99ab-toast--info { --s99ab-toast-kind: var(--v-theme-info); }
+.s99ab-toast--warning { --s99ab-toast-kind: var(--v-theme-warning); }
+.s99ab-toast--error { --s99ab-toast-kind: var(--v-theme-error); }
+
+/* The first-line band, so the icon, the first line and the dismiss share a
+   centre; a wrapped message grows downward. */
+.s99ab-toast__row {
+  --s99ab-toast-lead: var(--s99ab-control-h-dense);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s99ab-control-gap);
+  padding: var(--s99ab-pad-tight);
+}
+
+/* One line tall, glyph centred, so the icon matches the first line whether the
+   message wraps or not. */
+.s99ab-toast__icon {
+  flex: 0 0 auto;
+  height: var(--s99ab-toast-lead);
+  color: rgb(var(--s99ab-toast-kind));
+}
+
+/* The message wraps, `anywhere` so ids, paths and URLs break too. Height-capped
+   and scrollable. */
+.s99ab-toast__text {
+  /* Padding centres the first line on the band; centring the paragraph would
+     break once it wraps and put overflow above the scroll origin. */
+  --s99ab-toast-lead-pad: max(0px, calc((var(--s99ab-toast-lead) - 1lh) / 2));
+
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-block-start: var(--s99ab-toast-lead-pad);
+  max-height: calc(var(--s99ab-toast-lines) * 1lh + var(--s99ab-toast-lead-pad));
+  margin: 0;
+  overflow-y: auto;
+  overflow-wrap: anywhere;
+  font-size: var(--s99ab-toast-text-size);
+  line-height: var(--s99ab-toast-text-lh);
+}
+
+/* The repeat count and "+N still waiting", in tabular figures so the width is stable. */
+.s99ab-toast-marker {
+  padding: var(--s99ab-toast-marker-pad);
+  border-radius: var(--s99ab-radius);
+  font-size: var(--s99ab-toast-marker-size);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.s99ab-toast__count {
+  flex: 0 0 auto;
+  align-self: center;
+  background: color-mix(in srgb, rgb(var(--s99ab-toast-kind)) 18%, transparent);
+  color: rgb(var(--s99ab-toast-kind));
+}
+
+/* flex-start keeps it on the first line. The height floor covers a cluster
+   holding only the repeat count, which s99ab-controls--dense does not level. */
+.s99ab-toast__end {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  min-height: var(--s99ab-toast-lead);
+}
+
+/* The action takes the kind's colour, the close stays ink. */
+.s99ab-toast__action {
+  color: rgb(var(--s99ab-toast-kind));
+}
+
+.s99ab-toast__close {
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* --------------------------------------------------------------- lifespan ---- */
+
+/* scaleX so the countdown composites. transform-origin has no logical form, hence :dir(). */
+.s99ab-toast__life {
+  position: absolute;
+  inset-inline: 0;
+  height: var(--s99ab-toast-bar-h);
+  background: rgb(var(--s99ab-toast-kind));
+  transform-origin: left;
+  animation: s99ab-toast-life linear forwards;
+}
+
+.s99ab-toast__life:dir(rtl) {
+  transform-origin: right;
+}
+
+.s99ab-toast--life-bottom .s99ab-toast__life { inset-block-end: 0; }
+.s99ab-toast--life-top .s99ab-toast__life { inset-block-start: 0; }
+
+/* The bar pauses with the countdown (pointer on the toast, tab in background). */
+.s99ab-toast--held .s99ab-toast__life {
+  animation-play-state: paused;
+}
+
+@keyframes s99ab-toast-life {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+/* Rides past the last toast on the same lift. */
+.s99ab-toasts__more {
+  width: fit-content;
+  margin-inline: auto;
+  transform: translateY(calc(var(--s99ab-toast-lift, 0px) * var(--s99ab-toast-lift-dir, -1)));
+  transition: transform var(--s99ab-toast-move) var(--s99ab-motion-easing);
+  pointer-events: auto;
+  border: 1px solid rgb(var(--v-theme-edge));
+  background: rgb(var(--v-theme-chrome));
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* Reduced motion: places change at once, the fade remains. */
+:root[data-motion='reduced'] .s99ab-toast,
+:root[data-motion='reduced'] .s99ab-toasts__more,
+:root[data-motion='off'] .s99ab-toast,
+:root[data-motion='off'] .s99ab-toasts__more {
+  transition: none;
+}
+
+/* The `system` level, answered in CSS. applyMotionLevel writes the configured
+   level, so the OS preference has to be read here; unset means no plugin. */
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion]) .s99ab-toast,
+  :root:not([data-motion]) .s99ab-toasts__more,
+  :root[data-motion='system'] .s99ab-toast,
+  :root[data-motion='system'] .s99ab-toasts__more {
+    transition: none;
+  }
+}

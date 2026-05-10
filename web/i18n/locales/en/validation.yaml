@@ -1,0 +1,42 @@
+# i18n/locales/en/validation.yaml
+#
+# The messages useZodRules emits, one per zod issue code. The layer names these
+# keys in DEFAULT_MESSAGES, so it ships them too - an app that had to write
+# them would discover them as `validation.required` printed under a field.
+#
+# {min}, {max} and {divisor} come from the issue's own constraint, so the number
+# is never repeated in the message. Each is passed only when the issue carries
+# it, so a slot left standing names a message asking for a value its code has.
+
+required:
+  value: "Required"
+  description: "invalid_type - the field is empty and the schema does not allow it"
+tooSmall:
+  value: "At least {min}"
+  description: "too_small - a minimum length, or a minimum number"
+  placeholders:
+    min: {type: integer}
+tooBig:
+  value: "At most {max}"
+  description: "too_big - a maximum length, or a maximum number"
+  placeholders:
+    max: {type: integer}
+format:
+  value: "Not a valid format"
+  description: "invalid_format - an email, a URL, a regex"
+invalidValue:
+  value: "Not one of the allowed values"
+  description: "invalid_value - outside an enum"
+step:
+  value: "Must be a multiple of {divisor}"
+  description: "not_multiple_of - zod puts the factor on the issue's divisor, not
+    its minimum"
+  placeholders:
+    divisor: {type: integer}
+invalid:
+  value: "Invalid"
+  description: "custom, and the fallback for any code with no message of its own"
+email:
+  value: "Not an email address"
+  description: "A Kratos field typed email. Its own key rather than validation.format,
+    which names no shape"

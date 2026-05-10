@@ -1,0 +1,73 @@
+# i18n/locales/en/common.yaml
+#
+# The keys the layer's own components call. An app that defines none of these
+# still renders: useTranslate falls back to the key. These are the defaults it
+# should not have to write.
+
+confirm:
+  value: "Confirm"
+  description: "ConfirmDialog's accept button"
+cancel:
+  value: "Cancel"
+  description: "ConfirmDialog and PromptDialog's dismiss button"
+close:
+  value: "Close"
+  description: "ToastHost and ShortcutHelp's close button"
+copy:
+  value: "Copy"
+  description: "UiCode's copy button, before it is pressed"
+copied:
+  value: "Copied"
+  description: "UiCode's copy button, for the moment after"
+retry:
+  value: "Retry"
+  description: "ErrorState's retry action"
+noResults:
+  value: "No results"
+  description: "DataTable with an active filter and nothing matching"
+noResultsHint:
+  value: "Try a different search."
+  description: "Shown under noResults"
+toggleTheme:
+  value: "Toggle theme"
+  description: "ThemeToggle's accessible name and tooltip"
+menu:
+  value: "Menu"
+  description: "AppBar's navigation toggle, shown below the rail's breakpoint"
+language:
+  value: "Language"
+  description: "LocaleMenu's accessible name and tooltip"
+repeatedCount:
+  value: "Repeated {count} times"
+  description: "Names the toast repeat marker, which is drawn as a bare number. The
+    count is in the message because its place in the sentence is not the same in every
+    language."
+  placeholders:
+    count: {type: integer}
+search:
+  value: "Search"
+  description: "SearchField's label, and any screen that needs the word"
+clear:
+  value: "Clear"
+  description: "Clears the search in UiDataTable's strip"
+loading:
+  value: "Loading"
+  description: "LoadingState's live region, whose own content - bare bars, or an aria-hidden
+    goo - announces as nothing"
+value:
+  value: "Value"
+  description: "PromptDialog's field label where the caller names none. Not its placeholder:
+    a label that vanishes on the first keystroke is no label."
+linkNewTab:
+  value: "{text} (opens in a new tab)"
+  description: "A MarkdownInline link's whole accessible name. Those links always
+    open a new tab, and the author-written prose around them cannot be relied on to
+    say so. The link text is a slot so the warning's position and bracketing are the
+    translator's."
+  placeholders:
+    text: {type: string}
+
+highContrast:
+  value: "High contrast"
+  description: "UiContrastToggle's accessible name and tooltip. The same in both states;
+    aria-pressed carries which one it is in"

@@ -1,0 +1,14 @@
+# i18n/locales/pl/shortcut.yaml
+#
+# `group.<prefix>` is the other half of this namespace, and the layer ships none
+# of it. ShortcutHelp heads each group with shortcut.group.<prefix>, where the
+# prefix is the app's own registry id namespace - "app", "session" - so only the
+# app knows what its prefixes are and what they mean. An app that declares none
+# gets the bare prefix as a heading.
+
+title:
+  value: "Skróty klawiszowe"
+  description: "ShortcutHelp dialog title"
+none:
+  value: "Brak skrótów na tym ekranie."
+  description: "ShortcutHelp with an empty registry"

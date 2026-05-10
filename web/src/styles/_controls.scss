@@ -1,0 +1,108 @@
+// web/src/styles/_controls.scss
+//
+// Control rows. Vuetify sizes buttons, icon buttons and fields from three
+// scales; a row levels them to one height.
+
+/* One height for every button; `size` only changes the type and glyph inside.
+   For shorter rows use .s99ab-controls--dense. Tabs are excluded (their strip
+   has its own height), and so are icon buttons, which _surfaces.scss squares. */
+.v-btn:not(.v-tab):not(.v-btn--icon) {
+  height: var(--s99ab-control-h);
+  min-height: var(--s99ab-control-h);
+}
+
+/* Levels everything inside to --s99ab-control-h; icon-only controls are that
+   height square. Used on the app bar, panel head actions and any screen row. */
+.s99ab-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--s99ab-control-gap);
+}
+
+.s99ab-controls > * {
+  flex: 0 0 auto;
+}
+
+/* Spacers are excluded from levelling so they take the slack. Restated because
+   Vuetify's .v-spacer rule is layered and loses to the unlayered rule above. */
+.s99ab-controls > .v-spacer {
+  flex: 1 1 auto;
+}
+
+/* A lower row height for strips, toasts, list rows and table cells. */
+.s99ab-controls--dense {
+  --s99ab-control-h: var(--s99ab-control-h-dense);
+}
+
+/* Chips are levelled only inside a row; outside one a chip is a label. */
+.s99ab-controls .v-chip {
+  height: var(--s99ab-control-h);
+  min-height: var(--s99ab-control-h);
+}
+
+/* One glyph size for the whole row. */
+.s99ab-controls .v-icon {
+  font-size: var(--s99ab-icon);
+}
+
+
+/* A field in a control row gets the row's field width instead of shrinking to
+   its minimum. `flex-grow-1` still wins. */
+.s99ab-controls .v-input {
+  width: var(--s99ab-field-w);
+}
+
+/* Fields are sized through Vuetify's variables, since a direct height leaves the
+   label and outline drawn for the old one. Vuetify's compact padding gives 40px. */
+.s99ab-controls .v-input,
+.s99ab-controls .v-field,
+.v-data-table-footer .v-input,
+.v-data-table-footer .v-field {
+  --v-input-control-height: var(--s99ab-control-h);
+  --v-field-input-padding-top: calc((var(--s99ab-control-h) - 1.5rem) / 2);
+  --v-field-input-padding-bottom: calc((var(--s99ab-control-h) - 1.5rem) / 2);
+}
+
+/* Card borders use the `line` token instead of currentColor at --v-border-opacity. */
+.v-card--border,
+.v-sheet--border {
+  border-color: rgb(var(--v-theme-line));
+}
+
+/* v-divider would otherwise inherit currentColor and land near-white on dark. */
+.v-divider {
+  border-color: rgb(var(--v-theme-lineSoft));
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------- text btn ---- */
+
+/* Text buttons have no overlay or ripple in any state; the label opacity rises
+   on hover instead. Icon buttons keep the overlay as their hover shape. Keyboard
+   focus uses the ring from _focus.scss. */
+.v-btn--variant-text:not(.v-btn--icon):hover > .v-btn__overlay,
+.v-btn--variant-text:not(.v-btn--icon):focus > .v-btn__overlay,
+.v-btn--variant-text:not(.v-btn--icon):focus-visible > .v-btn__overlay,
+.v-btn--variant-text:not(.v-btn--icon):active > .v-btn__overlay,
+.v-btn--variant-text:not(.v-btn--icon).v-btn--active > .v-btn__overlay {
+  opacity: 0;
+}
+
+.v-btn--variant-text:not(.v-btn--icon) .v-ripple__container {
+  display: none;
+}
+
+.v-btn--variant-text:not(.v-btn--icon) .v-btn__content {
+  opacity: var(--s99ab-text-btn-rest);
+  transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+.v-btn--variant-text:not(.v-btn--icon):hover .v-btn__content,
+.v-btn--variant-text:not(.v-btn--icon):focus-visible .v-btn__content {
+  opacity: 1;
+}
+
+/* A disabled button does not brighten on hover. */
+.v-btn--variant-text:not(.v-btn--icon).v-btn--disabled .v-btn__content {
+  opacity: var(--s99ab-text-btn-rest);
+}

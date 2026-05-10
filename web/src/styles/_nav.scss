@@ -1,0 +1,154 @@
+// web/src/styles/_nav.scss
+//
+// Both nav bodies: the plain list and UiNavTrail's rail. Shared here because a
+// scoped rule would reach only one. Values are --s99ab-* knobs or theme tokens.
+
+// ------------------------------------------------------------------ both ----
+
+/* No list padding; group labels set the rhythm. Row styles are .nav__list in _lists.scss. */
+.nav__list {
+  padding: 0;
+  background: transparent;
+}
+
+/* Inset to the control gap and sized for a line of tracked capitals. */
+.nav__group {
+  min-height: 0;
+  padding: var(--s99ab-pad-tight) var(--s99ab-control-gap) 4px;
+}
+
+/* Marks a row that leaves the page, at meta weight. */
+.nav__away {
+  color: rgb(var(--v-theme-ink3));
+  font-size: var(--s99ab-meta-size);
+}
+
+// ----------------------------------------------------------------- trail ----
+
+/* The rail overlays the list's box so the list decides the height. Not clickable. */
+.trail {
+  position: relative;
+}
+
+.trail__rail {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  pointer-events: none;
+}
+
+.trail__line {
+  stroke: rgb(var(--v-theme-line));
+  stroke-width: var(--s99ab-nav-trail-stroke);
+  stroke-linecap: round;
+}
+
+/* The dash is on its own class, since the travelled path's dasharray arrives as
+   an attribute that CSS would override. 0 is solid. */
+.trail__line--rest {
+  stroke-opacity: var(--s99ab-nav-trail-rest);
+  stroke-dasharray: var(--s99ab-nav-trail-dash) var(--s99ab-nav-trail-dash);
+}
+
+/* The travelled portion is drawn over the rail. 0 hides it for a nav that is not a sequence. */
+.trail__line--done {
+  stroke: rgb(var(--v-theme-accent));
+  stroke-opacity: var(--s99ab-nav-trail-done);
+}
+
+/* The disc moves by CSS transition, which retargets from its current position
+   when interrupted. Scaled by --s99ab-motion-travel; `off` is in _motion.scss.
+   transform because WebKitGTK cannot animate cx/cy. */
+.trail__disc,
+.trail__halo {
+  transition:
+    transform calc(var(--s99ab-motion-base) * var(--s99ab-motion-travel)) var(--s99ab-motion-easing),
+    opacity var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+.trail__disc {
+  fill: rgb(var(--v-theme-accent));
+}
+
+/* Slash-alpha against Vuetify's comma triplet compiles to invalid CSS. */
+.trail__halo {
+  fill: rgba(var(--v-theme-accent), 0.22);
+}
+
+/* The travelled dash moves with the disc. */
+.trail__line--done {
+  transition: stroke-dashoffset calc(var(--s99ab-motion-base) * var(--s99ab-motion-travel)) var(--s99ab-motion-easing);
+}
+
+/* The row gap is on the list, so the list and the SVG measure the same height. */
+.trail__rows {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--s99ab-nav-trail-row-gap);
+}
+
+/* Each row starts just past its own rail segment. Two classes deep to beat
+   `.nav__list .v-list-item` in _lists.scss. */
+.trail__rows .trail__row,
+.trail__rows .trail__head {
+  margin-inline-start: var(--trail-inset);
+  padding-inline: var(--s99ab-control-gap);
+}
+
+/* The row heights the rail geometry uses. */
+.trail__rows .trail__row {
+  min-height: var(--s99ab-nav-trail-row);
+  height: var(--s99ab-nav-trail-row);
+  margin-block: 0;
+}
+
+/* Group heading clearance on top of the row gap. Margins, matching the rail's arithmetic. */
+.trail__rows .trail__head {
+  min-height: var(--s99ab-nav-trail-head);
+  height: var(--s99ab-nav-trail-head);
+  margin-block: var(--s99ab-nav-trail-group-above) var(--s99ab-nav-trail-group-below);
+  padding-block: 0;
+}
+
+/* No top band before a leading group heading. Mirrored by trailNodes. */
+.trail__rows .trail__head:first-child {
+  margin-block-start: 0;
+}
+
+/* A group with no label, on its first destination. 0 by default. */
+.trail__rows .trail__row--group {
+  margin-block-start: var(--s99ab-nav-trail-group-bare);
+}
+
+/* The four lit styles (see NavLit). Hover and focus keep their face in all of them. */
+
+/* The rail's colour on the row it points at. */
+.trail--lit-both .trail__rows .v-list-item--active,
+.trail--lit-accent .trail__rows .v-list-item--active {
+  color: rgb(var(--v-theme-accent));
+}
+
+.trail--lit-both .trail__rows .v-list-item--active .v-icon,
+.trail--lit-accent .trail__rows .v-list-item--active .v-icon {
+  color: rgb(var(--v-theme-accent));
+  opacity: 1;
+}
+
+/* No face for the two styles without one, and no Vuetify overlay. */
+.trail--lit-accent .trail__rows .v-list-item--active,
+.trail--lit-plain .trail__rows .v-list-item--active {
+  background: transparent;
+  font-weight: var(--s99ab-nav-trail-lit-weight);
+}
+
+.trail--lit-accent .trail__rows .v-list-item--active > .v-list-item__overlay,
+.trail--lit-plain .trail__rows .v-list-item--active > .v-list-item__overlay {
+  opacity: 0;
+}
+
+/* Plain: full ink at a heavier weight; the disc is the only colour. */
+.trail--lit-plain .trail__rows .v-list-item--active,
+.trail--lit-plain .trail__rows .v-list-item--active .v-icon {
+  color: rgb(var(--v-theme-ink));
+  opacity: 1;
+}

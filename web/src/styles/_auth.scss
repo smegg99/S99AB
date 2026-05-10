@@ -1,0 +1,289 @@
+// web/src/styles/_auth.scss
+//
+// The signed-out screen: the app's mark over the card, the build in the card's
+// foot, and the appearance controls pinned where the app bar would put them.
+
+/* One centred column: the mark, then the card. Lifted above centre by trimming
+   the bottom, so a short window collapses the space instead of scrolling. */
+.s99ab-auth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s99ab-gap);
+  min-height: 100dvh;
+  padding: var(--s99ab-pad);
+  padding-bottom: calc(var(--s99ab-pad) + min(var(--s99ab-auth-rise), 8vh));
+
+  /* Its own ground: with `layout: false` there is no v-app above to paint one.
+     Same values as Vuetify's root. */
+  background: rgb(var(--v-theme-background));
+  color: rgba(var(--v-theme-on-background), var(--v-high-emphasis-opacity));
+}
+
+/* Above UiBackdrop and UiFlow, which are positioned at z-index 0 and would
+   otherwise paint over the in-flow mark and card. */
+.s99ab-auth__mark,
+.s99ab-auth__card {
+  position: relative;
+  z-index: 1;
+}
+
+.s99ab-auth__card {
+  width: 100%;
+  max-width: var(--s99ab-auth-w);
+}
+
+/* Hides the foot strip when both halves rendered nothing (no version in a dev
+   build, unreadable repo). Checks their children, since UiAuthBuild's plate is
+   always present. Scoped to the auth card. */
+.s99ab-auth__card
+  .panel__foot:not(:has(.s99ab-auth__plate > *)):not(:has(.s99ab-auth__end > *)) {
+  display: none;
+}
+
+/* Drops the empty plate's gap when only the repository readout rendered. */
+.s99ab-auth__plate:not(:has(> *)) {
+  display: none;
+}
+
+.s99ab-auth__end {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The mark, above and outside the card, centred on the card's column. */
+.s99ab-auth__mark {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--s99ab-auth-w);
+}
+
+/* Pinned to the viewport at the page inset, above the card and below overlays. */
+.s99ab-auth__controls {
+  position: fixed;
+  inset-block-start: var(--s99ab-pad);
+  inset-inline-end: var(--s99ab-pad);
+  z-index: 1;
+}
+
+/* The way back, in the opposite corner on the same line. */
+.s99ab-auth__out {
+  position: fixed;
+  inset-block-start: var(--s99ab-pad);
+  inset-inline-start: var(--s99ab-pad);
+  z-index: 1;
+}
+
+/* Version, commit and build time in the foot strip, in tabular figures. */
+.s99ab-auth__plate {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s99ab-control-gap);
+  align-items: baseline;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* Hairline separators between entries. */
+.s99ab-auth__plate > * + *::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.72em;
+  margin-inline-end: var(--s99ab-control-gap);
+  vertical-align: baseline;
+  background: rgb(var(--v-theme-line));
+}
+
+.s99ab-auth__plate dt {
+  display: inline;
+  text-transform: uppercase;
+  letter-spacing: var(--s99ab-label-track);
+  opacity: 0.7;
+}
+
+.s99ab-auth__plate dd {
+  display: inline;
+  margin-inline-start: 0.4em;
+}
+
+/* The form's stack owns spacing, so _fields.scss's stacked-input clearance is dropped. */
+.s99ab-auth-form :where(.v-input) + :where(.v-input) {
+  margin-block-start: 0;
+}
+
+/* Width cap for the form wherever it renders. */
+.s99ab-auth-form {
+  width: 100%;
+  max-width: var(--s99ab-auth-w);
+}
+
+/* TOTP QR code on a white plate in every theme, which is also the required quiet zone. */
+.s99ab-auth-node__image {
+  display: block;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: var(--s99ab-pad-tight);
+  border-radius: var(--s99ab-radius);
+  background: #fff;
+}
+
+/* Recovery codes and lookup secrets: monospaced and wrapped so the whole code stays visible. */
+.s99ab-auth-node__text {
+  margin: 0;
+  padding: var(--s99ab-pad-tight);
+  border: 1px solid rgb(var(--v-theme-lineSoft));
+  border-radius: var(--s99ab-radius);
+  background: rgb(var(--v-theme-well));
+  color: rgb(var(--v-theme-ink));
+  font-family: var(--s99ab-font-mono, ui-monospace, monospace);
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+}
+
+/* Kratos messages styled as layer states (tinted face, hairline) instead of v-alert. */
+.s99ab-auth-note {
+  --s99ab-auth-note-kind: var(--v-theme-neutral);
+
+  display: flex;
+  gap: var(--s99ab-control-gap);
+  align-items: flex-start;
+  padding: var(--s99ab-pad-tight);
+  border: 1px solid rgb(var(--v-theme-edge));
+  border-radius: var(--s99ab-radius);
+  background: color-mix(in srgb, rgb(var(--s99ab-auth-note-kind)) 10%, rgb(var(--v-theme-chrome)));
+  font-size: 0.85rem;
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-auth-note--error { --s99ab-auth-note-kind: var(--v-theme-error); }
+.s99ab-auth-note--success { --s99ab-auth-note-kind: var(--v-theme-success); }
+.s99ab-auth-note--info { --s99ab-auth-note-kind: var(--v-theme-accent); }
+
+.s99ab-auth-note .v-icon {
+  color: rgb(var(--s99ab-auth-note-kind));
+}
+
+/* The switch under the card. */
+.s99ab-auth__switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s99ab-control-gap);
+  align-items: baseline;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* ------------------------------------------------------------- inspector ---- */
+
+/* A read-only flow readout: label size, quiet ink, no control heights. */
+.s99ab-kx {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s99ab-pad-tight);
+  font-size: var(--s99ab-label-size);
+  color: rgb(var(--v-theme-ink2));
+}
+
+/* The same plate as the auth card's foot. */
+.s99ab-kx__head {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s99ab-control-gap);
+  align-items: baseline;
+}
+
+.s99ab-kx__head > * + *::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 0.72em;
+  margin-inline-end: var(--s99ab-control-gap);
+  background: rgb(var(--v-theme-line));
+}
+
+.s99ab-kx__head dt,
+.s99ab-kx__head dd {
+  display: inline;
+  margin: 0;
+}
+
+.s99ab-kx__head dt {
+  text-transform: uppercase;
+  letter-spacing: var(--s99ab-label-track);
+  opacity: 0.7;
+}
+
+.s99ab-kx__head dd {
+  margin-inline-start: 0.4em;
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-kx__messages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* The message id first and dimmed; the text beside it is a translation. */
+.s99ab-kx__msg .num {
+  margin-inline-end: var(--s99ab-control-gap);
+  opacity: 0.7;
+}
+
+.s99ab-kx__msg--error { color: rgb(var(--v-theme-error)); }
+.s99ab-kx__msg--success { color: rgb(var(--v-theme-success)); }
+
+.s99ab-kx__group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Indented under its heading. */
+.s99ab-kx__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s99ab-control-gap);
+  align-items: baseline;
+  padding-inline-start: var(--s99ab-pad-tight);
+}
+
+.s99ab-kx__name {
+  color: rgb(var(--v-theme-ink));
+  font-weight: 600;
+}
+
+.s99ab-kx__type {
+  color: rgb(var(--v-theme-ink3));
+}
+
+/* A flag instead of a chip, since a row can carry four. */
+.s99ab-kx__mark {
+  padding-inline: 4px;
+  border: 1px solid rgb(var(--v-theme-lineSoft));
+  border-radius: var(--s99ab-radius);
+  color: rgb(var(--v-theme-ink3));
+  font-size: 0.72rem;
+}
+
+/* A node the renderer could not draw is highlighted. */
+.s99ab-kx__row--dropped .s99ab-kx__name {
+  color: rgb(var(--v-theme-error));
+}
+
+.s99ab-kx__dropped {
+  color: rgb(var(--v-theme-error));
+  font-weight: 600;
+}

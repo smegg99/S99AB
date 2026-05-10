@@ -1,0 +1,98 @@
+# i18n/locales/en/auth.yaml
+#
+# The keys UiKratosForm calls. Everything else on a login or registration
+# screen is Kratos's own text, arriving translated on the flow.
+
+starting:
+  value: "Starting..."
+  description: "UiKratosForm, while it reads the flow Kratos redirected it to"
+flowExpired:
+  value: "This form has expired. Start again."
+  description: "UiKratosForm when the flow itself is gone - 410, 404 or a stale
+    CSRF cookie. Said only when starting over is genuinely the fix."
+flowUnreachable:
+  value: "Could not reach the server. Try again."
+  description: "UiKratosForm when the request did not come back at all - Kratos
+    down, a proxy answering 502, or no network. Deliberately not the expiry
+    message: starting over fixes nothing here."
+
+signIn:
+  value: "Sign in"
+  description: "UiAccountMenu, signed out"
+signUp:
+  value: "Create account"
+  description: "UiAccountMenu, signed out"
+signOut:
+  value: "Sign out"
+  description: "UiAccountMenu's menu, signed in"
+signOutFailed:
+  value: "Signing out failed. Try again."
+  description: "Toast when Kratos refuses the logout call. The session is still standing,
+    which is the one outcome nobody must be left guessing about"
+account:
+  value: "Account"
+  description: "UiAccountMenu's avatar button, screen-reader name"
+required:
+  value: "Sign in to continue"
+  description: "UiSignInPrompt, and what a 401 renders as"
+noAccount:
+  value: "No account yet?"
+  description: "UiAuthCard, beside the link to registration"
+haveAccount:
+  value: "Already have one?"
+  description: "UiAuthCard, beside the link back to sign in"
+version:
+  value: "version"
+  description: "UiAuthPage's build plate. Lower case: it is a marking, not a heading"
+commit:
+  value: "commit"
+  description: "UiAuthPage's build plate, the short git sha"
+built:
+  value: "built"
+  description: "UiAuthPage's build plate, when the binary was built"
+backHome:
+  value: "Back"
+  description: "UiAuthPage's way out of the signed-out screen. Short: the corner is
+    narrow, and an app with room passes its own name through home-label"
+showPassword:
+  value: "Show password"
+  description: "The reveal toggle inside a password field. One name in both states;
+    aria-pressed carries which it is in"
+msg:
+  badCredentials:
+    value: "Wrong email or password."
+    description: "Replaces one of Kratos's own sentences, which are written for a
+      support inbox. Only ids whose meaning is unambiguous are mapped; see composables/kratos/rules.ts"
+  exists:
+    value: "That account already exists."
+    description: "Replaces one of Kratos's own sentences, which are written for a
+      support inbox. Only ids whose meaning is unambiguous are mapped; see composables/kratos/rules.ts"
+
+forbidden:
+  value: "You do not have access to this."
+  description: "kratosauth.RequireFunc, for a signed-in identity the gate refuses.
+    Answered as a 404, so this is only ever seen where the app chooses to show it"
+
+# Kratos writes its own button and field labels and ships no locale for them,
+# so without these a Polish screen says "Sign in with password". Keyed by
+# Kratos's own message id, which is stable across versions.
+#
+# Only Kratos's own words. 1070002 is deliberately absent: it is the label of a
+# *trait*, whose words come from the identity schema's title and are already
+# the app's - mapping it would rename every trait to whichever one was listed.
+label:
+  "1070001":
+    value: "Password"
+    description: "Kratos: the password field on sign-in and sign-up"
+  "1070007":
+    value: "Email"
+    description: "Kratos: the address field on recovery and verification"
+  "1070009":
+    value: "Continue"
+    description: "Kratos: the submit on recovery and verification"
+  "1010022":
+    value: "Sign in"
+    description: "Kratos: the password submit on the login flow"
+  "1040001":
+    value: "Create account"
+    description: "Kratos: the password submit on the registration flow"

@@ -1,0 +1,78 @@
+// web/src/styles/_layout.scss
+//
+// Layout: the page container, and images that never overflow it.
+
+/* Application screens use the full width up to this cap; prose is held to
+   62ch separately. The cap keeps a panel head's title and actions together on
+   an ultrawide. */
+.v-container {
+  max-width: var(--s99ab-container);
+}
+
+/* Opt-out for full-width screens such as a table or a file grid. */
+.v-container.s99ab-wide {
+  max-width: none;
+}
+
+
+/* UiStack and UiRow. The gap is one of the four spacing roles, set through one
+   custom property for both directions. */
+.s99ab-stack,
+.s99ab-row {
+  display: flex;
+  gap: var(--s99ab-flow-gap);
+}
+
+.s99ab-stack {
+  flex-direction: column;
+}
+
+/* Rows wrap by default so they never overflow a narrow window. */
+.s99ab-row {
+  flex-flow: row wrap;
+}
+
+.s99ab-row--nowrap {
+  flex-wrap: nowrap;
+}
+
+.s99ab-row--start { align-items: flex-start; }
+.s99ab-row--center { align-items: center; }
+.s99ab-row--end { align-items: flex-end; }
+.s99ab-row--stretch { align-items: stretch; }
+
+.s99ab-stack--gap,
+.s99ab-row--gap { --s99ab-flow-gap: var(--s99ab-gap); }
+
+.s99ab-stack--tight,
+.s99ab-row--tight { --s99ab-flow-gap: var(--s99ab-pad-tight); }
+
+.s99ab-stack--control,
+.s99ab-row--control { --s99ab-flow-gap: var(--s99ab-control-gap); }
+
+/* Inset for a state inside a flush panel, so ErrorState's border does not land
+   on the panel's own. */
+.s99ab-async__state {
+  padding: var(--s99ab-pad);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* A page tab strip stuck under the app bar; pair with .s99ab-glass. The negative
+   top margin makes its resting position equal its stuck position, and the bottom
+   margin restores the page's top space below it. */
+.s99ab-sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  box-sizing: border-box;
+  margin-top: calc(-1 * var(--s99ab-page-y));
+  margin-bottom: var(--s99ab-page-y);
+  /* Full bleed to the content edges, like the app bar. Uses the same knob as
+     .shell__page's padding-inline. */
+  margin-inline: calc(-1 * var(--s99ab-pad));
+  border-bottom: 1px solid rgb(var(--v-theme-line));
+}
