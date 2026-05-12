@@ -4,6 +4,7 @@
 package apipage
 
 import (
+	"math"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -23,9 +24,17 @@ type Query struct {
 	Search string
 }
 
-// Offset is the row to start at. The one line every list query would otherwise
-// write itself, and the one place an off-by-one silently skips a row.
-func (q Query) Offset() int { return (q.Page - 1) * q.Limit }
+// Offset is the row to start at. It saturates at math.MaxInt because Page is
+// uncapped and an overflowed negative OFFSET is a database error.
+func (q Query) Offset() int {
+	if q.Page <= 1 || q.Limit <= 0 {
+		return 0
+	}
+	if rows := q.Page - 1; rows <= math.MaxInt/q.Limit {
+		return rows * q.Limit
+	}
+	return math.MaxInt
+}
 
 type Options struct {
 	// DefaultLimit is the page size when the client asks for none. Zero means 25.

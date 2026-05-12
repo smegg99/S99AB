@@ -76,6 +76,26 @@ func TestOffsetCountsFromTheFirstPage(t *testing.T) {
 	}
 }
 
+// Page is uncapped, so (Page-1)*Limit can overflow int64.
+func TestOffsetNeverGoesNegative(t *testing.T) {
+	for _, query := range []string{
+		"page=9223372036854775807&limit=200",
+		"page=184467440737095516&limit=200",
+		"page=9223372036854775807&limit=25",
+	} {
+		if got := apipage.Parse(ctx(t, "/items?"+query), apipage.Options{}).Offset(); got < 0 {
+			t.Fatalf("%s -> offset %d, want a non-negative offset", query, got)
+		}
+	}
+}
+
+// A hand-built Query with zero Limit must not panic.
+func TestOffsetOfAZeroValueQueryIsZero(t *testing.T) {
+	if got := (apipage.Query{}).Offset(); got != 0 {
+		t.Fatalf("offset = %d, want 0 for the zero value", got)
+	}
+}
+
 // useServerTable calls it search internally but sends it as q.
 func TestSearchArrivesUnderQ(t *testing.T) {
 	got := apipage.Parse(ctx(t, "/items?q=widget"), apipage.Options{})
