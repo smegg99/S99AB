@@ -207,30 +207,52 @@ func (c *Client) Objects(ctx context.Context, namespace, subject string, rel Rel
 	return out, nil
 }
 
+// list follows next_page_token through every page; one page would truncate the
+// result without an error.
 func (c *Client) list(ctx context.Context, query url.Values) ([]Tuple, error) {
 	query.Set("page_size", "500")
 
+	var all []Tuple
+	for {
+		page, next, err := c.listPage(ctx, query)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, page...)
+		if next == "" {
+			return all, nil
+		}
+		// A repeated token would loop forever.
+		if next == query.Get("page_token") {
+			return nil, fmt.Errorf("keto: list repeated page token %q", next)
+		}
+		query.Set("page_token", next)
+	}
+}
+
+func (c *Client) listPage(ctx context.Context, query url.Values) ([]Tuple, string, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
 		c.opts.ReadURL+"/relation-tuples?"+query.Encode(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("keto: request: %w", err)
+		return nil, "", fmt.Errorf("keto: request: %w", err)
 	}
 
 	resp, err := c.opts.Client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("keto: list: %w", err)
+		return nil, "", fmt.Errorf("keto: list: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("keto: list returned %d", resp.StatusCode)
+		return nil, "", fmt.Errorf("keto: list returned %d", resp.StatusCode)
 	}
 
 	var body struct {
 		RelationTuples []Tuple `json:"relation_tuples"`
+		NextPageToken  string  `json:"next_page_token"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&body); err != nil {
-		return nil, fmt.Errorf("keto: decode list: %w", err)
+		return nil, "", fmt.Errorf("keto: decode list: %w", err)
 	}
-	return body.RelationTuples, nil
+	return body.RelationTuples, body.NextPageToken, nil
 }

@@ -5,6 +5,7 @@ package keto_test
 import (
 	"context"
 	"net/http"
+	"net/http/httptest"
 	"slices"
 	"testing"
 	"time"
@@ -236,5 +237,46 @@ func TestUnreachableKetoIsAnErrorNotAllow(t *testing.T) {
 func TestMissingURLsAreRejected(t *testing.T) {
 	if _, err := keto.New(keto.Options{ReadURL: readURL}); err == nil {
 		t.Fatal("a client with no write URL was accepted")
+	}
+}
+
+// A stub here: the real server would need more than a page of tuples per run.
+func TestListFollowsEveryPage(t *testing.T) {
+	pages := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := r.URL.Query().Get("page_token")
+		w.Header().Set("Content-Type", "application/json")
+
+		switch token {
+		case "":
+			pages++
+			_, _ = w.Write([]byte(`{"relation_tuples":[
+				{"namespace":"doc","object":"a","relation":"viewer","subject_id":"alice"}],
+				"next_page_token":"second"}`))
+		case "second":
+			pages++
+			_, _ = w.Write([]byte(`{"relation_tuples":[
+				{"namespace":"doc","object":"b","relation":"viewer","subject_id":"alice"}],
+				"next_page_token":""}`))
+		default:
+			t.Errorf("asked for an unknown page %q", token)
+		}
+	}))
+	defer srv.Close()
+
+	c, err := keto.New(keto.Options{ReadURL: srv.URL, WriteURL: srv.URL})
+	if err != nil {
+		t.Fatalf("new: %v", err)
+	}
+
+	got, err := c.Objects(context.Background(), "doc", "alice", keto.RelViewer)
+	if err != nil {
+		t.Fatalf("objects: %v", err)
+	}
+	if pages != 2 {
+		t.Fatalf("read %d pages, want both", pages)
+	}
+	if !slices.Equal(got, []string{"a", "b"}) {
+		t.Fatalf("objects = %v, want [a b] - the second page was dropped", got)
 	}
 }
