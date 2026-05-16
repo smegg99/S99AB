@@ -116,30 +116,66 @@ func (w *Worker) Drain(ctx context.Context) (int, error) {
 	return done, nil
 }
 
+// claim returns the due jobs this worker won, via an optimistic update that
+// pushes next_try_at a lease ahead (SQLite has no SKIP LOCKED).
 func (w *Worker) claim(ctx context.Context) ([]Job, error) {
-	now := w.opts.Now().Format(time.RFC3339Nano)
+	now := w.opts.Now()
+	due := now.Format(time.RFC3339Nano)
+	lease := now.Add(w.opts.Lease).Format(time.RFC3339Nano)
 
 	rows, err := w.db.QueryContext(ctx, w.sql(
-		`SELECT id, kind, payload, attempts, COALESCE(last_error, '')
+		`SELECT id, kind, payload, attempts, COALESCE(last_error, ''), next_try_at
 		   FROM outbox
 		  WHERE done_at IS NULL AND attempts < ? AND next_try_at <= ?
 		  ORDER BY id
 		  LIMIT ?`),
-		w.opts.MaxAttempts, now, w.opts.BatchSize)
+		w.opts.MaxAttempts, due, w.opts.BatchSize)
 	if err != nil {
 		return nil, fmt.Errorf("outbox: claim: %w", err)
 	}
-	defer rows.Close()
 
-	var jobs []Job
+	type candidate struct {
+		job  Job
+		seen string
+	}
+	var found []candidate
 	for rows.Next() {
-		var job Job
-		if err := rows.Scan(&job.ID, &job.Kind, &job.Payload, &job.Attempts, &job.LastError); err != nil {
+		var c candidate
+		if err := rows.Scan(&c.job.ID, &c.job.Kind, &c.job.Payload, &c.job.Attempts, &c.job.LastError, &c.seen); err != nil {
+			rows.Close()
 			return nil, fmt.Errorf("outbox: scan: %w", err)
 		}
-		jobs = append(jobs, job)
+		found = append(found, c)
 	}
-	return jobs, rows.Err()
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, err
+	}
+	// Closed before the updates: SQLite will not write while a read cursor is
+	// open over the same table.
+	if err := rows.Close(); err != nil {
+		return nil, fmt.Errorf("outbox: claim: %w", err)
+	}
+
+	var jobs []Job
+	for _, c := range found {
+		res, err := w.db.ExecContext(ctx, w.sql(
+			`UPDATE outbox SET next_try_at = ?
+			  WHERE id = ? AND next_try_at = ? AND done_at IS NULL`),
+			lease, c.job.ID, c.seen)
+		if err != nil {
+			return nil, fmt.Errorf("outbox: claim %d: %w", c.job.ID, err)
+		}
+		// A driver that cannot count rows must not count as claimed.
+		n, err := res.RowsAffected()
+		if err != nil {
+			return nil, fmt.Errorf("outbox: claim %d: %w", c.job.ID, err)
+		}
+		if n == 1 {
+			jobs = append(jobs, c.job)
+		}
+	}
+	return jobs, nil
 }
 
 func (w *Worker) run(ctx context.Context, job Job) error {

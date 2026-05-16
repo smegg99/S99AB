@@ -33,13 +33,14 @@ type Options struct {
 	Interval time.Duration
 	// BatchSize claimed per pass.
 	BatchSize int
-	// Now is injectable so tests do not sleep through a backoff. It must stay
-	// consistent with the wall clock Enqueue stamps rows with - move it
-	// forward, do not relocate it, or nothing is ever due.
+	// Now must stay consistent with the wall clock Enqueue stamps rows with:
+	// move it forward only, or nothing is ever due.
 	Now func() time.Time
-	// Driver selects the placeholder style. Empty means detect it from the
-	// pool, which is what a caller written before this field did.
+	// Driver selects the placeholder style. Empty means detect it from the pool.
 	Driver string
+	// Lease is how long a claimed job stays invisible to other workers; it must
+	// outlast the slowest handler. Zero means 5 minutes.
+	Lease time.Duration
 }
 
 func (o *Options) defaults() {
@@ -57,6 +58,9 @@ func (o *Options) defaults() {
 	}
 	if o.BatchSize <= 0 {
 		o.BatchSize = 20
+	}
+	if o.Lease <= 0 {
+		o.Lease = 5 * time.Minute
 	}
 	if o.Now == nil {
 		o.Now = func() time.Time { return time.Now().UTC() }

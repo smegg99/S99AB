@@ -142,3 +142,47 @@ func TestSecondStartIsIgnored(t *testing.T) {
 		t.Fatalf("handler ran %d times, want 1", calls)
 	}
 }
+
+func TestAJobIsClaimedByOneWorkerOnly(t *testing.T) {
+	conn := store(t)
+	ctx := context.Background()
+
+	_ = outbox.Enqueue(ctx, conn, "once", []byte("x"))
+
+	var mu sync.Mutex
+	runs := 0
+	// Held open until both workers are inside, so timing cannot hide a duplicate.
+	inside := make(chan struct{}, 2)
+	release := make(chan struct{})
+	handlers := map[string]outbox.Handler{
+		"once": func(context.Context, []byte) error {
+			mu.Lock()
+			runs++
+			mu.Unlock()
+			inside <- struct{}{}
+			<-release
+			return nil
+		},
+	}
+
+	var wg sync.WaitGroup
+	for range 2 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			_, _ = outbox.NewWorker(conn, handlers, outbox.Options{}).Drain(ctx)
+		}()
+	}
+
+	// Whichever workers got in, let them finish.
+	time.Sleep(150 * time.Millisecond)
+	close(release)
+	wg.Wait()
+
+	mu.Lock()
+	got := runs
+	mu.Unlock()
+	if got != 1 {
+		t.Fatalf("the job ran %d times, want exactly 1", got)
+	}
+}
