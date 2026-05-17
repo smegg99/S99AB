@@ -1,17 +1,21 @@
-// auth/kratosauth/fake.go
+// auth/kratosauth/kratosauthtest/fake.go
 
-package kratosauth
+// Package kratosauthtest supplies a Kratos stand-in for tests, kept apart so
+// kratosauth does not import testing.
+package kratosauthtest
 
 import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/smegg99/s99ab/auth/kratosauth"
 )
 
 // Fake is a Client backed by a whoami endpoint that maps a credential (the whole
 // Cookie, X-Session-Token or Authorization header) to an account.
-func Fake(t *testing.T, accounts map[string]Identity) *Client {
+func Fake(t *testing.T, accounts map[string]kratosauth.Identity) *kratosauth.Client {
 	t.Helper()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +39,7 @@ func Fake(t *testing.T, accounts map[string]Identity) *Client {
 	}))
 	t.Cleanup(srv.Close)
 
-	c, err := New(Options{PublicURL: srv.URL})
+	c, err := kratosauth.New(kratosauth.Options{PublicURL: srv.URL})
 	if err != nil {
 		t.Fatalf("fake kratos: %v", err)
 	}
@@ -57,7 +61,7 @@ func credential(r *http.Request) string {
 }
 
 // traitsOf returns {} for empty traits; null fails every Identity.Trait call.
-func traitsOf(identity Identity) json.RawMessage {
+func traitsOf(identity kratosauth.Identity) json.RawMessage {
 	if len(identity.Traits) == 0 {
 		return json.RawMessage(`{}`)
 	}

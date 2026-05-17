@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/auth/kratosauth/kratosauthtest"
 )
 
 var fakeAccounts = map[string]kratosauth.Identity{
@@ -17,7 +18,7 @@ var fakeAccounts = map[string]kratosauth.Identity{
 }
 
 func TestFakeTellsAccountsApart(t *testing.T) {
-	r := engine(kratosauth.Fake(t, fakeAccounts))
+	r := engine(kratosauthtest.Fake(t, fakeAccounts))
 
 	for credential, want := range map[string]string{
 		"alice-token": "alice@example.com",
@@ -34,7 +35,7 @@ func TestFakeTellsAccountsApart(t *testing.T) {
 }
 
 func TestFakeRejectsAnUnknownCredential(t *testing.T) {
-	r := engine(kratosauth.Fake(t, fakeAccounts))
+	r := engine(kratosauthtest.Fake(t, fakeAccounts))
 
 	if code := do(r, "/private", "nobody-token").Code; code != http.StatusUnauthorized {
 		t.Fatalf("code = %d, want 401", code)
@@ -49,7 +50,7 @@ func TestFakeRejectsAnUnknownCredential(t *testing.T) {
 }
 
 func TestFakeAcceptsASessionToken(t *testing.T) {
-	r := engine(kratosauth.Fake(t, fakeAccounts))
+	r := engine(kratosauthtest.Fake(t, fakeAccounts))
 
 	req := httptest.NewRequest(http.MethodGet, "/private", nil)
 	req.Header.Set("X-Session-Token", "alice-token")
@@ -63,7 +64,7 @@ func TestFakeAcceptsASessionToken(t *testing.T) {
 }
 
 func TestFakeAccountWithoutTraitsIsUsable(t *testing.T) {
-	r := engine(kratosauth.Fake(t, map[string]kratosauth.Identity{"t": {ID: "id-plain"}}))
+	r := engine(kratosauthtest.Fake(t, map[string]kratosauth.Identity{"t": {ID: "id-plain"}}))
 
 	w := do(r, "/private", "t")
 	if w.Code != http.StatusOK {

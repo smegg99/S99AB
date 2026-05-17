@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/auth/kratosauth/kratosauthtest"
 )
 
 // router mounts Session for everyone and a role gate on /admin.
@@ -17,7 +18,7 @@ func router(t *testing.T, accounts map[string]kratosauth.Identity) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 
 	r := gin.New()
-	r.Use(kratosauth.Session(kratosauth.Fake(t, accounts)))
+	r.Use(kratosauth.Session(kratosauthtest.Fake(t, accounts)))
 
 	guarded := r.Group("", kratosauth.Require())
 	guarded.GET("/me", func(c *gin.Context) { c.String(http.StatusOK, "me") })
