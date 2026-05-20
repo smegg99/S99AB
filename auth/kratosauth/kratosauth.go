@@ -192,9 +192,17 @@ func Session(c *Client) gin.HandlerFunc {
 			apierr.Respond(ctx, err)
 			return
 
+		case errors.Is(err, ErrNoSession):
+			// Anonymous: continue with no identity.
+
 		case errors.Is(err, ErrUpstream):
-			// An unreachable Kratos is not an anonymous user. Treating it as one
-			// would silently downgrade every protected route to public.
+			// An unreachable Kratos must not downgrade protected routes to public.
+			apierr.Respond(ctx, apierr.Wrap(err, apierr.Unavailable, "auth.unavailable"))
+			return
+
+		default:
+			// Request build and decode errors are outages too; only ErrNoSession
+			// means anonymous.
 			apierr.Respond(ctx, apierr.Wrap(err, apierr.Unavailable, "auth.unavailable"))
 			return
 		}

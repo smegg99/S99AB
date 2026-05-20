@@ -293,3 +293,16 @@ func TestTraitDecodesArbitraryFields(t *testing.T) {
 		t.Fatal("a missing trait returned no error")
 	}
 }
+
+// A 200 with an undecodable body (a gateway error page, a truncated response)
+// is an outage.
+func TestUndecodableWhoamiIs503NotAnonymous(t *testing.T) {
+	r := engine(fakeKratos(t, http.StatusOK, `<html>502 Bad Gateway</html>`))
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/public", nil))
+
+	if w.Code != http.StatusServiceUnavailable {
+		t.Fatalf("status = %d, want 503; a caller was served as anonymous during an outage", w.Code)
+	}
+}
