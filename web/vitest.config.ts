@@ -9,13 +9,10 @@ export default defineConfig({
   test: {
     environment: 'happy-dom',
     include: ['tests/**/*.spec.ts'],
-    // Vuetify ships CSS next to its components; without inlining it the
-    // externalised import reaches Node, which cannot load a .css file.
-    //
-    // material-color-utilities is inlined for the neighbouring reason: its own
-    // ESM imports its submodules without file extensions, which Node's resolver
-    // refuses and Vite's resolves. An app bundles it through Vite and never
-    // notices; only a runner that externalises node_modules does.
+    // Pins the DOM capabilities the suite assumes.
+    setupFiles: ['tests/setup.ts'],
+    // Vuetify imports CSS, and material-color-utilities imports without file
+    // extensions; Node cannot load either when externalised.
     server: { deps: { inline: ['vuetify', '@material/material-color-utilities'] } },
   },
 })
