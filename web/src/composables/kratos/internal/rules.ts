@@ -60,6 +60,10 @@ const SHORT: Record<number, string> = {
   4000007: 'auth.msg.exists',
   // "The provided credentials are invalid. No credentials found."
   4000028: 'auth.msg.badCredentials',
+  // "Please confirm this action by verifying that it is you." - the whole of
+  // what a refresh login says, and the only thing explaining why somebody who
+  // is already signed in is being asked for their password again.
+  1010003: 'auth.msg.confirmItIsYou',
 }
 
 /** Short text for a mapped id, else Kratos's own words, also when the key is untranslated. */

@@ -12,6 +12,16 @@ flowUnreachable:
   description: "UiKratosForm when the request did not come back at all - Kratos
     down, a proxy answering 502, or no network. Deliberately not the expiry
     message: starting over fixes nothing here."
+alreadySignedIn:
+  value: "Jesteś już zalogowany."
+  description: "UiKratosForm when Kratos refuses a login, registration or
+    recovery flow because the reader already holds a session. Not a failure -
+    they are through the door already, and the screen offers the way on rather
+    than silently sending them somewhere."
+alreadySignedInGo:
+  value: "Przejdź do konta"
+  description: "The way out of the already-signed-in notice, when the app has
+    told the layer where its account screen is."
 
 signIn:
   value: "Zaloguj się"
@@ -56,6 +66,10 @@ showPassword:
   description: "The reveal toggle inside a password field. One name in both states;
     aria-pressed carries which it is in"
 msg:
+  confirmItIsYou:
+    value: "Potwierdź, że to Ty, zanim to zmienisz."
+    description: "Kratos 1010003, the whole of what a refresh login says - why
+      somebody already signed in is being asked for their password again."
   badCredentials:
     value: "Zły e-mail lub hasło."
     description: "Replaces one of Kratos's own sentences, which are written for a
@@ -78,6 +92,13 @@ forbidden:
 # *trait*, whose words come from the identity schema's title and are already
 # the app's - mapping it would rename every trait to whichever one was listed.
 label:
+  "1010001":
+    value: "Zaloguj się"
+    description: "Kratos's submit on a refresh login. A different id from
+      1010022, which is the ordinary sign-in button."
+  "1070003":
+    value: "Zapisz"
+    description: "Kratos's Save on a settings flow, one per method group."
   "1070001":
     value: "Hasło"
     description: "Kratos: the password field on sign-in and sign-up"

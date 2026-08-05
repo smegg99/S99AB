@@ -15,30 +15,16 @@
       />
     </template>
 
-    <!-- A native form, deliberately.
-       The button that was clicked is what tells Kratos which method to run -
-       `method=password`, `method=profile`, or `screen` to go back - and the
-       only thing that puts it in the body is the browser, from the submitter
-       on this event. Vuetify's v-form cannot carry that: it cancels the
-       submit and re-posts through form.submit(), which sends no submitter at
-       all, so the pair is dropped and Kratos answers "Could not find a
-       strategy to sign you up with. Did you fill out the form correctly?" -
-       with nothing wrong with the form.
-       action and method stay on the element even though the submit is
-       intercepted: they are what the form would do unaided, and they keep the
-       target in one place rather than only inside the handler. -->
-    <!-- Only once there is a flow to render.
-
-         UiAsync holds its loading state back for a moment so a fast answer
-         never flashes a skeleton, and during that window the content slot is
-         what renders - with no flow behind it, that is an empty form. Nothing
-         is the right thing to draw there; the box animates open when the
-         fields arrive. -->
+    <!-- A native form: Kratos picks the method from the submitter's name/value,
+         which v-form's form.submit() re-post drops. Rendered only once a flow
+         exists. novalidate because settings groups submit separately;
+         validate() checks only the asked group. -->
     <form
       v-if="flow"
       :action="flow.ui.action"
       :method="flow.ui.method"
       class="s99ab-auth-form"
+      novalidate
       @submit.prevent="onSubmit"
     >
       <!-- Not keyed or wrapped in UiMotion: nested Transitions inside UiAsync
@@ -79,6 +65,30 @@
         </template>
       </UiKratosNodes>
     </form>
+
+    <!-- No session on a flow that needs one: the sign-in prompt, returning here. -->
+    <UiSignInPrompt
+      v-else-if="signedOut"
+      :return-to="here"
+    />
+
+    <!-- Already signed in: Kratos makes no flow, so say so and offer the way on. -->
+    <div
+      v-else-if="signedInAlready"
+      class="s99ab-auth-signedin"
+    >
+      <p
+        class="s99ab-auth-note s99ab-auth-note--info"
+        role="status"
+      >
+        {{ alreadyText }}
+      </p>
+      <a
+        v-if="onwardHref"
+        class="s99ab-auth-signedin__go"
+        :href="onwardHref"
+      >{{ onwardText }}</a>
+    </div>
   </UiAsync>
 </template>
 
@@ -87,6 +97,7 @@ import { computed, onMounted, ref, useSlots, watch } from 'vue'
 import UiAsync from '../state/Async.vue'
 import UiLoadingState from '../state/LoadingState.vue'
 import UiKratosNodes from './KratosNodes.vue'
+import UiSignInPrompt from '../state/SignInPrompt.vue'
 import { kratosRules } from '../../composables/kratos/internal/rules'
 import { config as kratosConfig } from '../../composables/kratos/internal/types'
 import { useKratosFields } from '../../composables/kratos/useKratosFields'
@@ -97,6 +108,8 @@ import {
   type KratosMessage,
   type KratosNode,
 } from '../../composables/kratos/useKratosFlow'
+import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
+import { useReturnTo } from '../../composables/kratos/useAuthRoute'
 import { useTranslate } from '../../composables/useTranslate'
 
 // A whole login or registration screen in one tag. The page supplies the kind
@@ -127,10 +140,27 @@ const t = useTranslate()
 const slots = useSlots()
 // Both arrive as getters: they are destructured props, so passing either by
 // value would pin the flow to whatever the parent happened to say first.
+/*
+  Where to land, from the URL when the caller does not say.
+
+  Kratos is told the destination when the flow is created, and the only thing
+  that knows it is the link that sent the reader here: the shop builds
+  `/konto/logowanie?return_to=/dostawa` precisely so signing in puts them back
+  where they were. UiAuthPage already defaulted to it; a screen using this form
+  directly did not, so its `return_to` was read by nobody, the flow was created
+  without one, and Kratos fell back to default_browser_return_url - the site
+  root. Signing in from anywhere therefore landed on '/'.
+
+  An explicit prop still wins, and useReturnTo() drops anything pointing off
+  this origin, so the URL cannot aim the redirect somewhere else.
+*/
+const routeReturnTo = useReturnTo()
+const target = computed(() => returnTo || routeReturnTo.value)
+
 // Getters, so the flow follows prop changes.
 const kratos = useKratosFlow(() => kind, {
   get returnTo() {
-    return returnTo
+    return target.value
   },
 })
 const {
@@ -162,6 +192,25 @@ const asAsync = {
 }
 
 const startingLabel = computed(() => t('auth.starting', 'Starting...'))
+
+// Already signed in, nothing to render. Not an error, so no retry.
+const signedInAlready = computed(() => notice.value === 'signedIn' && !flow.value)
+
+// Signed out on a flow that needs a session (settings). No retry; sign in instead.
+const signedOut = computed(() => notice.value === 'signedOut' && !flow.value)
+
+// Returns here after signing in.
+const here = computed(() => (typeof window === 'undefined'
+  ? ''
+  : window.location.pathname + window.location.search))
+
+const alreadyText = computed(() => t('auth.alreadySignedIn', 'You are already signed in.'))
+const onwardText = computed(() => t('auth.alreadySignedInGo', 'Go to your account'))
+
+// The onward link: the flow's return URL, else the account screen, else home.
+// Empty when none is configured, and then no link is drawn.
+const paths = useAuthPaths()
+const onwardHref = computed(() => returnTo || paths.settingsPath || paths.homePath || '')
 
 // Explains a replaced expired flow at the top of the new form, since its fields are now empty.
 const shownMessages = computed<KratosMessage[]>(() => {
@@ -195,6 +244,11 @@ function validate(form: HTMLFormElement, submitter: Element | null): boolean {
     return true
   }
 
+  // Only the submitted group plus `default` (csrf and shared fields), so one
+  // settings group is not blocked by another's empty required field.
+  const asked = submitter.getAttribute('value') ?? ''
+  const groups = new Set([asked, 'default'])
+
   // Checks the form's data, which is what the browser sends.
   const data = new FormData(form)
   const found: Record<string, string[]> = {}
@@ -202,6 +256,7 @@ function validate(form: HTMLFormElement, submitter: Element | null): boolean {
   for (const node of renderable.value) {
     const name = node.attributes.name
     if (!name) continue
+    if (!groups.has(node.group)) continue
 
     const value = String(data.get(name) ?? '')
     const failed = kratosRules(node, t, kratosConfig.identifierIsEmail)

@@ -11,16 +11,10 @@ export interface KratosSuccess {
 }
 
 /**
- * Why the last attempt did not work, when it did not.
- *
- * `expired` is the flow itself being gone - submitted already, forgotten, or
- * past its lifespan. Starting over genuinely fixes it. `unreachable` is
- * everything else: Kratos down, a proxy answering 502, the browser offline, a
- * request that never came back. Starting over fixes nothing there, and saying
- * "this form has expired" to somebody whose network dropped sends them round
- * the same loop wondering what they did wrong.
+ * `expired`: the flow is gone and a new one fixes it. `unreachable`: Kratos or
+ * the network failed. `signedIn`/`signedOut`: the flow does not apply to this session.
  */
-export type KratosNotice = 'expired' | 'unreachable'
+export type KratosNotice = 'expired' | 'unreachable' | 'signedIn' | 'signedOut'
 
 export interface KratosFlowApi {
   flow: Ref<KratosFlow | null>
@@ -76,5 +70,12 @@ export interface KratosFlowOptions {
 export class AlreadySignedIn extends Error {
   constructor() {
     super('kratos: already signed in')
+  }
+}
+
+/** The flow needs a session and there is none (`session_inactive`). */
+export class NotSignedIn extends Error {
+  constructor() {
+    super('kratos: not signed in')
   }
 }

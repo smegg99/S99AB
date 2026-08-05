@@ -3,7 +3,7 @@
 import { computed, reactive, ref } from 'vue'
 import { config } from './internal/types'
 import { isKratosHidden, isKratosInput, isKratosSubmit } from './internal/nodes'
-import { AlreadySignedIn, flowIdFromLocation } from './internal/api'
+import { AlreadySignedIn, NotSignedIn, flowIdFromLocation } from './internal/api'
 import type { KratosFlow, KratosFlowKind } from './internal/types'
 import type {
   KratosFlowApi,
@@ -84,6 +84,10 @@ export function useKratosFlow(
       if (body?.error?.id === 'session_already_available') {
         throw new AlreadySignedIn()
       }
+      // A settings flow without a session answers 401 session_inactive.
+      if (body?.error?.id === 'session_inactive' || res.status === 401) {
+        throw new NotSignedIn()
+      }
       throw new Error(`kratos ${flowKind()} flow ${res.status}`)
     }
     return (await res.json()) as KratosFlow
@@ -118,7 +122,11 @@ export function useKratosFlow(
     }
     catch (err) {
       if (err instanceof AlreadySignedIn) {
-        finish({})
+        notice.value = 'signedIn'
+        return
+      }
+      if (err instanceof NotSignedIn) {
+        notice.value = 'signedOut'
         return
       }
       failed.value = true
@@ -150,10 +158,14 @@ export function useKratosFlow(
       load(id ? await readOrCreateFlow(id) : await createFlow())
     }
     catch (err) {
-      // Nothing to sign into. Leave pending set on the way out, so the screen
-      // holds its spinner rather than flashing a form it is about to leave.
+      // Reported, not navigated: where a signed-in user belongs is the app's call.
       if (err instanceof AlreadySignedIn) {
-        finish({})
+        notice.value = 'signedIn'
+        return
+      }
+      // No session, on a flow that needs one.
+      if (err instanceof NotSignedIn) {
+        notice.value = 'signedOut'
         return
       }
       // Stale flows were replaced above, so this is Kratos being unreachable.
@@ -205,14 +217,20 @@ export function useKratosFlow(
         load((await res.json()) as KratosFlow)
         return
       }
-      // Kratos wants the browser somewhere else - an OIDC hand-off, or a
-      // second factor served by another screen.
-      if (res.status === 422) {
-        const { redirect_browser_to: to } = (await res.json()) as {
+      // 422 is a hand-off (OIDC, second factor); 403 with redirect_browser_to is
+      // session_refresh_required. A stale CSRF 403 carries no redirect.
+      if (res.status === 422 || res.status === 403) {
+        const { redirect_browser_to: to } = ((await res.json().catch(() => null)) ?? {}) as {
           redirect_browser_to?: string
         }
-        if (typeof window !== 'undefined' && to) window.location.href = to
-        return
+        if (typeof window !== 'undefined' && to) {
+          // The page is leaving, so nothing re-renders a form behind the
+          // navigation - the same promise finish() makes.
+          leaving.value = true
+          window.location.href = to
+          return
+        }
+        if (res.status === 422) return
       }
       // Gone, unknown, or refused: restart at once and say the form expired.
       if ([403, 404, 410].includes(res.status)) {

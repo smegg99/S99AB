@@ -97,8 +97,10 @@ const TRANSLATED = new Set([
   1070001, // Password
   1070007, // Email, on recovery and verification
   1070009, // Continue, on recovery and verification
+  1010001, // Sign in, on a refresh login (not 1010022)
   1010022, // Sign in with password
   1040001, // Sign up
+  1070003, // Save, on settings
 ])
 
 // Kratos input types passed through; anything else renders as text.

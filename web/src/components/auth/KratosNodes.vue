@@ -25,11 +25,15 @@
       v-for="(node, i) in nodes"
       :key="nodeKey(node, i)"
     >
+      <!-- `update` lets a slot write a value back; UiKratosNode is fully
+           controlled, so without it the flow's value map would go stale. -->
       <slot
         :errors="errorsFor(node.attributes.name ?? '')"
         :hints="hintsFor(node.attributes.name ?? '')"
         :kind="kratosNodeKind(node)"
         :node="node"
+        :submitting="submitting"
+        :update="(next: string) => emit('update:value', node, next)"
         :value="valueOf(node)"
         name="node"
       >

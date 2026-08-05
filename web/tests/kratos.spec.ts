@@ -3,7 +3,7 @@
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import { nextTick } from 'vue'
+import { h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import KratosForm from '../src/components/auth/KratosForm.vue'
@@ -21,12 +21,14 @@ import {
   type KratosFlow,
   type KratosNode,
 } from '../src/composables/kratos/useKratosFlow'
+import { registerAuthRouting } from '../src/composables/kratos/useAuthRoute'
 import { fakeI18n } from './fake-i18n'
 
 // Real flows captured from Kratos v1.3.1; the form renders whatever shape Kratos sends.
 import login from './fixtures/login.json'
 import step1 from './fixtures/registration-step1.json'
 import step2 from './fixtures/registration-step2.json'
+import settings from './fixtures/settings.json'
 
 const vuetify = createVuetify({ components, directives })
 
@@ -89,12 +91,14 @@ function serve(flow: unknown, post?: PostReply | (() => PostReply)): Call[] {
 
 async function mountForm(
   flow: unknown,
-  kind: 'login' | 'registration' = 'registration',
+  kind: 'login' | 'registration' | 'settings' = 'registration',
   post?: PostReply | (() => PostReply),
+  slots?: Record<string, unknown>,
 ) {
   const calls = serve(flow, post)
   const wrapper = mount(KratosForm, {
     props: { kind },
+    slots: slots as never,
     global: { plugins: [vuetify, fakeI18n(k => k)] },
     attachTo: document.body,
   })
@@ -260,13 +264,11 @@ describe('reading the flow', () => {
     expect(Object.keys(kratos.values)).toEqual(['password'])
   })
 
-  // Kratos refuses to make a login or registration flow for someone who
-  // already has a session. Redirected it answered that by quietly sending the
-  // browser home; asked for JSON it returns 400 instead, and reading that as a
-  // dead flow puts "This form has expired" in front of someone whose only
-  // problem is that they are already signed in.
-  it('sends an already-signed-in reader on rather than erroring at them', async () => {
+  // Kratos answers JSON login, registration and recovery for a signed-in user
+  // with 400 session_already_available: report it, do not navigate or show "expired".
+  it('reports an already-signed-in reader rather than navigating for them', async () => {
     window.history.replaceState({}, '', '/login')
+    const before = window.location.href
     vi.stubGlobal(
       'fetch',
       vi.fn(() =>
@@ -279,18 +281,17 @@ describe('reading the flow', () => {
       ),
     )
 
-    // An empty returnTo is what a page with no ?return_to= passes, and it must
-    // not become the destination: an empty href is "this page again", which on
-    // a screen that leaves because you are already signed in is an infinite
-    // reload rather than a way out.
     const kratos = useKratosFlow('login', { returnTo: '' })
     await kratos.start()
 
+    // Retrying would be refused for the same reason.
     expect(kratos.failed.value).toBe(false)
-    // Still pending: the browser is leaving, and dropping the spinner would
-    // show a frame of an empty form on the way out.
-    expect(kratos.pending.value).toBe(true)
-    expect(window.location.pathname).toBe('/')
+    expect(kratos.notice.value).toBe('signedIn')
+    // No flow and no spinner: the screen renders the notice.
+    expect(kratos.flow.value).toBe(null)
+    expect(kratos.pending.value).toBe(false)
+    // The user stays on the page they asked for.
+    expect(window.location.href).toBe(before)
   })
 
   // A backend that accepts connections but never answers must not hold the
@@ -388,7 +389,7 @@ describe('reading the flow', () => {
   })
 
   // A spent id plus a live session reports the signed-in state.
-  it('sends a signed-in reader on even when the URL names a spent flow', async () => {
+  it('reports a signed-in reader even when the URL names a spent flow', async () => {
     window.history.replaceState({}, '', '/register?flow=spent')
     vi.stubGlobal(
       'fetch',
@@ -407,7 +408,10 @@ describe('reading the flow', () => {
     await kratos.start()
 
     expect(kratos.failed.value).toBe(false)
-    expect(window.location.pathname).toBe('/')
+    expect(kratos.notice.value).toBe('signedIn')
+    // The spent id is still dropped from the address bar.
+    expect(window.location.search).not.toContain('flow=')
+    expect(window.location.pathname).toBe('/register')
   })
 })
 
@@ -633,8 +637,150 @@ describe('UiKratosForm', () => {
   })
 })
 
-// Inside the form element and inside the stack, so anything an app puts here
-// takes the same gap the fields do and a button it adds submits the same flow.
+// The node slot gets a setter, since UiKratosNode is fully controlled.
+describe('UiKratosForm node slot binding', () => {
+  it('hands the slot a way to write the value back', async () => {
+    const seen: string[][] = []
+    const { wrapper } = await mountForm(login, 'login', undefined, {
+      node: (scope: Record<string, unknown>) => {
+        seen.push(Object.keys(scope))
+        return null
+      },
+    })
+    expect(seen.length).toBeGreaterThan(0)
+    for (const keys of seen) {
+      expect(keys).toContain('value')
+      expect(keys).toContain('update')
+    }
+    void wrapper
+  })
+
+  it('writes through to the flow when the slot calls update', async () => {
+    // The value the slot gets on each render; a stale map shows as the old value.
+    const seen: string[] = []
+    const { wrapper } = await mountForm(login, 'login', undefined, {
+      node: (scope: { node: KratosNode, value: string, update: (v: string) => void }) => {
+        if (scope.node.attributes.name !== 'identifier') return null
+        seen.push(scope.value)
+        return h('button', {
+          class: 'proxy',
+          onClick: () => scope.update('typed@example.com'),
+        })
+      },
+    })
+
+    expect(seen.at(-1)).toBe('')
+
+    await wrapper.find('button.proxy').trigger('click')
+    await nextTick()
+
+    expect(seen.at(-1)).toBe('typed@example.com')
+  })
+})
+
+// A settings flow answered with 401 session_inactive shows the signed-out
+// state, not "could not reach the server".
+describe('UiKratosForm with no session', () => {
+  const inactive = {
+    ok: false,
+    status: 401,
+    json: () => Promise.resolve({ error: { id: 'session_inactive' } }),
+  }
+
+  it('reports being signed out rather than a broken network', async () => {
+    window.history.replaceState({}, '', '/settings')
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(inactive)))
+
+    const kratos = useKratosFlow('settings', { returnTo: '' })
+    await kratos.start()
+
+    expect(kratos.notice.value).toBe('signedOut')
+    // Nothing to retry.
+    expect(kratos.failed.value).toBe(false)
+    expect(kratos.pending.value).toBe(false)
+  })
+
+  // An unreachable server is still reported as unreachable.
+  it('still reports an unreachable server as unreachable', async () => {
+    window.history.replaceState({}, '', '/settings')
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({ ok: false, status: 502, json: () => Promise.resolve({}) })))
+
+    const kratos = useKratosFlow('settings', { returnTo: '' })
+    await kratos.start()
+
+    expect(kratos.failed.value).toBe(true)
+    expect(kratos.notice.value).toBe('unreachable')
+  })
+})
+
+// The destination from the link is passed to Kratos when the flow is created.
+describe('UiKratosForm return_to', () => {
+  // registerAuthRouting writes module-level state.
+  afterEach(() => {
+    registerAuthRouting({ route: () => ({ fullPath: '/', params: {}, query: {} }), push: () => {} })
+  })
+
+  it('creates the flow with the return_to the URL carries', async () => {
+    const calls = serve(login)
+    // After serve(), which rewrites the address bar; a ?flow= would make start() read it.
+    window.history.replaceState({}, '', '/login?return_to=%2Fdostawa')
+    // useReturnTo reads the injected route; src/ stays router-free.
+    registerAuthRouting({
+      route: () => ({ fullPath: '/login', params: {}, query: { return_to: '/dostawa' } }),
+      push: () => {},
+    })
+    mount(KratosForm, {
+      props: { kind: 'login' as const },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+    })
+    await flushPromises()
+
+    const create = calls.find(c => c.url.includes('/login/browser'))
+    expect(create).toBeTruthy()
+    expect(decodeURIComponent(create!.url)).toContain('return_to=')
+    expect(decodeURIComponent(create!.url)).toContain('/dostawa')
+  })
+
+  // An explicit prop outranks the URL.
+  it('lets an explicit prop outrank the URL', async () => {
+    const calls = serve(login)
+    registerAuthRouting({
+      route: () => ({ fullPath: '/login', params: {}, query: { return_to: '/dostawa' } }),
+      push: () => {},
+    })
+    // After serve(), which rewrites the address bar.
+    window.history.replaceState({}, '', '/login?return_to=%2Fdostawa')
+    mount(KratosForm, {
+      props: { kind: 'login' as const, returnTo: 'http://localhost:3000/konto' },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+    })
+    await flushPromises()
+
+    const create = calls.find(c => c.url.includes('/login/browser'))
+    expect(decodeURIComponent(create!.url)).toContain('/konto')
+    expect(decodeURIComponent(create!.url)).not.toContain('/dostawa')
+  })
+
+  // An off-origin return_to is dropped, so the URL cannot aim the redirect elsewhere.
+  it('drops a return_to pointing off this origin', async () => {
+    const calls = serve(login)
+    registerAuthRouting({
+      route: () => ({ fullPath: '/login', params: {}, query: { return_to: 'https://evil.example/x' } }),
+      push: () => {},
+    })
+    // After serve(), which rewrites the address bar.
+    window.history.replaceState({}, '', '/login?return_to=https%3A%2F%2Fevil.example%2Fx')
+    mount(KratosForm, {
+      props: { kind: 'login' as const },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+    })
+    await flushPromises()
+
+    const create = calls.find(c => c.url.includes('/login/browser'))
+    expect(create!.url).not.toContain('evil.example')
+  })
+})
+
 // Slot content sits inside the form and the stack, and its buttons submit the same flow.
 describe('UiKratosForm slots', () => {
   it('renders a note above the fields and one under the submit', async () => {
@@ -721,9 +867,88 @@ describe('UiKratosForm validation', () => {
   })
 })
 
-// Switching flow in place, which is what a card does when it is not remounted.
-// restart() keeps the old flow until the new one lands, so no loading state
-// appears - but the fields it renders have to be the new flow's.
+// Settings returns profile and password as separate groups, each with its own
+// submit. A required field in one group must not block the other's submit.
+describe('UiKratosForm with several method groups', () => {
+  // The browser cannot know which group was pressed, so the form sets novalidate.
+  it('does not leave the whole form to the browser', async () => {
+    const { wrapper } = await mountForm(settings, 'settings')
+    expect(wrapper.find('form').attributes('novalidate')).toBeDefined()
+  })
+
+  it('saves one group while the other group\'s required field is empty', async () => {
+    const { wrapper, calls } = await mountForm(settings, 'settings')
+
+    const inputs = wrapper.findAll('input')
+    await inputs.find(i => i.attributes('name') === 'traits.name')!.setValue('Carol')
+    calls.length = 0
+
+    await wrapper.find('button[value="profile"]').trigger('click')
+    await flushPromises()
+
+    expect(calls.filter(c => c.method === 'POST')).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Required')
+  })
+
+  // The pressed group is still checked.
+  it('still refuses the group that is missing its own required field', async () => {
+    const { wrapper, calls } = await mountForm(settings, 'settings')
+    calls.length = 0
+
+    await wrapper.find('button[value="password"]').trigger('click')
+    await flushPromises()
+    await nextTick()
+
+    expect(calls.filter(c => c.method === 'POST')).toHaveLength(0)
+    expect(wrapper.text()).toContain('Required')
+  })
+
+  // Pressing password must not report the profile group's email.
+  it('reports nothing about the group that was not pressed', async () => {
+    const flow = structuredClone(settings) as typeof settings
+    const email = flow.ui.nodes.find(n => n.attributes.name === 'traits.email')!
+    email.attributes.value = ''
+
+    const { wrapper, calls } = await mountForm(flow, 'settings')
+    const inputs = wrapper.findAll('input')
+    await inputs.find(i => i.attributes('name') === 'password')!.setValue('secret123')
+    calls.length = 0
+
+    await wrapper.find('button[value="password"]').trigger('click')
+    await flushPromises()
+    await nextTick()
+
+    // The submit went through as well.
+    expect(calls.filter(c => c.method === 'POST')).toHaveLength(1)
+    expect(wrapper.text()).not.toContain('Required')
+  })
+
+  // `default` holds the csrf token (and a login's identifier), so it is checked with any group.
+  it('checks the default group alongside the one that was pressed', async () => {
+    const flow = structuredClone(settings) as typeof settings
+    flow.ui.nodes.push({
+      type: 'input',
+      group: 'default',
+      attributes: {
+        name: 'traits.handle', type: 'text', value: '',
+        required: true, disabled: false, node_type: 'input',
+      },
+      messages: [],
+      meta: { label: { id: 1070002, text: 'Handle', type: 'info', context: { title: 'Handle' } } },
+    } as never)
+
+    const { wrapper, calls } = await mountForm(flow, 'settings')
+    calls.length = 0
+
+    await wrapper.find('button[value="profile"]').trigger('click')
+    await flushPromises()
+    await nextTick()
+
+    expect(calls.filter(c => c.method === 'POST')).toHaveLength(0)
+    expect(wrapper.text()).toContain('Required')
+  })
+})
+
 // Switching flow in place: restart() keeps the old flow until the new one
 // lands, and the fields must be the new flow's.
 describe('UiKratosForm switching kind', () => {
@@ -749,13 +974,61 @@ describe('UiKratosForm switching kind', () => {
   })
 })
 
-// The rules were decorative before this: a native form has no v-form to
-// validate on submit, so they lit up on blur and the request went to Kratos
-// with whatever was typed.
+// A credential change on a session older than `privileged_session_max_age`
+// arrives with a redirect to re-authenticate.
+describe('UiKratosForm asked to re-authenticate', () => {
+  const REFRESH = 'http://localhost:3000/kratos/self-service/login/browser'
+    + '?refresh=true&return_to=%2Fkratos%2Fself-service%2Fsettings'
+
+  const stale = {
+    status: 403,
+    body: {
+      error: {
+        id: 'session_refresh_required',
+        code: 403,
+        reason: 'The login session is too old and thus not allowed to update these fields.',
+      },
+      redirect_browser_to: REFRESH,
+    },
+  }
+
+  it('goes where Kratos said, rather than calling the flow dead', async () => {
+    const { wrapper } = await mountForm(settings, 'settings', stale)
+    const inputs = wrapper.findAll('input')
+    await inputs.find(i => i.attributes('name') === 'password')!.setValue('secret123')
+
+    await wrapper.find('button[value="password"]').trigger('click')
+    await flushPromises()
+    await nextTick()
+
+    expect(window.location.href).toBe(REFRESH)
+    // Not the expiry notice: the form is valid.
+    expect(wrapper.text()).not.toContain('expired')
+  })
+
+  // A stale CSRF cookie gives a 403 with no redirect, so the form starts over.
+  it('still starts over on a 403 with nowhere to go', async () => {
+    const { wrapper, calls } = await mountForm(settings, 'settings', { status: 403, body: {} })
+    // Origin and path only: starting over drops ?flow= from the query.
+    const page = window.location.origin + window.location.pathname
+    const inputs = wrapper.findAll('input')
+    await inputs.find(i => i.attributes('name') === 'password')!.setValue('secret123')
+    calls.length = 0
+
+    await wrapper.find('button[value="password"]').trigger('click')
+    await flushPromises()
+    await nextTick()
+
+    expect(window.location.origin + window.location.pathname).toBe(page)
+    // A fresh flow was fetched.
+    expect(calls.some(c => c.method === 'GET')).toBe(true)
+    expect(wrapper.text()).toContain('expired')
+  })
+})
+
+// A native form has no v-form, so the rules are checked on submit here.
 describe('UiKratosForm blocking a bad submit', () => {
-  // Not `required` - the browser enforces that one itself, before any handler
-  // runs. This is the rule only the layer can apply: Kratos types a login's
-  // identifier `text`, so nothing native checks the shape of it.
+  // The identifier shape rule: Kratos types it `text`, so nothing native checks it.
   it('says why, rather than failing silently', async () => {
     configureKratos({ identifierIsEmail: true })
     const { wrapper } = await mountForm(login, 'login')
