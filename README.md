@@ -53,7 +53,7 @@ client and its server disagree about the envelope.
 
 ## Prerequisites
 
-- Go 1.26+. No CGO: the SQLite driver is `modernc.org/sqlite`, pure Go.
+- Go 1.27+. No CGO: the SQLite driver is `modernc.org/sqlite`.
 - Node.js and pnpm 11+
 - [just](https://github.com/casey/just)
 - [`loc`](https://github.com/smegg99/S99Locale) (S99Locale) for the locales:
@@ -62,12 +62,41 @@ client and its server disagree about the envelope.
 
 ## Usage
 
-This is a library and a layer. It is not run on its own - an app depends on it.
+This is a library and a layer; an app depends on it.
+
+Both halves are private and not on a public registry. A machine that builds
+against them needs both of these settings:
+
+```sh
+go env -w GOPRIVATE='github.com/smegg99/*'
+git config --global url."ssh://git@github.com/smegg99/".insteadOf "https://github.com/smegg99/"
+```
+
+`GOPRIVATE` alone moves the module off the public proxy to direct git over
+https, which has no credentials and fails.
 
 ```sh
 go get github.com/smegg99/s99ab
-pnpm add @smegg99/s99ab
 ```
+
+The layer is not on npm. Depend on a checkout beside the app:
+
+```json
+"@smegg99/s99ab": "link:../S99AB"
+```
+
+or pin a release with `git+ssh://git@github.com/smegg99/S99AB.git#<tag>`.
+
+The app installs the peer dependencies. The layer imports `vue-router`, adds
+its `.scss` to the app's Vite pipeline, and uses `mdi-` icons:
+
+```sh
+pnpm add nuxt vue vue-router vuetify pinia @pinia/colada sass-embedded @mdi/font
+```
+
+`zod`, `@firecms/neat` and `vue-i18n` are optional. The validation helpers, the
+animated background and the translated strings each fall back when their peer
+is absent.
 
 ```ts
 // nuxt.config.ts
