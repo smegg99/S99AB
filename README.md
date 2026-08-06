@@ -10,46 +10,44 @@ go.mod:      github.com/smegg99/s99ab
 nuxt.config: extends: ['@smegg99/s99ab']
 ```
 
-## What It Does
+[USAGE.md](USAGE.md) shows how an app imports both halves.
 
-The Go half answers the questions every HTTP service has to answer the same
-way. `apierr` is one error envelope for every failing status, matching
-`contracts/schemas/error.yaml` exactly, and it hides the cause from the
-response while handing it to the log. `apihealth` serves `/health`, `/ready`
-and `/version`. `apimount` wires the middleware an API group needs in the order
-that is easy to get wrong - one rate limiter above everything, health before
-authentication, `Session` mounted before any subgroup is created, and separate
-size caps for JSON and uploads because the caps cannot nest. `applife` owns
-shutdown in reverse construction order and races the server's own failure
-against the shutdown signal, so a process that could not bind stops instead of
-sitting there reporting healthy.
+## Go packages
 
-`apipage` is the Go side of `contracts/parameters/pagination.yaml`: it parses
-and clamps `page`, `limit`, `sort` and `q`, and builds an `ORDER BY` clause
-from a whitelist rather than from the request. `db` opens SQLite or Postgres
-with the pragmas that are wrong by default, and migrates through goose as a
-library. `jobs` runs cron work, `outbox` runs work that must survive a crash by
-enqueueing in the same transaction as the business change. `storage` puts
-content-addressed objects in a local directory or an S3-compatible bucket
-behind one interface. `sse` fans server events out to many `EventSource`
-clients, one long-lived response each, and imports no router - a desktop app
-streams progress through its asset server without linking Gin. `kratosauth` and
-`keto` resolve identity and per-object
-permissions from Ory. `ghreleases`, `releases` and `apireleases` turn a GitHub
-release list into a download page's model.
+| Package | What it does |
+| --- | --- |
+| `api/apierr` | One error envelope for every failing status, matching `contracts/schemas/error.yaml`. The cause goes to the log, not the response. |
+| `api/apihealth` | Serves `/health`, `/ready` and `/version`. |
+| `api/apimount` | Mounts API middleware in a fixed order: one rate limiter above everything, health before authentication, `Session` before any subgroup, separate size caps for JSON and uploads (the caps cannot nest). |
+| `api/apipage` | Parses and clamps `page`, `limit`, `sort` and `q` from `contracts/parameters/pagination.yaml`, and builds `ORDER BY` from a whitelist. |
+| `api/apiquery` | Reads a scalar parameter from the query, with the body as fallback. |
+| `auth/kratosauth`, `auth/keto` | Identity from Ory Kratos, per-object permissions from Ory Keto. |
+| `data/db` | Opens SQLite or Postgres with the needed pragmas; runs goose migrations as a library. |
+| `data/outbox` | Work that must survive a crash, enqueued in the same transaction as the business change. |
+| `data/storage` | Content-addressed objects in a local directory or an S3-compatible bucket. |
+| `mail/mailer`, `mail/mailcatch` | Sending mail, and reading a mailbox back. |
+| `net/sse` | Server events to many `EventSource` clients, one long-lived response each. Imports no router, so a desktop app can stream through its asset server without Gin. |
+| `net/httpmw` | Rate limits and request size caps. |
+| `net/netprobe` | Host reachability: unprivileged ICMP, then TCP connect. |
+| `release/ghreleases`, `release/releases`, `api/apireleases` | A GitHub release list as a download page's model. |
+| `work/applife` | Shutdown in reverse construction order. A server that fails to bind stops the process instead of reporting healthy. |
+| `work/jobs` | Scheduled (cron) work in-process. |
+| `work/daemon` | HTTP over a unix socket, and starting the process when it is down. |
+| `common/pool` | Work items through bounded goroutines, results in order. |
+| `common/ttlcache` | One value behind a TTL; concurrent misses collapse into one fetch. |
 
-The Nuxt layer supplies the look and the interaction primitives: dialogs,
-toasts, server-paged tables, a folder explorer, keyboard shortcuts, motion, a
-`useEventSource` that wraps the browser's own `EventSource` for the stream `sse`
-serves, and the loading, error and empty states. `UiAsync` resolves the four-way branch a
-screen would otherwise write by hand - first load, failure, nothing to show,
-content. `UiAppShell` and `UiPanel` are the frame, and the palette, component
-defaults and stylesheet all live here, so an app writes no CSS and differs only
-in its accent colour.
+## Nuxt layer
 
-Both halves ship as one version. They share the error and pagination
-contracts, so an app on layer 1.2 and module 1.1 is an app whose generated
-client and its server disagree about the envelope.
+Dialogs, toasts, server-paged tables, a folder explorer, keyboard shortcuts,
+motion, and loading, error and empty states. `useEventSource` wraps the
+browser's `EventSource` for the stream `net/sse` serves. `UiAsync` picks
+between first load, failure, empty and content. `UiAppShell` and `UiPanel` are
+the page frame. The palette, component defaults and stylesheet live in the
+layer, so an app sets only its accent colour.
+
+Both halves share the error and pagination contracts and ship as one version.
+An app on layer 1.2 and module 1.1 gets a generated client and a server that
+disagree about the error envelope.
 
 ## Prerequisites
 
