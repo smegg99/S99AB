@@ -82,6 +82,7 @@ import UiMotion from '../motion/Motion.vue'
 import UiSignInPrompt from './SignInPrompt.vue'
 import { useApiError } from '../../composables/state/useApiError'
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
+import { resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useErrorAttempt } from '../../composables/state/useErrorAttempt'
 import { useTranslate } from '../../composables/useTranslate'
 
@@ -119,6 +120,10 @@ const retryLabel = computed(() => t('common.retry', 'Retry'))
 // Read from location at call time: works without a router, and a computed would
 // cache the first path since location is not reactive.
 function returnTo() {
-  return typeof window === 'undefined' ? '' : window.location.pathname + window.location.search
+  if (typeof window === 'undefined') return ''
+  return resolveReturnTo(
+    window.location.pathname + window.location.search,
+    window.location.origin,
+  )
 }
 </script>

@@ -109,7 +109,7 @@ import {
   type KratosNode,
 } from '../../composables/kratos/useKratosFlow'
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
-import { useReturnTo } from '../../composables/kratos/useAuthRoute'
+import { resolveReturnTo, useReturnTo } from '../../composables/kratos/useAuthRoute'
 import { useTranslate } from '../../composables/useTranslate'
 
 // A whole login or registration screen in one tag. The page supplies the kind
@@ -138,24 +138,15 @@ const emit = defineEmits<{
 
 const t = useTranslate()
 const slots = useSlots()
-// Both arrive as getters: they are destructured props, so passing either by
-// value would pin the flow to whatever the parent happened to say first.
-/*
-  Where to land, from the URL when the caller does not say.
-
-  Kratos is told the destination when the flow is created, and the only thing
-  that knows it is the link that sent the reader here: the shop builds
-  `/konto/logowanie?return_to=/dostawa` precisely so signing in puts them back
-  where they were. UiAuthPage already defaulted to it; a screen using this form
-  directly did not, so its `return_to` was read by nobody, the flow was created
-  without one, and Kratos fell back to default_browser_return_url - the site
-  root. Signing in from anywhere therefore landed on '/'.
-
-  An explicit prop still wins, and useReturnTo() drops anything pointing off
-  this origin, so the URL cannot aim the redirect somewhere else.
-*/
+// The return URL from the query when the caller sets none. useReturnTo() drops
+// off-origin targets.
 const routeReturnTo = useReturnTo()
-const target = computed(() => returnTo || routeReturnTo.value)
+const target = computed(() => {
+  // The prop is sanitised too: absolute URLs become paths (Kratos refuses
+  // unlisted ones) and auth routes are dropped.
+  const origin = typeof window === 'undefined' ? '' : window.location.origin
+  return resolveReturnTo(returnTo, origin) || routeReturnTo.value
+})
 
 // Getters, so the flow follows prop changes.
 const kratos = useKratosFlow(() => kind, {

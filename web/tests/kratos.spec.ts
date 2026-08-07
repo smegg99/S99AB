@@ -21,7 +21,12 @@ import {
   type KratosFlow,
   type KratosNode,
 } from '../src/composables/kratos/useKratosFlow'
-import { registerAuthRouting } from '../src/composables/kratos/useAuthRoute'
+import {
+  AUTH_FLOW_ROUTES,
+  configureAuthFlowRoutes,
+  registerAuthRouting,
+  resolveReturnTo,
+} from '../src/composables/kratos/useAuthRoute'
 import { fakeI18n } from './fake-i18n'
 
 // Real flows captured from Kratos v1.3.1; the form renders whatever shape Kratos sends.
@@ -1075,5 +1080,111 @@ describe('UiKratosForm blocking a bad submit', () => {
 
     expect(calls.length).toBeGreaterThan(0)
     configureKratos({ identifierIsEmail: false })
+  })
+})
+
+// resolveReturnTo returns a same-origin path, never an auth route.
+describe('resolveReturnTo', () => {
+  const origin = 'http://localhost:3000'
+
+  it('answers a path, never an absolute URL', () => {
+    // Kratos refuses an absolute return_to its allowed_return_urls does not list.
+    expect(resolveReturnTo('/dostawa', origin)).toBe('/dostawa')
+    expect(resolveReturnTo(`${origin}/dostawa`, origin)).toBe('/dostawa')
+  })
+
+  it('keeps the query and the fragment', () => {
+    expect(resolveReturnTo('/kawy?filtr=jasne#opis', origin))
+      .toBe('/kawy?filtr=jasne#opis')
+  })
+
+  it('drops a destination on another origin', () => {
+    // Kratos redirects to whatever it is handed.
+    expect(resolveReturnTo('https://evil.example/x', origin)).toBe('')
+    expect(resolveReturnTo('//evil.example/x', origin)).toBe('')
+  })
+
+  it('drops an auth route, whatever it is mounted under', () => {
+    // An auth route is never a destination; built from the current path it would loop.
+    expect(resolveReturnTo('/login', origin)).toBe('')
+
+    // App-specific segments come from the configured table.
+    configureAuthFlowRoutes({ logowanie: 'login' })
+    try {
+      expect(resolveReturnTo('/konto/logowanie', origin)).toBe('')
+      expect(resolveReturnTo('/konto/logowanie?return_to=%2Fkonto', origin)).toBe('')
+    }
+    finally {
+      // Module state.
+      delete AUTH_FLOW_ROUTES.logowanie
+    }
+
+    // A path that only contains a segment is still a destination.
+    expect(resolveReturnTo('/konto', origin)).toBe('/konto')
+    expect(resolveReturnTo('/pomoc/login-problemy', origin)).toBe('/pomoc/login-problemy')
+  })
+
+  it('drops a value too long to be a path on this site', () => {
+    // Each round re-encodes the last, so the value grows geometrically.
+    let nested = '/konto/logowanie'
+    while (nested.length <= 512) {
+      nested = `/konto/logowanie?return_to=${encodeURIComponent(nested)}`
+    }
+    expect(resolveReturnTo(nested, origin)).toBe('')
+  })
+
+  it('answers empty for anything that is not a string', () => {
+    expect(resolveReturnTo(undefined, origin)).toBe('')
+    expect(resolveReturnTo(['/a'], origin)).toBe('')
+    expect(resolveReturnTo('/a', '')).toBe('')
+  })
+})
+
+// A return_to Kratos refuses (incomplete allowed_return_urls) is retried without one.
+describe('a refused return_to', () => {
+  afterEach(() => {
+    registerAuthRouting({ route: () => ({ fullPath: '/', params: {}, query: {} }), push: () => {} })
+  })
+
+  it('is retried without the destination rather than reported as a failure', async () => {
+    const calls: { url: string }[] = []
+    let served = 0
+
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      calls.push({ url })
+      // Kratos's answer for a destination outside allowed_return_urls.
+      if (url.includes('return_to=')) {
+        served += 1
+        return Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({
+            error: { id: 'self_service_flow_return_to_forbidden' },
+          }),
+        })
+      }
+      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(login) })
+    }))
+
+    window.history.replaceState({}, '', '/login?return_to=%2Fdostawa')
+    registerAuthRouting({
+      route: () => ({ fullPath: '/login', params: {}, query: { return_to: '/dostawa' } }),
+      push: () => {},
+    })
+
+    const wrapper = mount(KratosForm, {
+      props: { kind: 'login' as const },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+    })
+    await flushPromises()
+
+    expect(served).toBe(1)
+    // The retry carries no destination and produced the form.
+    expect(calls.some(c => c.url.includes('/login/browser') && !c.url.includes('return_to'))).toBe(true)
+    expect(wrapper.find('form').exists()).toBe(true)
+
+    // Unmounted here: happy-dom aborts in-flight requests at teardown and reports
+    // them as unhandled errors in another spec.
+    wrapper.unmount()
   })
 })

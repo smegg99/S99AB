@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 import UiEmptyState from './EmptyState.vue'
-import { authRoute } from '../../composables/kratos/internal/route'
+import { authRoute, resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { useTranslate } from '../../composables/useTranslate'
 
@@ -66,7 +66,13 @@ const t = useTranslate()
 const paths = useAuthPaths()
 const slots = useSlots()
 
-const back = computed(() => returnTo || authRoute()?.fullPath || '')
+// resolveReturnTo drops auth routes and returns a path, which Kratos accepts
+// without the origin being listed.
+const origin = () =>
+  (typeof window === 'undefined' ? '' : window.location.origin)
+
+const back = computed(() =>
+  resolveReturnTo(returnTo || authRoute()?.fullPath, origin()))
 
 const hasActions = computed(() =>
   Boolean(slots.actions) || Boolean(paths.signInPath || paths.signUpPath))

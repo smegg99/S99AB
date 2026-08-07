@@ -4,6 +4,7 @@
 
 import type { ComputedRef, Ref } from 'vue'
 import { config } from './types'
+import { resolveReturnTo } from './route'
 import type { KratosFlow, KratosMessage, KratosNode } from './types'
 
 export interface KratosSuccess {
@@ -42,10 +43,25 @@ export interface KratosFlowApi {
 }
 
 /** Ends the session by navigating to the one-shot `logout_url`. */
-export async function kratosSignOut(): Promise<void> {
+export async function kratosSignOut(options: { returnTo?: string } = {}): Promise<void> {
   if (typeof window === 'undefined') return
 
-  const res = await fetch(`${config.basePath}/self-service/logout/browser`, {
+  /*
+    Where to land afterwards, asked for when the URL is minted rather than
+    appended to it.
+
+    Kratos puts the destination into the one-shot logout URL it hands back, so
+    a caller that tacks `&return_to=` onto that URL is editing a token. Asked
+    for here it is checked once, against the same allowed_return_urls every
+    other flow is checked against - and it is a path, for the reason
+    resolveReturnTo answers paths: an absolute URL on an origin nobody listed
+    is refused, and being refused a destination must not cost somebody the
+    ability to sign out.
+  */
+  const to = resolveReturnTo(options.returnTo, window.location.origin)
+  const query = to ? `?return_to=${encodeURIComponent(to)}` : ''
+
+  const res = await fetch(`${config.basePath}/self-service/logout/browser${query}`, {
     credentials: 'include',
     headers: { accept: 'application/json' },
   })
@@ -53,6 +69,8 @@ export async function kratosSignOut(): Promise<void> {
 
   const { logout_url: url } = (await res.json()) as { logout_url?: string }
   if (!url) throw new Error('kratos logout: no logout_url')
+  // A navigation, not a fetch: the Set-Cookie that clears the session has to
+  // land in the browser rather than in a response nobody keeps.
   window.location.href = url
 }
 

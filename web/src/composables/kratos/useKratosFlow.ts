@@ -69,8 +69,8 @@ export function useKratosFlow(
     })
   }
 
-  async function createFlow(): Promise<KratosFlow> {
-    const query = options.returnTo
+  async function createFlow(carryReturnTo = true): Promise<KratosFlow> {
+    const query = carryReturnTo && options.returnTo
       ? `?return_to=${encodeURIComponent(options.returnTo)}`
       : ''
     const res = await ask(
@@ -80,6 +80,12 @@ export function useKratosFlow(
       const body = (await res.json().catch(() => null)) as {
         error?: { id?: string }
       } | null
+
+      // return_to not in allowed_return_urls: retry once without it, so a
+      // misconfigured origin loses the redirect instead of the flow.
+      if (query && body?.error?.id === 'self_service_flow_return_to_forbidden') {
+        return createFlow(false)
+      }
       // Kratos refuses login, registration and recovery flows to a live session.
       if (body?.error?.id === 'session_already_available') {
         throw new AlreadySignedIn()
