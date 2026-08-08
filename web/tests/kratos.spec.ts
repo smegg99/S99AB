@@ -111,6 +111,20 @@ async function mountForm(
   return { wrapper, calls }
 }
 
+async function signIn(wrapper: { find: (s: string) => { element: Element } }) {
+  const form = wrapper.find('form').element as HTMLFormElement
+  const set = (name: string, value: string) => {
+    const el = form.querySelector<HTMLInputElement>(`input[name="${name}"]`)
+    if (el) el.value = value
+  }
+  set('identifier', 'carol@example.com')
+  set('password', 'correct-horse-battery-staple')
+
+  form.querySelector<HTMLButtonElement>('button[name="method"]')!.click()
+  await flushPromises()
+  return form
+}
+
 async function signUp(wrapper: { find: (s: string) => { element: Element } }) {
   const form = wrapper.find('form').element as HTMLFormElement
   const email = form.querySelector<HTMLInputElement>(
@@ -1185,6 +1199,50 @@ describe('a refused return_to', () => {
 
     // Unmounted here: happy-dom aborts in-flight requests at teardown and reports
     // them as unhandled errors in another spec.
+    wrapper.unmount()
+  })
+})
+
+// A step is posted to the current origin. `ui.action` comes from
+// `serve.public.base_url`, which often names a different host.
+describe('the flow action', () => {
+  it('is posted to this origin when Kratos names another', async () => {
+    // The flow from a box configured for 127.0.0.1, read on localhost.
+    const elsewhere = {
+      ...(login as KratosFlow),
+      ui: {
+        ...(login as KratosFlow).ui,
+        action: 'http://127.0.0.1:3000/kratos/self-service/login?flow=abc',
+      },
+    }
+
+    const { wrapper, calls } = await mountForm(elsewhere, 'login')
+    await signIn(wrapper)
+
+    const post = calls.find(c => c.method === 'POST')
+    expect(post).toBeTruthy()
+    // The path and flow id survive; only the host is dropped.
+    expect(post!.url).toBe('/kratos/self-service/login?flow=abc')
+
+    wrapper.unmount()
+  })
+
+  it('leaves an action outside the proxied path alone', async () => {
+    // An external URL (an OIDC provider) is left alone.
+    const external = {
+      ...(login as KratosFlow),
+      ui: {
+        ...(login as KratosFlow).ui,
+        action: 'https://accounts.example.com/o/oauth2/auth?x=1',
+      },
+    }
+
+    const { wrapper, calls } = await mountForm(external, 'login')
+    await signIn(wrapper)
+
+    const post = calls.find(c => c.method === 'POST')
+    expect(post!.url).toBe('https://accounts.example.com/o/oauth2/auth?x=1')
+
     wrapper.unmount()
   })
 })
