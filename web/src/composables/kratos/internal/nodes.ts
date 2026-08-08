@@ -100,6 +100,7 @@ const TRANSLATED = new Set([
   1010001, // Sign in, on a refresh login (not 1010022)
   1010022, // Sign in with password
   1040001, // Sign up
+  1040008, // Back, on registration step two
   1070003, // Save, on settings
 ])
 

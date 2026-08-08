@@ -1246,3 +1246,25 @@ describe('the flow action', () => {
     wrapper.unmount()
   })
 })
+
+// A success redirect to another host is moved to the current one, where the session cookie is.
+describe('the success redirect', () => {
+  it('keeps the path when Kratos names another host', async () => {
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 200,
+      body: {
+        continue_with: [{
+          action: 'redirect_browser_to',
+          redirect_browser_to: 'http://127.0.0.1:3000/konto',
+        }],
+      },
+    })
+    await signIn(wrapper)
+
+    // jsdom records the assignment without navigating.
+    expect(window.location.href).toContain('/konto')
+    expect(window.location.href).not.toContain('127.0.0.1:3000')
+
+    wrapper.unmount()
+  })
+})

@@ -196,7 +196,39 @@ export function useKratosFlow(
     // empty href means "this page again" - which on a screen that leaves
     // because you are already signed in is an infinite reload, not a
     // destination.
-    window.location.href = to || options.returnTo || '/'
+    window.location.href = here(to) || options.returnTo || '/'
+  }
+
+  /*
+    A destination Kratos names, brought back to this origin.
+
+    Everything Kratos redirects to on success is this app: a `return_to` it has
+    already checked against allowed_return_urls, or one of its own configured
+    UI URLs. Both are built from settings written with one hostname, and the
+    reader is not always on it - `127.0.0.1` in the config, `localhost` in the
+    address bar; the apex in the config, `www` in the address bar.
+
+    Following it verbatim is how somebody registers successfully and arrives
+    signed out: the session cookie was set on the host they were on, and the
+    redirect moves them to the other one, where the browser has no cookie to
+    send. The path is the part that means anything, so only the host is
+    dropped.
+
+    A genuine hand-off elsewhere - an OIDC provider - does not come through
+    here. It arrives on a 422 or a 403 as a bare `redirect_browser_to`, which
+    submit() follows untouched.
+  */
+  function here(to: string | undefined): string {
+    if (!to || typeof window === 'undefined') return to ?? ''
+    try {
+      const url = new URL(to, window.location.origin)
+      return url.origin === window.location.origin
+        ? to
+        : url.pathname + url.search + url.hash
+    }
+    catch {
+      return to
+    }
   }
 
   /*

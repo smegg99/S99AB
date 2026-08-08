@@ -70,6 +70,11 @@ msg:
     value: "Potwierdź, że to Ty, zanim to zmienisz."
     description: "Kratos 1010003, the whole of what a refresh login says - why
       somebody already signed in is being asked for their password again."
+  chooseCredential:
+    value: "Wybierz, czym będziesz się logować."
+    description: "Kratos 1040009, the info message opening step two of a
+      registration - said before the password field, so it has to be an
+      instruction rather than a status"
   badCredentials:
     value: "Zły e-mail lub hasło."
     description: "Replaces one of Kratos's own sentences, which are written for a
@@ -96,6 +101,9 @@ label:
     value: "Zaloguj się"
     description: "Kratos's submit on a refresh login. A different id from
       1010022, which is the ordinary sign-in button."
+  "1040008":
+    value: "Wstecz"
+    description: "Kratos: the button back to step one of a registration"
   "1070003":
     value: "Zapisz"
     description: "Kratos's Save on a settings flow, one per method group."

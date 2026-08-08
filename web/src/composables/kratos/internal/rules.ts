@@ -64,6 +64,11 @@ const SHORT: Record<number, string> = {
   // what a refresh login says, and the only thing explaining why somebody who
   // is already signed in is being asked for their password again.
   1010003: 'auth.msg.confirmItIsYou',
+  // "Please choose a credential to authenticate yourself with." - step two of
+  // a v1.3 registration opens with it, so it is the first thing a reader sees
+  // after giving their address, and it was the last English sentence left on a
+  // Polish sign-up.
+  1040009: 'auth.msg.chooseCredential',
 }
 
 /** Short text for a mapped id, else Kratos's own words, also when the key is untranslated. */
