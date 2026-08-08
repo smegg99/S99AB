@@ -69,9 +69,26 @@ export async function kratosSignOut(options: { returnTo?: string } = {}): Promis
 
   const { logout_url: url } = (await res.json()) as { logout_url?: string }
   if (!url) throw new Error('kratos logout: no logout_url')
-  // A navigation, not a fetch: the Set-Cookie that clears the session has to
-  // land in the browser rather than in a response nobody keeps.
-  window.location.href = url
+  // A navigation so the clearing Set-Cookie lands; on this origin so the cookie is sent.
+  window.location.href = onThisOrigin(url, true)
+}
+
+// Drops the host from a Kratos URL so the session cookie follows; with
+// `underBasePath`, URLs outside the proxy (an OIDC provider) are left alone.
+export function onThisOrigin(url: string, underBasePath = false): string {
+  if (!url || typeof window === 'undefined') return url
+
+  try {
+    const parsed = new URL(url, window.location.origin)
+    if (parsed.origin === window.location.origin) return url
+    if (underBasePath && !parsed.pathname.startsWith(`${config.basePath}/`)) {
+      return url
+    }
+    return parsed.pathname + parsed.search + parsed.hash
+  }
+  catch {
+    return url
+  }
 }
 
 export function flowIdFromLocation(): string | null {

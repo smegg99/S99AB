@@ -27,6 +27,7 @@ import {
   registerAuthRouting,
   resolveReturnTo,
 } from '../src/composables/kratos/useAuthRoute'
+import { kratosSignOut } from '../src/composables/kratos/internal/api'
 import { fakeI18n } from './fake-i18n'
 
 // Real flows captured from Kratos v1.3.1; the form renders whatever shape Kratos sends.
@@ -1266,5 +1267,52 @@ describe('the success redirect', () => {
     expect(window.location.href).not.toContain('127.0.0.1:3000')
 
     wrapper.unmount()
+  })
+})
+
+/*
+  Signing out, on the origin holding the session.
+
+  Kratos hands back a one-shot logout URL built from its own base_url. Followed
+  verbatim from another host it arrives with no session cookie, so Kratos
+  answers with an error flow instead of ending anything - which is exactly what
+  it did: pressing "Wyloguj się" landed on the error page, on the other
+  hostname, still signed in.
+*/
+describe('kratosSignOut', () => {
+  it('follows the logout URL on this origin', async () => {
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({
+        logout_url: 'http://127.0.0.1:3000/kratos/self-service/logout?token=abc',
+      }),
+    })))
+
+    await kratosSignOut()
+
+    expect(window.location.href).toContain('/kratos/self-service/logout?token=abc')
+    expect(window.location.href).not.toContain('127.0.0.1:3000')
+  })
+
+  it('asks for a destination as a path, and drops one it may not use', async () => {
+    const calls: string[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      calls.push(url)
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ logout_url: '/kratos/self-service/logout?token=abc' }),
+      })
+    }))
+
+    await kratosSignOut({ returnTo: '/konto/odzyskiwanie' })
+    expect(decodeURIComponent(calls[0]!)).toContain('return_to=/konto/odzyskiwanie')
+
+    calls.length = 0
+    // An auth route is refused the same way it is everywhere else, and so is
+    // another origin - being denied a destination must not deny the sign-out.
+    await kratosSignOut({ returnTo: 'https://evil.example/x' })
+    expect(calls[0]).not.toContain('return_to')
   })
 })

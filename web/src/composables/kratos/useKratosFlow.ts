@@ -3,7 +3,7 @@
 import { computed, reactive, ref } from 'vue'
 import { config } from './internal/types'
 import { isKratosHidden, isKratosInput, isKratosSubmit } from './internal/nodes'
-import { AlreadySignedIn, NotSignedIn, flowIdFromLocation } from './internal/api'
+import { AlreadySignedIn, NotSignedIn, flowIdFromLocation, onThisOrigin } from './internal/api'
 import type { KratosFlow, KratosFlowKind } from './internal/types'
 import type {
   KratosFlowApi,
@@ -196,79 +196,18 @@ export function useKratosFlow(
     // empty href means "this page again" - which on a screen that leaves
     // because you are already signed in is an infinite reload, not a
     // destination.
-    window.location.href = here(to) || options.returnTo || '/'
-  }
-
-  /*
-    A destination Kratos names, brought back to this origin.
-
-    Everything Kratos redirects to on success is this app: a `return_to` it has
-    already checked against allowed_return_urls, or one of its own configured
-    UI URLs. Both are built from settings written with one hostname, and the
-    reader is not always on it - `127.0.0.1` in the config, `localhost` in the
-    address bar; the apex in the config, `www` in the address bar.
-
-    Following it verbatim is how somebody registers successfully and arrives
-    signed out: the session cookie was set on the host they were on, and the
-    redirect moves them to the other one, where the browser has no cookie to
-    send. The path is the part that means anything, so only the host is
-    dropped.
-
-    A genuine hand-off elsewhere - an OIDC provider - does not come through
-    here. It arrives on a 422 or a 403 as a bare `redirect_browser_to`, which
-    submit() follows untouched.
-  */
-  function here(to: string | undefined): string {
-    if (!to || typeof window === 'undefined') return to ?? ''
-    try {
-      const url = new URL(to, window.location.origin)
-      return url.origin === window.location.origin
-        ? to
-        : url.pathname + url.search + url.hash
-    }
-    catch {
-      return to
-    }
-  }
-
-  /*
-    Where a step is posted, on the origin the reader is actually on.
-
-    Kratos builds `ui.action` from its own `serve.public.base_url`, so the
-    absolute URL it hands back names whatever host that setting was written
-    with. Posting to it verbatim is a cross-origin request the moment the two
-    disagree - and they disagree constantly: `base_url` says `127.0.0.1:3000`
-    and the reader typed `localhost:3000`, or it says the apex and they came in
-    on `www`. The browser then blocks the POST, the fetch rejects, and the
-    screen says "could not reach the server" on a form that is perfectly fine.
-    Worse when it does not block: the session cookie would be set for the other
-    host, so registering would succeed and leave the reader signed out.
-
-    The path is what matters. `config.basePath` is where this app proxies
-    Kratos, so an action under it is served from here too, and only the host is
-    dropped. An action pointing anywhere else is left exactly as it is - that
-    is a genuine hand-off to somebody else's URL, an OIDC provider's most
-    likely, and rewriting it would break it.
-  */
-  function sameOrigin(action: string): string {
-    if (typeof window === 'undefined') return action
-    try {
-      const url = new URL(action, window.location.origin)
-      if (url.origin === window.location.origin) return action
-      return url.pathname.startsWith(`${config.basePath}/`)
-        ? url.pathname + url.search
-        : action
-    }
-    catch {
-      return action
-    }
+    // Anything Kratos redirects to on success is this app - a return_to it
+    // already checked, or one of its own UI URLs - so the host is dropped
+    // whatever the path. A hand-off elsewhere arrives on a 422 or 403 instead,
+    // and submit() follows that one untouched.
+    window.location.href = onThisOrigin(to ?? '') || options.returnTo || '/'
   }
 
   async function submit(form: HTMLFormElement, submitter?: Element | null) {
     if (!flow.value || submitting.value) return
-    const action = sameOrigin(flow.value.ui.action)
+    // Rewritten only under the proxied path; an OIDC provider action is left alone.
+    const action = onThisOrigin(flow.value.ui.action, true)
 
-    // A fresh attempt clears whatever the last one had to say about itself.
     notice.value = null
     submitting.value = true
     try {
