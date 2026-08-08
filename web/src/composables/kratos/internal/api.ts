@@ -5,6 +5,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import { config } from './types'
 import { resolveReturnTo } from './route'
+import { useAuthPaths } from '../useAuthPaths'
 import type { KratosFlow, KratosMessage, KratosNode } from './types'
 
 export interface KratosSuccess {
@@ -57,8 +58,17 @@ export async function kratosSignOut(options: { returnTo?: string } = {}): Promis
     resolveReturnTo answers paths: an absolute URL on an origin nobody listed
     is refused, and being refused a destination must not cost somebody the
     ability to sign out.
+
+    Defaulted rather than left empty. Without one Kratos redirects to its own
+    `logout.after.default_browser_return_url`, which is absolute and built with
+    whichever hostname that config was written with - so signing out on
+    `localhost` put the reader on `127.0.0.1`, a different origin, looking at a
+    shop that does not know them. That redirect is Kratos's own and issued
+    server-side, so the only way to steer it is to ask for somewhere else.
   */
-  const to = resolveReturnTo(options.returnTo, window.location.origin)
+  const origin = window.location.origin
+  const to = resolveReturnTo(options.returnTo, origin)
+    || resolveReturnTo(useAuthPaths().homePath || '/', origin)
   const query = to ? `?return_to=${encodeURIComponent(to)}` : ''
 
   const res = await fetch(`${config.basePath}/self-service/logout/browser${query}`, {

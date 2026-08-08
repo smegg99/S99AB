@@ -1310,9 +1310,12 @@ describe('kratosSignOut', () => {
     expect(decodeURIComponent(calls[0]!)).toContain('return_to=/konto/odzyskiwanie')
 
     calls.length = 0
-    // An auth route is refused the same way it is everywhere else, and so is
-    // another origin - being denied a destination must not deny the sign-out.
+    // Another origin is refused the way it is everywhere else - and it falls
+    // back to home rather than to nothing, because "nothing" means Kratos's
+    // own configured return URL, which is absolute and on whichever hostname
+    // that config was written with.
     await kratosSignOut({ returnTo: 'https://evil.example/x' })
-    expect(calls[0]).not.toContain('return_to')
+    expect(calls[0]).not.toContain('evil.example')
+    expect(decodeURIComponent(calls[0]!)).toContain('return_to=/')
   })
 })
