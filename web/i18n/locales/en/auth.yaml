@@ -76,8 +76,10 @@ msg:
   chooseCredential:
     value: "Choose how you will sign in."
     description: "Kratos 1040009, the info message opening step two of a
-      registration - said before the password field, so it has to be an
-      instruction rather than a status"
+      registration. Generic on purpose: the step may offer a password, a
+      passkey or a one-time code, and only the app knows which. An app with a
+      single method should override this with the instruction for that method -
+      \"choose\" is nonsense above one field"
   badCredentials:
     value: "Wrong email or password."
     description: "Replaces one of Kratos's own sentences, which are written for a
