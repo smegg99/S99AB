@@ -47,34 +47,23 @@ export interface KratosFlowApi {
 export async function kratosSignOut(options: { returnTo?: string } = {}): Promise<void> {
   if (typeof window === 'undefined') return
 
-  /*
-    Where to land afterwards, asked for when the URL is minted rather than
-    appended to it.
-
-    Kratos puts the destination into the one-shot logout URL it hands back, so
-    a caller that tacks `&return_to=` onto that URL is editing a token. Asked
-    for here it is checked once, against the same allowed_return_urls every
-    other flow is checked against - and it is a path, for the reason
-    resolveReturnTo answers paths: an absolute URL on an origin nobody listed
-    is refused, and being refused a destination must not cost somebody the
-    ability to sign out.
-
-    Defaulted rather than left empty. Without one Kratos redirects to its own
-    `logout.after.default_browser_return_url`, which is absolute and built with
-    whichever hostname that config was written with - so signing out on
-    `localhost` put the reader on `127.0.0.1`, a different origin, looking at a
-    shop that does not know them. That redirect is Kratos's own and issued
-    server-side, so the only way to steer it is to ask for somewhere else.
-  */
+  // Absolute on this origin: Kratos redirects server-side and would resolve a
+  // path (or an empty value) against its own base_url host.
   const origin = window.location.origin
-  const to = resolveReturnTo(options.returnTo, origin)
+  const path = resolveReturnTo(options.returnTo, origin)
     || resolveReturnTo(useAuthPaths().homePath || '/', origin)
-  const query = to ? `?return_to=${encodeURIComponent(to)}` : ''
 
-  const res = await fetch(`${config.basePath}/self-service/logout/browser${query}`, {
-    credentials: 'include',
-    headers: { accept: 'application/json' },
-  })
+  const ask = (to: string) => {
+    const query = to ? `?return_to=${encodeURIComponent(to)}` : ''
+    return fetch(`${config.basePath}/self-service/logout/browser${query}`, {
+      credentials: 'include',
+      headers: { accept: 'application/json' },
+    })
+  }
+
+  let res = await ask(path ? origin + path : '')
+  // An unlisted return_to is refused with 400; sign out without it.
+  if (!res.ok && path) res = await ask('')
   if (!res.ok) throw new Error(`kratos logout ${res.status}`)
 
   const { logout_url: url } = (await res.json()) as { logout_url?: string }

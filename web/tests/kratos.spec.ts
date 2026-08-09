@@ -1270,16 +1270,34 @@ describe('the success redirect', () => {
   })
 })
 
-/*
-  Signing out, on the origin holding the session.
-
-  Kratos hands back a one-shot logout URL built from its own base_url. Followed
-  verbatim from another host it arrives with no session cookie, so Kratos
-  answers with an error flow instead of ending anything - which is exactly what
-  it did: pressing "Wyloguj się" landed on the error page, on the other
-  hostname, still signed in.
-*/
+// Kratos's logout URL is built from its base_url; it is followed on the session's origin.
 describe('kratosSignOut', () => {
+  it('signs out anyway when Kratos refuses the destination', async () => {
+    // A missing allowed_return_urls entry must not prevent signing out.
+    const calls: string[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      calls.push(url)
+      if (url.includes('return_to')) {
+        return Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ error: { id: 'self_service_flow_return_to_forbidden' } }),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ logout_url: '/kratos/self-service/logout?token=abc' }),
+      })
+    }))
+
+    await kratosSignOut({ returnTo: '/konto' })
+
+    expect(calls).toHaveLength(2)
+    expect(calls[1]).not.toContain('return_to')
+    expect(window.location.href).toContain('/kratos/self-service/logout?token=abc')
+  })
+
   it('follows the logout URL on this origin', async () => {
     vi.stubGlobal('fetch', vi.fn(() => Promise.resolve({
       ok: true,
@@ -1306,16 +1324,15 @@ describe('kratosSignOut', () => {
       })
     }))
 
+    // Absolute and on this origin: Kratos resolves a relative destination against its own base_url.
     await kratosSignOut({ returnTo: '/konto/odzyskiwanie' })
-    expect(decodeURIComponent(calls[0]!)).toContain('return_to=/konto/odzyskiwanie')
+    expect(decodeURIComponent(calls[0]!))
+      .toContain(`return_to=${window.location.origin}/konto/odzyskiwanie`)
 
     calls.length = 0
-    // Another origin is refused the way it is everywhere else - and it falls
-    // back to home rather than to nothing, because "nothing" means Kratos's
-    // own configured return URL, which is absolute and on whichever hostname
-    // that config was written with.
+    // Another origin falls back to home, since no destination means Kratos's configured one.
     await kratosSignOut({ returnTo: 'https://evil.example/x' })
     expect(calls[0]).not.toContain('evil.example')
-    expect(decodeURIComponent(calls[0]!)).toContain('return_to=/')
+    expect(decodeURIComponent(calls[0]!)).toContain(`return_to=${window.location.origin}/`)
   })
 })
