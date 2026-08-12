@@ -240,7 +240,29 @@ export function useKratosFlow(
       }
       if (!res.ok) throw new Error(`kratos submit ${res.status}`)
 
-      finish((await res.json()) as KratosSuccess)
+      /*
+        A 200 is not always the end of the flow.
+
+        Login and registration answer success with a session and a
+        `continue_with`, so treating every 200 as "done" worked for them and
+        hid this everywhere else: verification and recovery are two steps, and
+        their first step answers 200 with *the flow*, moved on to `sent_email`
+        and now carrying the code field. Finishing on that navigated the reader
+        to the return URL - or, with none, to `/` - one keystroke after the
+        code had been sent and one moment before they could be shown where to
+        type it. From the outside it looked like the button did nothing.
+
+        So the body decides: something to continue with is an ending, and a
+        flow is the next screen.
+      */
+      const answer = (await res.json()) as KratosSuccess & KratosFlow & { session?: unknown }
+
+      if (!answer.continue_with && !answer.session && answer.ui?.nodes) {
+        load(answer)
+        return
+      }
+
+      finish(answer)
     }
     catch {
       // Offline, refused, or past the deadline; the flow itself may be fine.

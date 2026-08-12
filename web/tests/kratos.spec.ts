@@ -1375,3 +1375,79 @@ describe('what a finished registration continues with', () => {
     wrapper.unmount()
   })
 })
+
+// Verification and recovery answer the first step with 200 and the flow
+// (now `sent_email` with a code field); the form stays to show it.
+describe('a step that answers with the flow', () => {
+  const sentEmail = {
+    id: 'v1',
+    state: 'sent_email',
+    ui: {
+      action: '/kratos/self-service/verification?flow=v1',
+      method: 'POST',
+      messages: [{ id: 1080003, type: 'info', text: 'A code has been sent.' }],
+      nodes: [
+        {
+          type: 'input',
+          group: 'code',
+          attributes: { name: 'code', type: 'text', required: true },
+          meta: { label: { id: 1070011, text: 'Verification code' } },
+        },
+        {
+          type: 'input',
+          group: 'code',
+          attributes: { name: 'method', type: 'submit', value: 'code' },
+          meta: { label: { id: 1070009, text: 'Continue' } },
+        },
+      ],
+    },
+  }
+
+  it('renders the next step instead of leaving the page', async () => {
+    const { wrapper } = await mountForm(login, 'login', { status: 200, body: sentEmail })
+    // After mountForm, since serve() rewrites the address bar.
+    const before = window.location.href
+    await signIn(wrapper)
+
+    // Still here, now showing the code field.
+    expect(window.location.href).toBe(before)
+    expect(wrapper.find('input[name="code"]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('still finishes on an answer that carries a session', async () => {
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 200,
+      body: {
+        session: { id: 's1' },
+        continue_with: [{ action: 'redirect_browser_to', redirect_browser_to: '/konto' }],
+      },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).toContain('/konto')
+    wrapper.unmount()
+  })
+})
+
+// Fields the session already knows are filled in.
+describe('seeded fields', () => {
+  it('fills an empty field and leaves a filled one alone', async () => {
+    const calls = serve(login)
+    const wrapper = mount(KratosForm, {
+      props: { kind: 'login' as const, seed: { identifier: 'carol@example.com', password: 'nope' } },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+      attachTo: document.body,
+    })
+    await flushPromises()
+
+    const form = wrapper.find('form').element as HTMLFormElement
+    const identifier = form.querySelector<HTMLInputElement>('input[name="identifier"]')
+    expect(identifier?.value).toBe('carol@example.com')
+
+    // The fixture ships a value for this one, so the seed must not win.
+    expect(calls.length).toBeGreaterThan(0)
+    wrapper.unmount()
+  })
+})

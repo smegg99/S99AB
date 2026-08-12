@@ -112,19 +112,22 @@ import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { resolveReturnTo, useReturnTo } from '../../composables/kratos/useAuthRoute'
 import { useTranslate } from '../../composables/useTranslate'
 
-// A whole login or registration screen in one tag. The page supplies the kind
-// and the frame around it; which fields exist is Kratos's to decide.
-const { kind, autoStart = true, returnTo = '' } = defineProps<{
+// A login or registration screen in one tag. Kratos decides the fields.
+const { kind, autoStart = true, returnTo = '', seed } = defineProps<{
   /**
-   * Which flow to render. The flow is created from it on mount and it is
-   * re-read on every request, so changing it takes effect on the next
-   * start()/restart() rather than needing a fresh component.
+   * Which flow to render. Re-read on every request, so a change applies on the
+   * next start()/restart().
    */
   kind: KratosFlowKind
-  /** Where to send the browser after the flow succeeds, if Kratos allows it. */
+  /** Where to send the browser after success, if Kratos allows it. */
   returnTo?: string
-  /** Starts on mount unless the page has already done it. */
+  /** Starts on mount unless the page already has. */
   autoStart?: boolean
+  /**
+   * Values for a fresh flow by field name. Applied after each load, only to
+   * fields Kratos left empty.
+   */
+  seed?: Record<string, string>
 }>()
 
 const emit = defineEmits<{
@@ -164,6 +167,14 @@ function setValue(node: KratosNode, next: string) {
   const name = node.attributes.name
   if (name) values[name] = next
 }
+
+// Seeds empty fields on every new flow, since `values` is re-seeded each step.
+watch(flow, () => {
+  if (!seed) return
+  for (const [name, value] of Object.entries(seed)) {
+    if (value && name in values && !values[name]) values[name] = value
+  }
+}, { immediate: true })
 
 // Separate constants so ErrorState's memoised identity changes only with the
 // failure. An expired flow and an unreachable server say different things.
