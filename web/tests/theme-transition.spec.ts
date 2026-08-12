@@ -412,7 +412,10 @@ describe('the cover shapes', () => {
     return runs
   }
 
-  afterEach(() => {
+  // A cover schedules its leave on a real timer after the hold, so pending
+  // animations are drained before the stub is removed.
+  afterEach(async () => {
+    await new Promise(resolve => setTimeout(resolve, 200))
     Reflect.deleteProperty(HTMLElement.prototype, 'animate')
     for (const disc of document.querySelectorAll('.s99ab-vt-cover')) disc.remove()
   })
