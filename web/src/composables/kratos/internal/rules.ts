@@ -69,6 +69,11 @@ const SHORT: Record<number, string> = {
   // after giving their address, and it was the last English sentence left on a
   // Polish sign-up.
   1040009: 'auth.msg.chooseCredential',
+  // "An email containing a verification code has been sent to the email
+  // address you provided." - the whole of what a verification screen says, and
+  // now the first thing a new customer reads, because confirming the address
+  // happens during registration rather than after it.
+  1080003: 'auth.msg.codeSent',
 }
 
 /** Short text for a mapped id, else Kratos's own words, also when the key is untranslated. */

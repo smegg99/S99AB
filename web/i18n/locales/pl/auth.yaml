@@ -70,6 +70,11 @@ msg:
     value: "Potwierdź, że to Ty, zanim to zmienisz."
     description: "Kratos 1010003, the whole of what a refresh login says - why
       somebody already signed in is being asked for their password again."
+  codeSent:
+    value: "Wysłaliśmy ci kod. Wpisz go tutaj, żeby potwierdzić adres."
+    description: "Kratos 1080003. Its own sentence explains what to do if the
+      mail does not arrive, at the length of a support article; this is the
+      instruction, said where the field is"
   chooseCredential:
     value: "Wybierz sposób logowania."
     description: "Kratos 1040009, the info message opening step two of a
@@ -115,6 +120,9 @@ label:
   "1070007":
     value: "E-mail"
     description: "Kratos: the address field on recovery and verification"
+  "1070011":
+    value: "Kod z e-maila"
+    description: "Kratos: the code field on a verification flow"
   "1070009":
     value: "Dalej"
     description: "Kratos: the submit on recovery and verification"
