@@ -8,8 +8,26 @@ import { resolveReturnTo } from './route'
 import { useAuthPaths } from '../useAuthPaths'
 import type { KratosFlow, KratosMessage, KratosNode } from './types'
 
+/** One `continue_with` entry; list order is not priority (see nextStop). */
+export interface KratosContinueWith {
+  action: string
+  redirect_browser_to?: string
+  /** The verification flow for `show_verification_ui`. */
+  flow?: { id?: string, url?: string, verifiable_address?: string }
+}
+
 export interface KratosSuccess {
-  continue_with?: Array<{ action: string, redirect_browser_to?: string }>
+  continue_with?: KratosContinueWith[]
+}
+
+/** Next URL after a finished step: verification UI first, then the redirect. */
+export function nextStop(body: KratosSuccess): string {
+  const steps = body.continue_with ?? []
+
+  const verify = steps.find(s => s.action === 'show_verification_ui')?.flow?.url
+  if (verify) return verify
+
+  return steps.find(s => s.action === 'redirect_browser_to')?.redirect_browser_to ?? ''
 }
 
 /**

@@ -1336,3 +1336,42 @@ describe('kratosSignOut', () => {
     expect(decodeURIComponent(calls[0]!)).toContain(`return_to=${window.location.origin}/`)
   })
 })
+
+// A registration that needs verification continues to the verification
+// hand-off, whatever order continue_with lists it in.
+describe('what a finished registration continues with', () => {
+  it('goes to the verification screen over the plain redirect', async () => {
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 200,
+      body: {
+        continue_with: [
+          { action: 'redirect_browser_to', redirect_browser_to: 'http://127.0.0.1:3000/' },
+          {
+            action: 'show_verification_ui',
+            flow: { id: 'abc', url: 'http://127.0.0.1:3000/konto/weryfikacja?flow=abc' },
+          },
+        ],
+      },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).toContain('/konto/weryfikacja?flow=abc')
+    wrapper.unmount()
+  })
+
+  it('takes the plain redirect when there is nothing left to verify', async () => {
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 200,
+      body: {
+        continue_with: [
+          { action: 'redirect_browser_to', redirect_browser_to: 'http://127.0.0.1:3000/konto' },
+        ],
+      },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).toContain('/konto')
+    expect(window.location.href).not.toContain('weryfikacja')
+    wrapper.unmount()
+  })
+})

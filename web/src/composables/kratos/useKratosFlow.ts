@@ -3,7 +3,7 @@
 import { computed, reactive, ref } from 'vue'
 import { config } from './internal/types'
 import { isKratosHidden, isKratosInput, isKratosSubmit } from './internal/nodes'
-import { AlreadySignedIn, NotSignedIn, flowIdFromLocation, onThisOrigin } from './internal/api'
+import { AlreadySignedIn, NotSignedIn, flowIdFromLocation, nextStop, onThisOrigin } from './internal/api'
 import type { KratosFlow, KratosFlowKind } from './internal/types'
 import type {
   KratosFlowApi,
@@ -183,23 +183,14 @@ export function useKratosFlow(
     }
   }
 
-  /** The one navigation left: landing somewhere with a session in hand. */
+  /** Navigates away after a successful flow. */
   function finish(body: KratosSuccess) {
-    // The page is on its way out. Everything else keeps showing the spinner
-    // rather than flashing a form nobody is going to fill in.
     leaving.value = true
     if (typeof window === 'undefined') return
-    const to = body.continue_with?.find(
-      c => c.action === 'redirect_browser_to',
-    )?.redirect_browser_to
-    // `||`, not `??`. An app with no return_to in the URL passes "", and an
-    // empty href means "this page again" - which on a screen that leaves
-    // because you are already signed in is an infinite reload, not a
-    // destination.
-    // Anything Kratos redirects to on success is this app - a return_to it
-    // already checked, or one of its own UI URLs - so the host is dropped
-    // whatever the path. A hand-off elsewhere arrives on a 422 or 403 instead,
-    // and submit() follows that one untouched.
+    // Prefers the verification hand-off over the post-signup redirect.
+    const to = nextStop(body)
+    // `||` because an empty returnTo would reload this page. Success redirects
+    // always target this app, so the host is dropped.
     window.location.href = onThisOrigin(to ?? '') || options.returnTo || '/'
   }
 
