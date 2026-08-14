@@ -1416,6 +1416,22 @@ describe('a step that answers with the flow', () => {
     wrapper.unmount()
   })
 
+  it('finishes on a flow that says it is over', async () => {
+    // A passed verification returns a flow with only a success message.
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 200,
+      body: {
+        id: 'v1',
+        state: 'passed_challenge',
+        ui: { action: '/x', method: 'POST', nodes: [], messages: [{ id: 1080002, type: 'success', text: 'Verified.' }] },
+      },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).not.toContain('/x')
+    wrapper.unmount()
+  })
+
   it('still finishes on an answer that carries a session', async () => {
     const { wrapper } = await mountForm(login, 'login', {
       status: 200,
