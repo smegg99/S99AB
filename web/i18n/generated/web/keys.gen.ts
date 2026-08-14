@@ -18,6 +18,7 @@ export type I18nKey =
   | 'auth.label.1070001'
   | 'auth.label.1070003'
   | 'auth.label.1070007'
+  | 'auth.label.1070008'
   | 'auth.label.1070009'
   | 'auth.label.1070011'
   | 'auth.msg.badCredentials'

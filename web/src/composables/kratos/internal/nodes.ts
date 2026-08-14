@@ -97,6 +97,7 @@ const TRANSLATED = new Set([
   1070001, // Password
   1070007, // Email, on recovery and verification
   1070009, // Continue, on recovery and verification
+  1070008, // Resend code, on verification and recovery
   1070011, // Verification code, the field on a verification flow
   1010001, // Sign in, on a refresh login (not 1010022)
   1010022, // Sign in with password

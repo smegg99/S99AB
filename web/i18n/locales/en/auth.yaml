@@ -123,6 +123,10 @@ label:
   "1070007":
     value: "Email"
     description: "Kratos: the address field on recovery and verification"
+  "1070008":
+    value: "Send another code"
+    description: "Kratos: the resend button on verification and recovery, shown
+      once a code is already on its way"
   "1070011":
     value: "Verification code"
     description: "Kratos: the code field on a verification flow"
