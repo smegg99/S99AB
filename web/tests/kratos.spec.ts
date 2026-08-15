@@ -1499,3 +1499,43 @@ describe('a session refresh', () => {
     wrapper.unmount()
   })
 })
+
+// A restart that cannot make a new flow (live session) must not leave the
+// expired form on screen.
+describe('a restart that finds a live session', () => {
+  it('clears the dead flow and says what happened', async () => {
+    let posts = 0
+    vi.stubGlobal('fetch', vi.fn((url: string, init: RequestInit = {}) => {
+      if ((init.method ?? 'GET') === 'POST') {
+        posts += 1
+        // The flow expired.
+        return Promise.resolve({ ok: false, status: 410, json: () => Promise.resolve({}) })
+      }
+      // The restart cannot make another, because the user is signed in.
+      if (posts > 0) {
+        return Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ error: { id: 'session_already_available' } }),
+        })
+      }
+      return Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(login) })
+    }))
+
+    window.history.replaceState({}, '', '/login')
+    const wrapper = mount(KratosForm, {
+      props: { kind: 'login' as const },
+      global: { plugins: [vuetify, fakeI18n(k => k)] },
+      attachTo: document.body,
+    })
+    await flushPromises()
+    await signIn(wrapper)
+    await flushPromises()
+
+    // No form left, and the screen says why.
+    expect(wrapper.find('form').exists()).toBe(false)
+    expect(wrapper.text()).toContain('already signed in')
+
+    wrapper.unmount()
+  })
+})

@@ -127,11 +127,14 @@ export function useKratosFlow(
       load(await createFlow())
     }
     catch (err) {
+      // `flow` still holds the dead flow; clear it so these notices render.
       if (err instanceof AlreadySignedIn) {
+        flow.value = null
         notice.value = 'signedIn'
         return
       }
       if (err instanceof NotSignedIn) {
+        flow.value = null
         notice.value = 'signedOut'
         return
       }
