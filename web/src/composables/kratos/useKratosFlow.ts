@@ -225,10 +225,10 @@ export function useKratosFlow(
           redirect_browser_to?: string
         }
         if (typeof window !== 'undefined' && to) {
-          // The page is leaving, so nothing re-renders a form behind the
-          // navigation - the same promise finish() makes.
+          // Kept on this origin: the session cookie lives on the browsed host,
+          // and the refresh flow needs it.
           leaving.value = true
-          window.location.href = to
+          window.location.href = onThisOrigin(to, true)
           return
         }
         if (res.status === 422) return

@@ -78,6 +78,8 @@ export interface KratosNode {
 
 export interface KratosFlow {
   id: string
+  /** A login that re-confirms a signed-in user for a privileged action. */
+  refresh?: boolean
   ui: {
     action: string
     method: string

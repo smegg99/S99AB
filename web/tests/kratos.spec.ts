@@ -1467,3 +1467,35 @@ describe('seeded fields', () => {
     wrapper.unmount()
   })
 })
+
+// A 403 session_refresh_required redirect is followed on the session's origin.
+describe('a session refresh', () => {
+  it('is followed on this origin', async () => {
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 403,
+      body: {
+        error: { id: 'session_refresh_required' },
+        redirect_browser_to:
+          'http://127.0.0.1:3000/kratos/self-service/login/browser?refresh=true',
+      },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).toContain('/kratos/self-service/login/browser?refresh=true')
+    expect(window.location.href).not.toContain('127.0.0.1:3000')
+
+    wrapper.unmount()
+  })
+
+  it('leaves a hand-off to another service alone', async () => {
+    // An OIDC provider URL is left alone.
+    const { wrapper } = await mountForm(login, 'login', {
+      status: 422,
+      body: { redirect_browser_to: 'https://accounts.example.com/o/oauth2/auth?x=1' },
+    })
+    await signIn(wrapper)
+
+    expect(window.location.href).toBe('https://accounts.example.com/o/oauth2/auth?x=1')
+    wrapper.unmount()
+  })
+})
