@@ -108,6 +108,15 @@ export function onThisOrigin(url: string, underBasePath = false): string {
   }
 }
 
+/** Re-confirms a signed-in user via a `refresh=true` login flow. */
+export function kratosRefreshSession(options: { returnTo?: string } = {}): void {
+  if (typeof window === 'undefined') return
+
+  const to = resolveReturnTo(options.returnTo, window.location.origin)
+  const query = to ? `&return_to=${encodeURIComponent(to)}` : ''
+  window.location.href = `${config.basePath}/self-service/login/browser?refresh=true${query}`
+}
+
 export function flowIdFromLocation(): string | null {
   if (typeof window === 'undefined') return null
   return new URLSearchParams(window.location.search).get('flow')

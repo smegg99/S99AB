@@ -2,6 +2,7 @@
 
 import { computed, type ComputedRef } from 'vue'
 import { kratosSeverity } from './internal/nodes'
+import { kratosMessageText } from './internal/rules'
 import type { KratosFlowApi, KratosNode } from './useKratosFlow'
 
 export interface KratosFieldsApi {
@@ -13,19 +14,19 @@ export interface KratosFieldsApi {
 }
 
 /**
- * The renderable half of a flow, and each field's messages split by severity.
- *
- * A field can carry a hint as well as a failure - Kratos sends its password
- * policy as an info message on the password node - and putting both under
- * error-messages paints a valid field red.
+ * A flow's renderable nodes and each field's messages split by severity.
+ * @param t Translator for field messages; without it they stay in English.
  */
-export function useKratosFields(flow: KratosFlowApi): KratosFieldsApi {
+export function useKratosFields(
+  flow: KratosFlowApi,
+  t?: (key: string, fallback?: string) => string,
+): KratosFieldsApi {
   function texts(name: string, failures: boolean): string[] {
     if (!name) return []
     return flow
       .messagesFor(name)
       .filter(m => (kratosSeverity(m) === 'error') === failures)
-      .map(m => m.text)
+      .map(m => (t ? kratosMessageText(m, t) : m.text))
   }
 
   return {

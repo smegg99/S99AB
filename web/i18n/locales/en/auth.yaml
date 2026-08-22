@@ -85,6 +85,21 @@ msg:
       passkey or a one-time code, and only the app knows which. An app with a
       single method should override this with the instruction for that method -
       \"choose\" is nonsense above one field"
+  saved:
+    value: "Saved."
+    description: "Kratos 1050001, the whole of what a settings flow says when a save worked"
+  badCode:
+    value: "That code is wrong or has already been used. Check the e-mail, or send another."
+    description: "Kratos 4070006 and 4060006, a verification or recovery code that is wrong or spent"
+  passwordShort:
+    value: "The password needs at least 8 characters."
+    description: "Kratos 4000032. Its own text carries the character count; the rule is what a reader can act on"
+  passwordBreached:
+    value: "That password appears in a known data breach. Choose another."
+    description: "Kratos 4000034, a password found in a breach corpus"
+  passwordSimilar:
+    value: "The password is too much like your e-mail address."
+    description: "Kratos 4000031, a password too close to the identifier"
   badCredentials:
     value: "Wrong email or password."
     description: "Replaces one of Kratos's own sentences, which are written for a

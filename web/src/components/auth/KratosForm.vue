@@ -161,7 +161,7 @@ const {
   flow, values, pending, failed, notice, submitting,
   messages, start, restart, submit,
 } = kratos
-const { renderable, errorsFor, hintsFor } = useKratosFields(kratos)
+const { renderable, errorsFor, hintsFor } = useKratosFields(kratos, t)
 
 function setValue(node: KratosNode, next: string) {
   const name = node.attributes.name

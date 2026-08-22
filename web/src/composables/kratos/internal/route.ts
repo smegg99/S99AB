@@ -55,29 +55,14 @@ export function isAuthFlowRoute(route: AuthRoute): boolean {
 const MAX_RETURN_TO = 512
 
 /**
- * Where a finished flow lands, from `?return_to=`.
- *
- * Answered as a path, never as an absolute URL, and that is the whole point.
- * Kratos refuses any absolute return_to outside `allowed_return_urls` - 400,
- * `self_service_flow_return_to_forbidden` - so handing it one built from
- * `window.location.origin` means every origin an app is ever reached on has to
- * be listed. It never all is: `localhost` and `127.0.0.1` are different
- * origins, a preview deployment has a name nobody wrote down, and a dev on a
- * second port is simply locked out. Each of those turns every sign-in and
- * every sign-up into a flow that will not start. A path is same-origin by
- * construction and Kratos takes it as-is.
- *
- * Same origin is still enforced, because that is a different question: Kratos
- * redirects to whatever it is handed, so a URL off this origin is an open
- * redirect with extra steps. `new URL` resolves a relative path against ours
- * and leaves an absolute one alone, so the check has to come after it.
- *
- * An auth route is refused too. Coming back to the screen you just left is a
- * loop, and where the destination is built from the current path - a sign-in
- * link in a header, rendered on the sign-in page - it is a loop that writes
- * itself into the URL and re-encodes on every press.
+ * Same-origin path from `?return_to=`, or '' (a path avoids allowed_return_urls,
+ * the origin check blocks open redirects). Auth routes are refused unless `allowAuthPath`.
  */
-export function resolveReturnTo(raw: unknown, origin: string): string {
+export function resolveReturnTo(
+  raw: unknown,
+  origin: string,
+  { allowAuthPath = false }: { allowAuthPath?: boolean } = {},
+): string {
   if (typeof raw !== 'string' || !raw || !origin) return ''
   if (raw.length > MAX_RETURN_TO) return ''
 
@@ -86,7 +71,7 @@ export function resolveReturnTo(raw: unknown, origin: string): string {
     if (url.origin !== origin) return ''
 
     const here = url.pathname + url.search + url.hash
-    return isAuthPath(here) ? '' : here
+    return !allowAuthPath && isAuthPath(here) ? '' : here
   }
   catch {
     return ''

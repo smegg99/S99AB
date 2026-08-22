@@ -14,7 +14,7 @@ import type {
 
 export * from './internal/types'
 export * from './internal/nodes'
-export { kratosSignOut, type KratosFlowApi, type KratosFlowOptions, type KratosSuccess } from './internal/api'
+export { kratosRefreshSession, kratosSignOut, type KratosFlowApi, type KratosFlowOptions, type KratosSuccess } from './internal/api'
 
 /** `kind` may be a getter, so a destructured prop stays reactive. */
 export function useKratosFlow(

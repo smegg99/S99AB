@@ -27,7 +27,7 @@ import {
   registerAuthRouting,
   resolveReturnTo,
 } from '../src/composables/kratos/useAuthRoute'
-import { kratosSignOut } from '../src/composables/kratos/internal/api'
+import { kratosRefreshSession, kratosSignOut } from '../src/composables/kratos/internal/api'
 import { fakeI18n } from './fake-i18n'
 
 // Real flows captured from Kratos v1.3.1; the form renders whatever shape Kratos sends.
@@ -1537,5 +1537,81 @@ describe('a restart that finds a live session', () => {
     expect(wrapper.text()).toContain('already signed in')
 
     wrapper.unmount()
+  })
+})
+
+// Field messages (password policy) go through the translator like flow messages.
+describe('field messages', () => {
+  it('are translated the way a flow message is', async () => {
+    const rejected = {
+      ...(login as KratosFlow),
+      ui: {
+        ...(login as KratosFlow).ui,
+        nodes: (login as KratosFlow).ui.nodes.map(n =>
+          n.attributes.name === 'password'
+            ? {
+                ...n,
+                messages: [{
+                  id: 4000032,
+                  type: 'error',
+                  text: 'The password must be at least 8 characters long, but got 3.',
+                }],
+              }
+            : n),
+      },
+    }
+
+    // A translator with real words: useTranslate treats a value equal to its key as missing.
+    const calls = serve(rejected)
+    const wrapper = mount(KratosForm, {
+      props: { kind: 'login' as const },
+      global: {
+        plugins: [vuetify, fakeI18n(k =>
+          k === 'auth.msg.passwordShort' ? 'Hasło musi mieć co najmniej 8 znaków.' : k)],
+      },
+      attachTo: document.body,
+    })
+    await flushPromises()
+
+    expect(calls.length).toBeGreaterThan(0)
+    expect(wrapper.text()).toContain('Hasło musi mieć co najmniej 8 znaków.')
+    expect(wrapper.text()).not.toContain('at least 8 characters long')
+
+    wrapper.unmount()
+  })
+})
+
+// resolveReturnTo refuses auth routes; these two cases (sign out to recover a
+// password, re-authenticate a signed-in user) need an explicit way through.
+describe('signing out to an auth screen', () => {
+  it('keeps a signed-out destination instead of falling back home', async () => {
+    const calls: string[] = []
+    vi.stubGlobal('fetch', vi.fn((url: string) => {
+      calls.push(url)
+      return Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ logout_url: '/kratos/self-service/logout?token=abc' }),
+      })
+    }))
+
+    await kratosSignOut({ returnTo: '/konto/odzyskiwanie' })
+    expect(decodeURIComponent(calls[0]!)).toContain('/konto/odzyskiwanie')
+  })
+})
+
+describe('refreshing a session', () => {
+  it('asks Kratos for a refresh flow rather than an ordinary login', () => {
+    kratosRefreshSession({ returnTo: '/konto' })
+
+    expect(window.location.href).toContain('/self-service/login/browser?refresh=true')
+    expect(decodeURIComponent(window.location.href)).toContain('return_to=/konto')
+  })
+
+  it('drops a destination it may not use', () => {
+    kratosRefreshSession({ returnTo: 'https://evil.example/x' })
+
+    expect(window.location.href).toContain('refresh=true')
+    expect(window.location.href).not.toContain('evil.example')
   })
 })

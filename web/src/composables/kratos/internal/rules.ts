@@ -60,20 +60,27 @@ const SHORT: Record<number, string> = {
   4000007: 'auth.msg.exists',
   // "The provided credentials are invalid. No credentials found."
   4000028: 'auth.msg.badCredentials',
-  // "Please confirm this action by verifying that it is you." - the whole of
-  // what a refresh login says, and the only thing explaining why somebody who
-  // is already signed in is being asked for their password again.
+  // "Please confirm this action by verifying that it is you." (refresh login)
   1010003: 'auth.msg.confirmItIsYou',
-  // "Please choose a credential to authenticate yourself with." - step two of
-  // a v1.3 registration opens with it, so it is the first thing a reader sees
-  // after giving their address, and it was the last English sentence left on a
-  // Polish sign-up.
+  // "Please choose a credential to authenticate yourself with." (registration step two)
   1040009: 'auth.msg.chooseCredential',
   // "An email containing a verification code has been sent to the email
-  // address you provided." - the whole of what a verification screen says, and
-  // now the first thing a new customer reads, because confirming the address
-  // happens during registration rather than after it.
+  // address you provided."
   1080003: 'auth.msg.codeSent',
+  // "An email containing a recovery code has been sent..."
+  1060003: 'auth.msg.codeSent',
+  // "Your changes have been saved!"
+  1050001: 'auth.msg.saved',
+  // "The verification code is invalid or has already been used."
+  4070006: 'auth.msg.badCode',
+  // "The recovery code is invalid or has already been used."
+  4060006: 'auth.msg.badCode',
+  // "The password must be at least 8 characters long, but got N." (count dropped)
+  4000032: 'auth.msg.passwordShort',
+  // "The password has been found in data breaches and must no longer be used."
+  4000034: 'auth.msg.passwordBreached',
+  // "The password can not be used because it is too similar to the identifier."
+  4000031: 'auth.msg.passwordSimilar',
 }
 
 /** Short text for a mapped id, else Kratos's own words, also when the key is untranslated. */
