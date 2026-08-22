@@ -58,9 +58,13 @@ export default defineNuxtPlugin({
         : undefined,
     })
 
-    // Awaited, so the render that follows already knows. Only on the server:
-    // in the browser the payload has the answer, and useSession asks for
-    // itself if it somehow does not.
-    if (import.meta.server) await loadSession()
+    if (import.meta.server) {
+      await loadSession()
+      return
+    }
+
+    // A prerendered payload carries a build-time "signed out" with loaded=true;
+    // discard it and ask again in the browser.
+    if (useNuxtApp().payload.prerenderedAt) await loadSession(true)
   },
 })
