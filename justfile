@@ -41,6 +41,11 @@ set-version ver:
 check-version:
     node scripts/sync-version.mjs --check
 
+# Rebuild web/src/assets/fonts from fontsource's Overpass with fixed vertical
+# metrics and spacing marks made bases. Needs Python 3 with fontTools and brotli.
+fonts:
+    python3 scripts/overpass-metrics.py
+
 # Regenerate the runtime locales from their canonical source with S99Locale.
 locales:
     loc build -c web/i18n/config.cue
