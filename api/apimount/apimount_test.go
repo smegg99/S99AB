@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/smegg99/s99ab/api/apimount"
 	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/auth/kratosgin"
 )
 
 func init() { gin.SetMode(gin.TestMode) }
@@ -22,7 +23,7 @@ func TestGuardedRoutesSeeTheSessionMiddleware(t *testing.T) {
 	gs := mount(t, r, apimount.Options{Kratos: upKratos(t)})
 
 	gs.Guarded.GET("/items", func(c *gin.Context) {
-		identity, _ := kratosauth.From(c)
+		identity, _ := kratosgin.From(c)
 		c.JSON(http.StatusOK, gin.H{"id": identity.ID})
 	})
 

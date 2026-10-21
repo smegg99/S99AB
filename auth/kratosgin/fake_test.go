@@ -1,6 +1,6 @@
-// auth/kratosauth/fake_test.go
+// auth/kratosgin/fake_test.go
 
-package kratosauth_test
+package kratosgin_test
 
 import (
 	"encoding/json"

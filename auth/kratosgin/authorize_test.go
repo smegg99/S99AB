@@ -1,6 +1,6 @@
-// auth/kratosauth/authorize_test.go
+// auth/kratosgin/authorize_test.go
 
-package kratosauth_test
+package kratosgin_test
 
 import (
 	"net/http"
@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/smegg99/s99ab/auth/kratosauth"
 	"github.com/smegg99/s99ab/auth/kratosauth/kratosauthtest"
+	"github.com/smegg99/s99ab/auth/kratosgin"
 )
 
 // router mounts Session for everyone and a role gate on /admin.
@@ -18,12 +19,12 @@ func router(t *testing.T, accounts map[string]kratosauth.Identity) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 
 	r := gin.New()
-	r.Use(kratosauth.Session(kratosauthtest.Fake(t, accounts)))
+	r.Use(kratosgin.Session(kratosauthtest.Fake(t, accounts)))
 
-	guarded := r.Group("", kratosauth.Require())
+	guarded := r.Group("", kratosgin.Require())
 	guarded.GET("/me", func(c *gin.Context) { c.String(http.StatusOK, "me") })
 
-	admin := guarded.Group("", kratosauth.RequireMeta("role", "staff", "owner"))
+	admin := guarded.Group("", kratosgin.RequireMeta("role", "staff", "owner"))
 	admin.GET("/admin/orders", func(c *gin.Context) { c.String(http.StatusOK, "orders") })
 	return r
 }
@@ -49,7 +50,7 @@ func TestASignedInCustomerIsNotAnAdministrator(t *testing.T) {
 	if got := get(t, r, "/me", "customer"); got != http.StatusOK {
 		t.Errorf("a customer could not reach their own page: %d", got)
 	}
-	// 404, not 403, so the route is not confirmed.
+	// 404 so the route's existence is not confirmed.
 	if got := get(t, r, "/admin/orders", "customer"); got != http.StatusNotFound {
 		t.Errorf("customer reaching /admin/orders = %d, want 404", got)
 	}
@@ -88,6 +89,7 @@ func TestRequireMetaReadsAListAsWellAsAString(t *testing.T) {
 	}
 }
 
+// An exact comparison, so one role is not a prefix of another's permissions.
 func TestHasMetaDoesNotMatchOnAPrefix(t *testing.T) {
 	identity := &kratosauth.Identity{MetadataPublic: kratosauth.Metadata(
 		map[string]any{"role": "staff-applicant"})}

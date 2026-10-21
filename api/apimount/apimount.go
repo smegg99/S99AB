@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/smegg99/s99ab/api/apihealth"
 	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/auth/kratosgin"
 	"github.com/smegg99/s99ab/net/httpmw"
 )
 
@@ -46,9 +47,9 @@ type Groups struct {
 	Sized *gin.RouterGroup
 	// Uploads carries MaxUploadSize.
 	Uploads *gin.RouterGroup
-	// Guarded is Sized plus kratosauth.Require. Nil when Options.Kratos is nil.
+	// Guarded is Sized plus kratosgin.Require. Nil when Options.Kratos is nil.
 	Guarded *gin.RouterGroup
-	// GuardedUploads is Uploads plus kratosauth.Require. Nil when Options.Kratos
+	// GuardedUploads is Uploads plus kratosgin.Require. Nil when Options.Kratos
 	// is nil. Uploads alone has no authentication.
 	GuardedUploads *gin.RouterGroup
 }
@@ -81,7 +82,7 @@ func Mount(r *gin.Engine, opts Options) (Groups, error) {
 
 	// Before any Group(): gin copies the handler chain when a child is made.
 	if opts.Kratos != nil {
-		root.Use(kratosauth.Session(opts.Kratos))
+		root.Use(kratosgin.Session(opts.Kratos))
 	}
 
 	// Siblings, not nested: an outer size cap would trip before a larger inner one.
@@ -91,8 +92,8 @@ func Mount(r *gin.Engine, opts Options) (Groups, error) {
 		Uploads: root.Group("", httpmw.RequestSize(opts.MaxUploadSize)),
 	}
 	if opts.Kratos != nil {
-		groups.Guarded = groups.Sized.Group("", kratosauth.Require())
-		groups.GuardedUploads = groups.Uploads.Group("", kratosauth.Require())
+		groups.Guarded = groups.Sized.Group("", kratosgin.Require())
+		groups.GuardedUploads = groups.Uploads.Group("", kratosgin.Require())
 	}
 	return groups, nil
 }

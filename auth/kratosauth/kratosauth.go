@@ -10,9 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apierr"
 )
 
 var (
@@ -175,73 +172,7 @@ type contextKey struct{}
 
 var identityKey = contextKey{}
 
-// Session resolves a session when one is present and lets the request through
-// either way. Require rejects anonymous requests.
-func Session(c *Client) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		identity, err := c.Whoami(ctx.Request.Context(), ctx.Request)
-
-		switch {
-		case err == nil:
-			// Stored on the request context so FromContext sees it too.
-			ctx.Request = ctx.Request.WithContext(
-				WithIdentity(ctx.Request.Context(), identity))
-
-		case errors.Is(err, ErrCallerGone):
-			// Respond sees the request is over and writes the status only.
-			apierr.Respond(ctx, err)
-			return
-
-		case errors.Is(err, ErrNoSession):
-			// Anonymous: continue with no identity.
-
-		case errors.Is(err, ErrUpstream):
-			// An unreachable Kratos must not downgrade protected routes to public.
-			apierr.Respond(ctx, apierr.Wrap(err, apierr.Unavailable, "auth.unavailable"))
-			return
-
-		default:
-			// Request build and decode errors are outages too; only ErrNoSession
-			// means anonymous.
-			apierr.Respond(ctx, apierr.Wrap(err, apierr.Unavailable, "auth.unavailable"))
-			return
-		}
-		ctx.Next()
-	}
-}
-
-// Require rejects a request with no identity. Mount it after Session.
-func Require() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		if _, ok := From(ctx); !ok {
-			apierr.Respond(ctx, apierr.New(apierr.Unauthorized, "auth.required"))
-			ctx.Abort()
-			return
-		}
-		ctx.Next()
-	}
-}
-
-// From returns the identity Session stored on the request context.
-func From(c *gin.Context) (*Identity, bool) {
-	if c.Request == nil {
-		return nil, false
-	}
-	return FromContext(c.Request.Context())
-}
-
-// MustFrom is From for handlers behind Require; it answers 401 itself when the
-// identity is missing.
-func MustFrom(c *gin.Context) (*Identity, bool) {
-	identity, ok := From(c)
-	if !ok {
-		apierr.Respond(c, apierr.New(apierr.Unauthorized, "auth.required"))
-		return nil, false
-	}
-	return identity, true
-}
-
-// FromContext is From for code that only has a context.Context.
+// FromContext returns the identity WithIdentity stored on ctx.
 func FromContext(ctx context.Context) (*Identity, bool) {
 	identity, ok := ctx.Value(identityKey).(*Identity)
 	return identity, ok
