@@ -1,7 +1,7 @@
 <!-- web/src/components/primitives/ToolKey.vue -->
 <template>
   <button
-    :class="{ 'key--active': active }"
+    :class="{ 'key--active': active, 'key--icon': !label }"
     :disabled="disabled"
     :title="title"
     :aria-label="ariaLabel"
@@ -16,9 +16,11 @@
       class="key__icon"
       size="16"
     />
-    <template v-if="label">
-      {{ label }}
-    </template>
+    <!-- A span, so a narrow toolbar can hide the label; title and aria-label keep the name. -->
+    <span
+      v-if="label"
+      class="key__label"
+    >{{ label }}</span>
   </button>
 </template>
 
@@ -66,6 +68,12 @@ const ariaLabel = computed(() => (label ? undefined : title))
   transition:
     background var(--s99ab-motion-fast) var(--s99ab-motion-easing),
     color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+/* Icon-only keys are square. */
+.key--icon {
+  width: var(--s99ab-control-h);
+  padding: 0;
 }
 
 .key:hover:not(:disabled) {

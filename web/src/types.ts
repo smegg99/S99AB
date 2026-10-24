@@ -185,13 +185,13 @@ export interface NavLink {
   to: string
   label: string
   icon?: string
-/** A count or short status at the trailing edge. */
+  /** A count or short status at the trailing edge. */
   badge?: string | number
-/** Match the exact path only. Off by default, so /files/3 keeps /files lit. */
+  /** Match the exact path only. Off by default, so /files/3 keeps /files lit. */
   exact?: boolean
-/** Opens in a new tab as a plain link, so it never shows as the current page. */
+  /** Opens in a new tab as a plain link, so it never shows as the current page. */
   newTab?: boolean
-/** Nested destinations, drawn one level in. Depth comes from the tree. */
+  /** Nested destinations, drawn one level in. Depth comes from the tree. */
   children?: NavLink[]
 }
 
@@ -222,3 +222,15 @@ export type ToolItem = { value: ToolValue, label: string, icon?: string, title?:
   | { value: ToolValue, icon: string, title: string, label?: undefined }
 
 export type ToolValue = string | number | boolean
+
+export type { WorkspaceTab, TabsOptions } from './composables/tabs/useTabs'
+export type { MenuEntry } from './composables/tabs/internal/contextMenu'
+export type { TabWorkspace, NativeTabDrag, NativeTabFace, NativeTabTrack, TabStripGeometry } from './composables/tabs/useTabDrag'
+
+export type { FooterStat } from './composables/primitives/internal/paneFoot'
+
+export type {
+  CrashScreenActions,
+  CrashScreenKind,
+  CrashScreenReport,
+} from './components/state/crashScreen'

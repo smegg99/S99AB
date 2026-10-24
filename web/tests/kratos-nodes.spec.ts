@@ -51,6 +51,34 @@ describe('kratosNodeKind', () => {
 })
 
 describe('UiKratosNode', () => {
+  it('explains a server-disabled field and removes the extra focus stop when enabled', async () => {
+    const field = node({
+      type: 'input',
+      attributes: { name: 'identifier', type: 'text', disabled: true },
+      meta: { label: { text: 'Email' } },
+    })
+    const w = render(field, { errors: ['This identity cannot sign in.'] })
+    const hint = w.find('.s99ab-disabled-hint')
+    expect(hint.attributes('tabindex')).toBe('0')
+    expect(hint.attributes('aria-label')).toBe('Email')
+    expect(w.find('input').attributes('disabled')).toBeDefined()
+    expect(w.findComponent({ name: 'VTooltip' }).props('text')).toBe('This identity cannot sign in.')
+    await w.setProps({ node: { ...field, attributes: { ...field.attributes, disabled: false } }, errors: [] })
+    expect(hint.attributes('tabindex')).toBeUndefined()
+    expect(w.find('input').attributes('disabled')).toBeUndefined()
+    w.unmount()
+  })
+
+  it('explains pending submission without replacing the native disabled state', async () => {
+    const w = render(node({ type: 'input', attributes: { name: 'method', type: 'submit', value: 'password' } }), { submitting: true })
+    expect(w.find('button').attributes('disabled')).toBeDefined()
+    expect(w.findComponent({ name: 'VTooltip' }).props('text')).toBe('auth.pending')
+    await w.setProps({ submitting: false })
+    expect(w.find('button').attributes('disabled')).toBeUndefined()
+    expect(w.find('.s99ab-disabled-hint').attributes('tabindex')).toBeUndefined()
+    w.unmount()
+  })
+
   it('renders a boolean trait as a checkbox, not a text box', async () => {
     const w = render(node({
       type: 'input',
@@ -143,7 +171,7 @@ describe('UiKratosNode', () => {
   })
 })
 
-// Kratos links ("resend the code", "back to sign in") render as layer controls, not bare anchors.
+// Kratos links ("resend the code", "back to sign in") render as layer controls.
 describe('an anchor node', () => {
   it('is a text button rather than a browser-default link', () => {
     const wrapper = render(node({

@@ -268,6 +268,30 @@ describe('moving a node into a folder', () => {
     expect(source.moves).toEqual([])
   })
 
+  it('asks the source which node may go where, and never calls it for one it refused', async () => {
+    const source = sourceOf()
+    // note stays where it is, and nothing is filed into deep.
+    source.canMove = (node, parentId) => node.id !== 'note' && parentId !== 'deep'
+    const explorer = useExplorer(source)
+    await explorer.refresh()
+    explorer.navigate('docs')
+    const [, note, sheet] = explorer.children.value
+
+    expect(explorer.canDrag(note!)).toBe(false)
+    expect(explorer.canDrag(sheet!)).toBe(true)
+
+    explorer.drag.begin(sheet!)
+    expect(explorer.drag.canDrop('deep')).toBe(false)
+    explorer.drag.dropInto('deep')
+
+    explorer.drag.begin(note!)
+    explorer.drag.previewReorder(sheet!.id, true)
+    explorer.drag.commitReorder()
+
+    expect(source.moves).toEqual([])
+    expect(explorer.children.value.map(n => n.id)).toEqual(['deep', 'note', 'sheet'])
+  })
+
   it('does not drag at all when the source cannot move', async () => {
     const explorer = useExplorer({ load: () => Promise.resolve(seed()) })
     await explorer.refresh()

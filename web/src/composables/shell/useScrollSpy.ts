@@ -4,13 +4,8 @@ import { getCurrentInstance, onMounted, onScopeDispose, ref, watch, type Ref } f
 import { useRoute, useRouter } from 'vue-router'
 import { quietScroll, regionInset, scrollSettling } from './useShellScroll'
 
-/**
- * Tracks which section of a long page is on screen and mirrors it into the URL
- * hash with `replace`, so nav rows follow the user's scrolling. `quietScroll`
- * stops the scrollBehavior from scrolling to that rewritten anchor. A scroll
- * listener, since "last section whose top has passed" is not what an
- * IntersectionObserver answers.
- */
+// Mirrors the on-screen section of a long page into the URL hash with `replace`.
+// A scroll listener: IntersectionObserver cannot answer "last section whose top has passed".
 
 /** The region UiAppShell scrolls. */
 const REGION = '.shell__main'
@@ -149,6 +144,8 @@ export function useScrollSpy(ids: () => string[]): ScrollSpy {
       }
       if (gone || Date.now() > deadline) return
       await tick()
+      // Unmounted while waiting: the page may be gone with it, document too.
+      if (gone) return
     }
 
     region.addEventListener('scroll', onScroll, { passive: true })
@@ -170,7 +167,8 @@ export function useScrollSpy(ids: () => string[]): ScrollSpy {
     // Wait a tick: route watchers run before scrollBehavior marks the scroll as
     // settling, so measuring now would rewrite the anchor back.
     await tick()
-    while (scrollSettling()) await tick()
+    while (!gone && scrollSettling()) await tick()
+    if (gone) return
 
     measure()
   })

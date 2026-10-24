@@ -118,7 +118,7 @@ const hasHead = computed(() =>
   font-weight: 700;
   letter-spacing: var(--s99ab-label-track);
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: var(--s99ab-label-case);
   white-space: nowrap;
 }
 

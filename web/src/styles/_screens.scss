@@ -1,0 +1,144 @@
+// web/src/styles/_screens.scss
+//
+// UiBootScreen fills the window, centred on the page ground. UiCrashScreen is the app's own frame: a
+// heading bar and one panel above the status row; only its report scrolls, never the window.
+
+.s99ab-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px 16px;
+  background: rgb(var(--v-theme-bg));
+  color: rgb(var(--v-theme-ink));
+  text-align: center;
+}
+
+.s99ab-screen__figure {
+  --s99ab-state-kind: var(--v-theme-accent);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96px;
+}
+
+.s99ab-crash {
+  z-index: 3000;
+  color: rgb(var(--v-theme-ink));
+}
+
+.s99ab-crash__view {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--s99ab-control-gap);
+  min-height: 0;
+}
+
+.s99ab-crash__bar {
+  display: flex;
+  align-items: center;
+  min-height: var(--s99ab-strip-h);
+  padding: var(--s99ab-strip-pad-y) var(--s99ab-pad);
+}
+
+.s99ab-crash__title {
+  overflow: hidden;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s99ab-crash__panel {
+  min-height: 0;
+}
+
+.s99ab-crash__panel > .panel__body {
+  gap: var(--s99ab-pad);
+}
+
+.s99ab-crash__lead {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--s99ab-pad);
+}
+
+.s99ab-crash__figure {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+}
+
+.s99ab-crash__icon { color: rgb(var(--v-theme-error)); }
+
+.s99ab-crash__words {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.s99ab-crash__text { margin: 0; }
+
+.s99ab-crash__file {
+  margin: 0;
+  color: rgb(var(--v-theme-ink2));
+  font-family: var(--s99ab-font-mono);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+code.s99ab-crash__error {
+  align-self: flex-start;
+  max-height: 4.8em;
+  overflow: auto;
+  color: rgb(var(--v-theme-error));
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.s99ab-crash__panel .s99ab-eyebrow { margin-bottom: calc(-1 * var(--s99ab-pad) + 4px); }
+
+// The only part that scrolls. Selectable, since the frame turns selection off.
+.s99ab-crash__report {
+  flex: 1 1 auto;
+  min-height: 3em;
+  overflow: auto;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.s99ab-crash__status {
+  display: flex;
+  align-items: center;
+  gap: var(--s99ab-control-gap);
+  min-width: 0;
+  color: rgb(var(--v-theme-ink3));
+  font-size: var(--s99ab-meta-size);
+  white-space: nowrap;
+}
+
+.s99ab-crash__note {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.s99ab-crash__version {
+  flex: none;
+  font-family: var(--s99ab-font-mono);
+  font-size: 11px;
+}

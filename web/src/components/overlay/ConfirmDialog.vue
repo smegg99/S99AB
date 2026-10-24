@@ -1,21 +1,20 @@
 <!-- web/src/components/overlay/ConfirmDialog.vue -->
 <template>
-  <v-card>
-    <v-card-title>{{ options.title }}</v-card-title>
-
-    <v-card-text v-if="options.body">
+  <UiDialogCard :title="options.title">
+    <p
+      v-if="options.body"
+      class="s99ab-dialog__text"
+    >
       {{ options.body }}
-    </v-card-text>
-
-    <v-card-actions>
-      <v-spacer />
+    </p>
+    <template #actions>
       <v-btn
         variant="text"
         @click="close(false)"
       >
         {{ cancelText }}
       </v-btn>
-      <!-- Flat, since v-card-actions makes buttons text by default. -->
+      <!-- Flat, to set it apart from cancel. -->
       <v-btn
         :color="options.confirmColor ?? 'accent'"
         variant="flat"
@@ -23,12 +22,13 @@
       >
         {{ confirmText }}
       </v-btn>
-    </v-card-actions>
-  </v-card>
+    </template>
+  </UiDialogCard>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import UiDialogCard from './DialogCard.vue'
 import type { ConfirmOptions } from '../../composables/useDialog'
 import { useDialog } from '../../composables/useDialog'
 import { useTranslate } from '../../composables/useTranslate'

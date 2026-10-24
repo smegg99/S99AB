@@ -8,7 +8,7 @@
     :class="['s99ab-toasts', `s99ab-toasts--${position}`, directionClass(position)]"
     :aria-live="urgency(position)"
   >
-  <!-- No box: toasts are placed against the stack's edge. See UiMotion's `box`. -->
+    <!-- No box: toasts are placed against the stack's edge. See UiMotion's `box`. -->
     <UiMotion
       :box="false"
       group

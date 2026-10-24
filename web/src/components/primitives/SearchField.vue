@@ -10,7 +10,7 @@
     prepend-inner-icon="mdi-magnify"
     hide-details
     clearable
-    type="search"
+    type="text"
   />
 </template>
 

@@ -5,19 +5,17 @@ starting:
   description: "UiKratosForm, while it reads the flow Kratos redirected it to"
 flowExpired:
   value: "Ten formularz wygasł. Zacznij od nowa."
-  description: "UiKratosForm when the flow itself is gone - 410, 404 or a stale
-    CSRF cookie. Said only when starting over is genuinely the fix."
+  description: "UiKratosForm when the flow itself is gone (410, 404 or a stale
+    CSRF cookie), where starting over is the fix."
 flowUnreachable:
   value: "Nie udało się połączyć z serwerem. Spróbuj ponownie."
-  description: "UiKratosForm when the request did not come back at all - Kratos
-    down, a proxy answering 502, or no network. Deliberately not the expiry
-    message: starting over fixes nothing here."
+  description: "UiKratosForm when the request gets no response: Kratos
+    down, a proxy answering 502, or no network. Starting over does not help here."
 alreadySignedIn:
   value: "Jesteś już zalogowany."
   description: "UiKratosForm when Kratos refuses a login, registration or
-    recovery flow because the reader already holds a session. Not a failure -
-    they are through the door already, and the screen offers the way on rather
-    than silently sending them somewhere."
+    recovery flow because the reader already holds a session. The screen offers
+    a link onward instead of redirecting."
 alreadySignedInGo:
   value: "Przejdź do konta"
   description: "The way out of the already-signed-in notice, when the app has
@@ -34,8 +32,7 @@ signOut:
   description: "UiAccountMenu's menu, signed in"
 signOutFailed:
   value: "Nie udało się wylogować. Spróbuj ponownie."
-  description: "Toast when Kratos refuses the logout call. The session is still standing,
-    which is the one outcome nobody must be left guessing about"
+  description: "Toast when Kratos refuses the logout call. The session is still active"
 account:
   value: "Konto"
   description: "UiAccountMenu's avatar button, screen-reader name"
@@ -50,7 +47,7 @@ haveAccount:
   description: "UiAuthCard, beside the link back to sign in"
 version:
   value: "wersja"
-  description: "UiAuthPage's build plate. Lower case: it is a marking, not a heading"
+  description: "UiAuthPage's build plate, written in lower case"
 commit:
   value: "commit"
   description: "UiAuthPage's build plate, the short git sha"
@@ -59,8 +56,8 @@ built:
   description: "UiAuthPage's build plate, when the binary was built"
 backHome:
   value: "Wróć"
-  description: "UiAuthPage's way out of the signed-out screen. Short: the corner is
-    narrow, and an app with room passes its own name through home-label"
+  description: "UiAuthPage's link out of the signed-out screen. Short for a narrow
+    corner; an app can pass its own text through home-label"
 showPassword:
   value: "Pokaż hasło"
   description: "The reveal toggle inside a password field. One name in both states;
@@ -68,23 +65,20 @@ showPassword:
 msg:
   confirmItIsYou:
     value: "Potwierdź, że to Ty, zanim to zmienisz."
-    description: "Kratos 1010003, the whole of what a refresh login says - why
-      somebody already signed in is being asked for their password again."
+    description: "Kratos 1010003, a refresh login asking a signed-in reader for
+      their password again."
   codeSent:
     value: "Wysłaliśmy ci kod. Wpisz go tutaj, żeby potwierdzić adres."
-    description: "Kratos 1080003. Its own sentence explains what to do if the
-      mail does not arrive, at the length of a support article; this is the
-      instruction, said where the field is"
+    description: "Kratos 1080003, shortened to the instruction shown at the code field"
   chooseCredential:
     value: "Wybierz sposób logowania."
     description: "Kratos 1040009, the info message opening step two of a
-      registration. Generic on purpose: the step may offer a password, a
-      passkey or a one-time code, and only the app knows which. An app with a
-      single method should override this with the instruction for that method -
-      \"choose\" is nonsense above one field"
+      registration. Generic because the step may offer a password, a passkey
+      or a one-time code. An app with a single method should override it with
+      that method's instruction"
   saved:
     value: "Zapisano."
-    description: "Kratos 1050001, the whole of what a settings flow says when a save worked"
+    description: "Kratos 1050001, a settings flow's message after a successful save"
   badCode:
     value: "Ten kod jest nieprawidłowy albo już użyty. Sprawdź e-mail albo wyślij nowy."
     description: "Kratos 4070006 and 4060006, a verification or recovery code that is wrong or spent"
@@ -99,25 +93,21 @@ msg:
     description: "Kratos 4000031, a password too close to the identifier"
   badCredentials:
     value: "Zły e-mail lub hasło."
-    description: "Replaces one of Kratos's own sentences, which are written for a
-      support inbox. Only ids whose meaning is unambiguous are mapped; see composables/kratos/rules.ts"
+    description: "Replaces one of Kratos's own sentences. Only ids whose meaning is
+      unambiguous are mapped; see composables/kratos/rules.ts"
   exists:
     value: "To konto już istnieje."
-    description: "Replaces one of Kratos's own sentences, which are written for a
-      support inbox. Only ids whose meaning is unambiguous are mapped; see composables/kratos/rules.ts"
+    description: "Replaces one of Kratos's own sentences. Only ids whose meaning is
+      unambiguous are mapped; see composables/kratos/rules.ts"
 
 forbidden:
   value: "Nie masz do tego dostępu."
-  description: "kratosauth.RequireFunc, for a signed-in identity the gate refuses.
+  description: "kratosgin.RequireFunc, for a signed-in identity the check refuses.
     Answered as a 404, so this is only ever seen where the app chooses to show it"
 
-# Kratos writes its own button and field labels and ships no locale for them,
-# so without these a Polish screen says "Sign in with password". Keyed by
-# Kratos's own message id, which is stable across versions.
-#
-# Only Kratos's own words. 1070002 is deliberately absent: it is the label of a
-# *trait*, whose words come from the identity schema's title and are already
-# the app's - mapping it would rename every trait to whichever one was listed.
+# Kratos's own button and field labels, keyed by its stable message id.
+# Kratos ships no locale for them. 1070002 is absent: it labels a trait, whose
+# title comes from the app's identity schema.
 label:
   "1010001":
     value: "Zaloguj się"
@@ -151,3 +141,10 @@ label:
   "1040001":
     value: "Załóż konto"
     description: "Kratos: the password submit on the registration flow"
+
+disabled:
+  value: Serwer logowania wyłączył ten element.
+  description: Reason for an authentication control disabled by the identity server when it supplied no specific error
+pending:
+  value: Poczekaj na zakończenie żądania logowania.
+  description: Reason for a disabled submit control while an authentication request is pending

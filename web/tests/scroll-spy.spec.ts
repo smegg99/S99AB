@@ -2,7 +2,7 @@
 
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { anchorsIn, useScrollSpy } from '../src/composables/shell/useScrollSpy'
 
 // Lights the section being read on an anchor-only nav, where the URL only knows the clicked row.
@@ -137,6 +137,23 @@ describe('which section is being read', () => {
     await scrollTo(main, 1600)
 
     expect(spy.current.value).toBe('b')
+  })
+
+  // An unmounted spy stops looking for its region before it reads the page
+  // again, since the document may be gone with it.
+  it('stops looking for its region once it is unmounted, never reading the page again', async () => {
+    const wrapper = mount(defineComponent({
+      setup() {
+        useScrollSpy(() => ['a'])
+        return () => h('div')
+      },
+    }))
+    await nextTick()
+    const look = vi.spyOn(document, 'querySelector')
+    wrapper.unmount()
+    await new Promise(resolve => setTimeout(resolve, 80))
+    expect(look).not.toHaveBeenCalledWith('.shell__main')
+    look.mockRestore()
   })
 })
 

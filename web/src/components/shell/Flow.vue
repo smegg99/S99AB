@@ -115,13 +115,13 @@ async function start() {
   instance = new Neat({
     ref: canvas.value,
 
-  // Every shader parameter comes from configuration, dark overrides applied.
+    // Every shader parameter comes from configuration, dark overrides applied.
     ...groundShape(dark),
 
     colors: flowStops(colors, dark).map(color => ({ color, enabled: true })),
     resolution: config.resolution,
 
-  // Read by 1.x to remove its watermark; 0.x ignores it. Sent only when set.
+    // Read by 1.x to remove its watermark; 0.x ignores it. Sent only when set.
     ...(config.licenseKey ? { licenseKey: config.licenseKey } : {}),
 
     backgroundColor: colors.bg ?? colors.background,

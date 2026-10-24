@@ -6,6 +6,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { isMac } from '../../composables/useShortcut'
+import { useTranslate } from '../../composables/useTranslate'
 
 // A key cap. Resolves `mod` to Cmd on macOS and Ctrl elsewhere.
 const { keys } = defineProps<{
@@ -13,16 +14,20 @@ const { keys } = defineProps<{
   keys: string
 }>()
 
-// The platform is read after mount, so server and client render the same
-// markup before the client updates.
+// Resolved after mount: isMac() is false on the server, so reading it in render breaks hydration.
 const mac = ref(false)
 
-const pretty = computed(() =>
-  keys
-    .split('+')
-    .map(part => (part === 'mod' ? (mac.value ? 'Cmd' : 'Ctrl') : part))
-    .join(' + '),
-)
+const t = useTranslate()
+
+// Letters uppercase; named keys via shortcut.key.<name>, else capitalised.
+function cap(part: string): string {
+  if (part === 'mod') return mac.value ? 'Cmd' : t('shortcut.key.ctrl', 'Ctrl')
+  if (part.length === 1) return part.toUpperCase()
+  const name = part.toLowerCase()
+  return t(`shortcut.key.${name}`, name.charAt(0).toUpperCase() + name.slice(1))
+}
+
+const pretty = computed(() => keys.split('+').map(cap).join(' + '))
 
 onMounted(() => {
   mac.value = isMac()
@@ -30,9 +35,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* No Vuetify component draws a key cap. The heavier bottom border marks the
-   key's lip without a shadow. */
+/* The heavier bottom border draws the key's lip without a shadow. */
 .kbd {
+  transform: translateZ(0);
   display: inline-block;
   padding: 1px var(--s99ab-control-gap);
   border: 1px solid rgb(var(--v-theme-edge));

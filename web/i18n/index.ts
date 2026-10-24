@@ -11,6 +11,7 @@
 
 import authEn from './generated/web/en/auth.json'
 import commonEn from './generated/web/en/common.json'
+import crashEn from './generated/web/en/crash.json'
 import errorEn from './generated/web/en/error.json'
 import explorerEn from './generated/web/en/explorer.json'
 import inspectEn from './generated/web/en/inspect.json'
@@ -21,6 +22,7 @@ import validationEn from './generated/web/en/validation.json'
 
 import authPl from './generated/web/pl/auth.json'
 import commonPl from './generated/web/pl/common.json'
+import crashPl from './generated/web/pl/crash.json'
 import errorPl from './generated/web/pl/error.json'
 import explorerPl from './generated/web/pl/explorer.json'
 import inspectPl from './generated/web/pl/inspect.json'
@@ -39,11 +41,11 @@ function assemble(...files: Messages[]): Messages {
 /** One locale's messages. */
 export const s99abMessages: Record<string, Messages> = {
   en: assemble(
-    authEn, commonEn, errorEn, explorerEn, inspectEn,
+    authEn, commonEn, crashEn, errorEn, explorerEn, inspectEn,
     releaseEn, shortcutEn, transitionEn, validationEn,
   ),
   pl: assemble(
-    authPl, commonPl, errorPl, explorerPl, inspectPl,
+    authPl, commonPl, crashPl, errorPl, explorerPl, inspectPl,
     releasePl, shortcutPl, transitionPl, validationPl,
   ),
 }

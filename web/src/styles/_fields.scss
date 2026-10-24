@@ -67,10 +67,19 @@
   color: var(--s99ab-field-line-error-hover);
 }
 
-/* Clearance between stacked inputs. An outlined field's floating label sits
-   above its box and Vuetify reserves no room for it. */
-:where(.v-input) + :where(.v-input) {
+/* Clearance for the lower field's floating label, which Vuetify draws outside the
+   box. A UiDisabledHint host counts as the field it wraps. */
+:where(.v-input, .s99ab-disabled-hint:has(> .v-input)) + :where(.v-input, .s99ab-disabled-hint:has(> .v-input)) {
   margin-block-start: var(--s99ab-gap);
+}
+
+/* WebKitGTK rounds the four outline pieces separately and leaves a gap at
+   fractional seams; a compositing layer per piece snaps each edge. */
+.v-field--variant-outlined .v-field__outline__start,
+.v-field--variant-outlined .v-field__outline__notch::before,
+.v-field--variant-outlined .v-field__outline__notch::after,
+.v-field--variant-outlined .v-field__outline__end {
+  transform: translateZ(0);
 }
 
 /* The search box, at the width _controls.scss gives a field in a control row.

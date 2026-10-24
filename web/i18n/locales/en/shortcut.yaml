@@ -1,10 +1,9 @@
 # i18n/locales/en/shortcut.yaml
 #
-# `group.<prefix>` is the other half of this namespace, and the layer ships none
-# of it. ShortcutHelp heads each group with shortcut.group.<prefix>, where the
-# prefix is the app's own registry id namespace - "app", "session" - so only the
-# app knows what its prefixes are and what they mean. An app that declares none
-# gets the bare prefix as a heading.
+# The app owns `group.<prefix>`: ShortcutHelp heads each group with
+# shortcut.group.<prefix> and falls back to the bare registry prefix.
+# `key.<name>` uses the registry's lowercase key name, as in alt+arrowleft.
+# A letter is its capital and needs no entry.
 
 title:
   value: "Keyboard shortcuts"
@@ -12,3 +11,55 @@ title:
 none:
   value: "No shortcuts on this screen."
   description: "ShortcutHelp with an empty registry"
+key:
+  alt:
+    value: "Alt"
+    description: "Key cap: the alt key"
+  ctrl:
+    value: "Ctrl"
+    description: "Key cap: the ctrl key"
+  shift:
+    value: "Shift"
+    description: "Key cap: the shift key"
+  tab:
+    value: "Tab"
+    description: "Key cap: the tab key"
+  enter:
+    value: "Enter"
+    description: "Key cap: the enter key"
+  escape:
+    value: "Esc"
+    description: "Key cap: the escape key"
+  space:
+    value: "Space"
+    description: "Key cap: the space key"
+  backspace:
+    value: "Backspace"
+    description: "Key cap: the backspace key"
+  delete:
+    value: "Delete"
+    description: "Key cap: the delete key"
+  home:
+    value: "Home"
+    description: "Key cap: the home key"
+  end:
+    value: "End"
+    description: "Key cap: the end key"
+  pageup:
+    value: "PgUp"
+    description: "Key cap: the pageup key"
+  pagedown:
+    value: "PgDn"
+    description: "Key cap: the pagedown key"
+  arrowleft:
+    value: "Left"
+    description: "Key cap: the arrowleft key"
+  arrowright:
+    value: "Right"
+    description: "Key cap: the arrowright key"
+  arrowup:
+    value: "Up"
+    description: "Key cap: the arrowup key"
+  arrowdown:
+    value: "Down"
+    description: "Key cap: the arrowdown key"

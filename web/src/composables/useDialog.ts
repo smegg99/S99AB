@@ -8,6 +8,7 @@ import {
   reactive,
   readonly,
 } from 'vue'
+import { focused, pressedByKey } from './primitives/internal/opener'
 
 export type DialogWidth = 'sm' | 'md' | 'lg' | 'full'
 
@@ -28,6 +29,10 @@ export interface DialogEntry {
   opts: DialogOptions
   open: boolean
   resolve: (value?: unknown) => void
+  /** The element focused when the dialog opened; it gets focus back on close. */
+  opener: HTMLElement | null
+  /** Whether a key opened the dialog; only then does the opener get its focus ring back. */
+  openerRing: boolean
 }
 
 export interface ConfirmOptions {
@@ -45,7 +50,12 @@ export interface PromptOptions {
   value?: string
   confirmLabel?: string
   cancelLabel?: string
+  /** Each returns true, or the message under the field and in the disabled confirm key's tooltip. */
   rules?: Array<(v: string) => boolean | string>
+  /** Saves the answer before closing; a returned string is an error shown under the field. */
+  submit?: (value: string) => Promise<string | undefined>
+  /** An extra action at the start of the keys, run like `submit`; on success the dialog closes with no answer. */
+  secondary?: { label: string, color?: string, icon?: string, run: () => Promise<string | undefined> }
 }
 
 /** Injection key for the resolver of the dialog a component is rendered in. */
@@ -73,8 +83,7 @@ function openDialog<T = unknown>(
   opts: DialogOptions = {},
 ): Promise<T | undefined> {
   return new Promise<T | undefined>((resolve) => {
-    // A keepAlive dialog is reopened: its entry stays in the stack after close,
-    // so pushing a second one would leave the first mounted.
+    // Reuse a closed keepAlive entry; pushing another would leave the first mounted.
     const kept = opts.keepAlive
       ? entries.find(e => !e.open && e.opts.keepAlive && e.component === component)
       : undefined
@@ -83,18 +92,22 @@ function openDialog<T = unknown>(
       kept.props = props
       kept.opts = opts
       kept.resolve = resolve as (value?: unknown) => void
+      kept.opener = focused()
+      kept.openerRing = pressedByKey()
       kept.open = true
       return
     }
 
     entries.push({
       id: nextId++,
-    // markRaw: a component definition is not state.
+      // markRaw: a component definition needs no reactivity.
       component: markRaw(component),
       props,
       opts,
       open: true,
       resolve: resolve as (value?: unknown) => void,
+      opener: focused(),
+      openerRing: pressedByKey(),
     })
   })
 }
@@ -108,11 +121,24 @@ export function closeDialog(id: number, value?: unknown) {
   if (i === -1) return
 
   const entry = entries[i]!
+  const opener = entry.opener
+  const ring = entry.openerRing
+  // What the dialog leaves holding the focus: its field or key, or nothing.
+  const left = focused()
+  entry.opener = null
   entry.open = false
   entry.resolve(value)
+  if (!entry.opts.keepAlive) entries.splice(i, 1)
 
-  if (entry.opts.keepAlive) return
-  entries.splice(i, 1)
+  // Vuetify refocuses only an activator, and the host has none. A later task, so the focus
+  // trap is gone and WebKit does not ring it; skipped when the app moved focus meanwhile.
+  if (opener) {
+    setTimeout(() => {
+      const now = focused()
+      if (now && now !== left) return
+      if (opener.isConnected) opener.focus({ preventScroll: true, focusVisible: ring } as FocusOptions)
+    })
+  }
 }
 
 /** Resolves every open dialog as cancelled. */

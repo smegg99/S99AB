@@ -36,8 +36,7 @@ language:
 repeatedCount:
   value: "Powtórzone {count} razy"
   description: "Names the toast repeat marker, which is drawn as a bare number. The
-    count is in the message because its place in the sentence is not the same in every
-    language."
+    count's position in the sentence differs between languages."
   placeholders:
     count: {type: integer}
 search:
@@ -48,18 +47,15 @@ clear:
   description: "Clears the search in UiDataTable's strip"
 loading:
   value: "Wczytywanie"
-  description: "LoadingState's live region, whose own content - bare bars, or an aria-hidden
-    goo - announces as nothing"
+  description: "LoadingState's live region; its visual content is not announced"
 value:
   value: "Wartość"
-  description: "PromptDialog's field label where the caller names none. Not its placeholder:
-    a label that vanishes on the first keystroke is no label."
+  description: "PromptDialog's field label where the caller names none. Rendered as
+    a label, so it stays visible while typing."
 linkNewTab:
   value: "{text} (otwiera się w nowej karcie)"
-  description: "A MarkdownInline link's whole accessible name. Those links always
-    open a new tab, and the author-written prose around them cannot be relied on to
-    say so. The link text is a slot so the warning's position and bracketing are the
-    translator's."
+  description: "A MarkdownInline link's accessible name. Those links always open a
+    new tab; the text placeholder lets the translator place the warning."
   placeholders:
     text: {type: string}
 
@@ -67,3 +63,6 @@ highContrast:
   value: "Wysoki kontrast"
   description: "UiContrastToggle's accessible name and tooltip. The same in both states;
     aria-pressed carries which one it is in"
+pending:
+  value: "Poczekaj, aż się skończy."
+  description: "Why a dialog's key is disabled while what it started is still running (PromptDialog)"

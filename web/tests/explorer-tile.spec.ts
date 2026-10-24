@@ -206,6 +206,22 @@ describe('what a node can say about its own tile', () => {
   })
 })
 
+describe('a node the source keeps in place', () => {
+  it('is not draggable, while its neighbours are', async () => {
+    const explorer = useExplorer({
+      load: () => Promise.resolve(seed()),
+      move: () => Promise.resolve(),
+      canMove: node => node.id !== 'photo',
+    })
+    const wrapper = mountExplorer(explorer)
+    await flushPromises()
+    const [docs, , photo] = wrapper.findAll('.s99ab-tile')
+
+    expect(docs!.attributes('draggable')).toBe('true')
+    expect(photo!.attributes('draggable')).toBe('false')
+  })
+})
+
 // The icon variant: a glyph or preview with the name under it, no ground.
 describe('the icon variant', () => {
   it('gives every tile the same shape: something, then its name under it', async () => {

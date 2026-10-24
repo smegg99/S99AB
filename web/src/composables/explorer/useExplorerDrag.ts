@@ -110,6 +110,7 @@ export function createExplorerDrag<T = unknown>(host: ExplorerDragHost<T>) {
     const still = index === startIndex
       && (dragged.parentId ?? null) === host.currentId.value
     if (still && carried.length === 1) return
+    if (!host.canMoveInto(dragged, host.currentId.value)) return
 
     host.persist(dragged, host.currentId.value, index)
     // The rest of the group lands right after it, in grid order.

@@ -84,6 +84,19 @@ function createExplorer<T = unknown>(
     return groups.value.get(parentId)?.length ?? 0
   }
 
+  /** Whether a node may be dropped into a container, by the layer's rules and the source's. */
+  function canMoveNode(node: ExplorerNode<T>, parentId: string | null): boolean {
+    return can.value.move
+      && canMoveInto(nodes.value, node, parentId, maxDepth.value)
+      && (source.canMove?.(node, parentId) ?? true)
+  }
+
+  /** Whether a node can be picked up at all: dropped back where it sits. */
+  function canDrag(node: ExplorerNode<T>): boolean {
+    return can.value.move && !node.disabled
+      && (source.canMove?.(node, node.parentId ?? null) ?? true)
+  }
+
   function navigate(id: string | null) {
     if (currentId.value === id) return
     currentId.value = id
@@ -195,8 +208,7 @@ function createExplorer<T = unknown>(
             (a, b) => Number(a.kind === 'item') - Number(b.kind === 'item'),
           )
         : list,
-    canMoveInto: (node, parentId) =>
-      can.value.move && canMoveInto(nodes.value, node, parentId, maxDepth.value),
+    canMoveInto: canMoveNode,
     persist: persistMove,
     countOf,
   })
@@ -259,6 +271,7 @@ function createExplorer<T = unknown>(
     drag,
     events,
     countOf,
+    canDrag,
     canCreateIn,
     navigate,
     up,

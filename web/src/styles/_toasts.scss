@@ -1,11 +1,10 @@
 // web/src/styles/_toasts.scss
 //
 // The toast stacks. .s99ab-toasts .motion-group overrides _motion.scss on
-// specificity, so the load order does not matter.
+// specificity, so load order does not matter.
 
-/* A fixed width for every stack and toast. The stack only pins an edge; each
-   toast is placed against it individually. All six stay mounted. The z-index
-   is $toast-z. */
+/* A fixed-width, zero-height anchor on one screen edge; each toast is placed
+   against that edge, so one toast never moves another. z-index: $toast-z. */
 .s99ab-toasts {
   width: min(var(--s99ab-toast-w), calc(100vw - 2 * var(--s99ab-pad)));
   pointer-events: none;
@@ -45,10 +44,8 @@
 
 /* ---------------------------------------------------------------- toast ---- */
 
-/* Frosted chrome like the bar and the rail, tinted by kind. `edge` border so it
-   holds against whatever is underneath. The lift (distance from the pinned edge)
-   is a transitioned transform on this element; enter and leave own the
-   transform on the slot. */
+/* Frosted chrome tinted by kind. The lift transform is on the toast; enter and
+   leave animate the slot's transform. */
 .s99ab-toast {
   --s99ab-toast-ground: color-mix(in srgb, rgb(var(--s99ab-toast-kind)) 10%, rgb(var(--v-theme-chrome)));
 

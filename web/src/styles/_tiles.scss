@@ -57,6 +57,11 @@
     background-color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
 }
 
+/* WebKit's CSS drag override wins over the HTML attribute unless cleared. */
+.s99ab-tile[draggable='false'] {
+  -webkit-user-drag: none;
+}
+
 /* Hover, in the three styles s99ab.explorer.tile.hover picks from. The border
    always responds. */
 .s99ab-tile:hover {
@@ -83,8 +88,7 @@
   top: var(--s99ab-tile-corner);
   right: var(--s99ab-tile-corner);
   z-index: 3;
-  /* Its own size; the square comes from _surfaces.scss's aspect-ratio. */
-  height: var(--s99ab-tile-more);
+  --s99ab-icon-size: var(--s99ab-tile-more);
   opacity: 0;
   transition: opacity var(--s99ab-motion-fast) var(--s99ab-motion-easing);
 }
@@ -489,22 +493,48 @@
 }
 
 /* Accent and icon pickers in the folder dialog. */
+
+/* A field's name, as UiFormField sets it. */
+.s99ab-swatches__label {
+  margin-bottom: 6px;
+  color: rgb(var(--v-theme-ink));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 1;
+}
+
 .s99ab-swatches {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s99ab-control-gap);
 }
 
-.s99ab-swatch.v-btn {
+/* The tint is the whole face, without the key hairline _surfaces.scss gives a
+   flat button. */
+.s99ab-swatches .s99ab-swatch.v-btn {
+  border-color: transparent;
   background-color: rgb(var(--s99ab-tile-accent));
 }
 
-.s99ab-swatch--active {
-  outline: var(--s99ab-tile-ring) solid rgb(var(--v-theme-on-surface));
-  outline-offset: var(--s99ab-tile-corner);
+/* The one picked, a tint or a glyph: the ink ring with a gap of the surface
+   between, drawn by the shadow the flat button otherwise leaves empty. */
+.s99ab-swatches .s99ab-swatch--active {
+  box-shadow:
+    0 0 0 2px rgb(var(--v-theme-surface)),
+    0 0 0 calc(2px + var(--s99ab-tile-ring)) rgb(var(--v-theme-on-surface));
 }
 
 /* Each glyph choice shows the glyph itself. */
 .s99ab-glyph.v-btn {
   border: 1px solid rgb(var(--v-theme-edge));
+}
+
+/* Multiline titles use the same clamp across explorer layouts and WebKit versions. */
+.s99ab-explorer--multiline .s99ab-tile__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--s99ab-title-lines);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

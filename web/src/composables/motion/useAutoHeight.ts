@@ -46,7 +46,7 @@ export function useAutoHeight(content: ElementRef, ghost: ElementRef) {
     if (before === null) return
 
     measure()
-  // Only a shrink needs the copy; growth is revealed through the clip.
+    // Only a shrink needs the copy; growth is revealed through the clip.
     if (!copy || height.value === null || height.value >= before) return
 
     holdOutgoing(copy, before)

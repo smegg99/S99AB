@@ -125,6 +125,12 @@
   text-transform: none;
 }
 
+/* The path scrolls, which clips anything drawn outside a crumb: its focus
+   ring is drawn inside the button instead of around it. */
+.s99ab-explorer__crumb .v-btn:focus-visible {
+  outline-offset: -2px;
+}
+
 /* A tinted folder's crumb takes the tint. */
 .s99ab-explorer__crumb[data-accent] .v-btn {
   color: rgb(var(--s99ab-tile-accent));

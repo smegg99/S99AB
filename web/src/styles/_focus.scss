@@ -2,11 +2,23 @@
 //
 // Focus rings. Vuetify's overlay tint disappears on a bordered flat surface.
 
+/* A token so an app can recolour every ring at once. It reads a theme value, so
+   it sits on a selector rather than in _root.scss. */
+:root {
+  --s99ab-focus-ring: rgb(var(--v-theme-accent));
+}
+
 /* Drawn outside the element so it never shifts layout. Inputs are left out:
    a field shows focus through its own outline. */
-:where(a, button, [role='button'], .v-btn, .v-list-item, .v-tab):focus-visible {
-  outline: 2px solid rgb(var(--v-theme-accent));
+:where(a, button, [role='button'], .v-btn, .v-list-item, .v-tab, .s99ab-disabled-hint--disabled):focus-visible {
+  outline: 2px solid var(--s99ab-focus-ring);
   outline-offset: 2px;
+}
+
+/* A block UiDisabledHint fills its cell, often a row of a menu or list that
+   scrolls, where a ring drawn outside it is clipped at the sides. */
+:where(.s99ab-disabled-hint--block.s99ab-disabled-hint--disabled):focus-visible {
+  outline-offset: -2px;
 }
 
 /* Removes the browser's own ring on a focused input, which crosses an outlined
@@ -18,4 +30,28 @@
 .v-field__input :is(input, textarea, select):focus,
 .v-field__input :is(input, textarea, select):focus-visible {
   outline: none;
+}
+
+// Vuetify moves menu focus by script, which WebKitGTK gives no :focus-visible, so :focus draws the ring while the
+// keyboard was used last (plugins/input.client.ts).
+.v-menu .v-list-item:focus-visible,
+.v-select__content .v-list-item:focus-visible,
+:root[data-s99ab-keys] .v-menu .v-list-item:focus,
+:root[data-s99ab-keys] .v-select__content .v-list-item:focus {
+  outline: 2px solid var(--s99ab-focus-ring);
+  outline-offset: -2px;
+}
+
+
+/* Roving rows reached by script keep the keyboard ring until the next pointer press. */
+:where([data-s99ab-keyed]) :where([tabindex]):focus {
+  --s99ab-row-focus: 2px solid var(--s99ab-focus-ring);
+  outline: var(--s99ab-row-focus);
+  outline-offset: -2px;
+}
+
+/* Vuetify's modal trap also moves focus by script when Tab wraps. */
+:where(:root[data-s99ab-keys] .v-dialog) :where(a, button, [role='button'], .s99ab-disabled-hint--disabled):focus {
+  outline: 2px solid var(--s99ab-focus-ring);
+  outline-offset: 2px;
 }

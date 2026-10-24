@@ -2,7 +2,8 @@
 
 // State and labels for the <UiExplorer> tile context menu; tiles reach it through injected actions.
 
-import { computed, shallowRef } from 'vue'
+import { computed, shallowRef, watch } from 'vue'
+import { TILE_ATTR } from './useExplorerKeys'
 import { provideExplorerActions } from './useExplorerNode'
 import type { ExplorerNode } from './useExplorerTree'
 import { useTranslate } from '../useTranslate'
@@ -20,6 +21,10 @@ export interface ExplorerMenuHost<T> {
   pinWords: () => { add: string, remove: string }
   /** External file drop; absent ignores it. */
   files?: (parentId: string | null, files: File[]) => void
+  /** The explorer's element; focus returns to the menu's tile inside it on close. */
+  root?: () => HTMLElement | null
+  /** The open menu's element, which is teleported out of the explorer. */
+  content?: () => HTMLElement | undefined
 }
 
 export function useExplorerMenu<T = unknown>(host: ExplorerMenuHost<T>) {
@@ -51,7 +56,29 @@ export function useExplorerMenu<T = unknown>(host: ExplorerMenuHost<T>) {
     files: host.files,
   })
 
+  // Capture phase on the explorer: while the activator-less menu is open, up and down
+  // enter it, Escape closes it, and the grid gets no keys.
+  function onKeydown(event: KeyboardEvent) {
+    if (!menuOpen.value || event.isComposing) return
+    const items = () => [...host.content?.()?.querySelectorAll<HTMLElement>('.v-list-item[tabindex]:not(.v-list-item--disabled)') ?? []]
+    if (event.key === 'ArrowDown') items()[0]?.focus()
+    if (event.key === 'ArrowUp') items().at(-1)?.focus()
+    if (event.key === 'Escape') menuOpen.value = false
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  // On close, focus returns to the menu's tile unless an entry moved it (a field, a dialog).
+  watch(menuOpen, (open) => {
+    const id = menuNode.value?.id
+    const active = document.activeElement
+    const kept = active && active !== document.body && !host.content?.()?.contains(active)
+    if (open || id === undefined || kept) return
+    host.root?.()?.querySelector<HTMLElement>(`[${TILE_ATTR}="${CSS.escape(id)}"]`)?.focus()
+  }, { flush: 'post' })
+
   return {
+    onKeydown,
     menuOpen,
     menuAt,
     menuNode,

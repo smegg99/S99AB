@@ -68,7 +68,7 @@
           class="s99ab-kx__mark"
         >{{ mark }}</span>
 
-    <!-- Flags a node the renderer cannot draw. -->
+        <!-- Flags a node the renderer cannot draw. -->
         <span
           v-if="row.dropped"
           class="s99ab-kx__dropped"

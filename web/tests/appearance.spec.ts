@@ -365,20 +365,20 @@ describe('control shapes', () => {
     )
   })
 
-  // Square through aspect-ratio at --s99ab-control-h, so a component that sets
-  // its own height stays square.
-  it('keeps an icon button square at whatever height it is given', () => {
+  // Explicit dimensions survive a WebKit min-content column.
+  it('keeps icon button dimensions equal through the shared size token', () => {
     const rule = read('_surfaces.scss').match(
       /\.v-btn--icon:not\(\.v-tab\)\s*\{([^}]*)\}/,
     )?.[1]
 
-    expect(rule).toContain('height: var(--s99ab-control-h)')
-    expect(rule).toContain('aspect-ratio: 1')
+    expect(rule).toContain('height: var(--s99ab-icon-size, var(--s99ab-control-h))')
+    expect(rule).toContain('width: var(--s99ab-icon-size, var(--s99ab-control-h))')
+    expect(rule).not.toContain('width: auto')
     expect(rule).not.toContain('--v-btn-height')
   })
 
-  // Anything sizing one states the height only.
-  it('leaves the width to that ratio everywhere else', () => {
+  // Contexts size both dimensions through the shared icon token.
+  it('keeps contextual icon sizes on the shared sizing token', () => {
     for (const partial of ['_tables.scss', '_tiles.scss', '_controls.scss']) {
       const rules = read(partial).match(/\.v-btn--icon[^{]*\{[^}]*\}/g) ?? []
       for (const rule of rules) {

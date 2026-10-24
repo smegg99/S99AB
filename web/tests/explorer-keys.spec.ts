@@ -24,11 +24,12 @@ function seed(): ExplorerNode[] {
 
 const mounted: Array<{ unmount: () => void }> = []
 
-function mountExplorer(props: Record<string, unknown> = {}) {
+function mountExplorer(props: Record<string, unknown> = {}, slots: Record<string, string> = {}) {
   const explorer = useExplorer({ load: () => Promise.resolve(seed()) })
   const wrapper = mount(Explorer, {
     attachTo: document.body,
     props: { explorer, selected: [], ...props },
+    slots,
     global: { plugins: [vuetify] },
   })
   mounted.push(wrapper)
@@ -38,6 +39,29 @@ function mountExplorer(props: Record<string, unknown> = {}) {
 /** The model's last written value. */
 const picked = (wrapper: ReturnType<typeof mountExplorer>) =>
   wrapper.emitted('update:selected')?.at(-1)?.[0]
+
+// Vuetify's overlay positioning reads `visualViewport` as a bare global the
+// moment a menu opens, and happy-dom has none.
+if (!('visualViewport' in globalThis)) {
+  Object.defineProperty(globalThis, 'visualViewport', {
+    configurable: true,
+    value: {
+      width: 1024,
+      height: 768,
+      offsetLeft: 0,
+      offsetTop: 0,
+      scale: 1,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    },
+  })
+}
+
+// A menu opened at a point asks which elements lie under that point when it
+// places itself, and happy-dom cannot answer.
+if (!('elementsFromPoint' in document)) {
+  Object.defineProperty(document, 'elementsFromPoint', { configurable: true, value: () => [] })
+}
 
 beforeEach(() => {
   disposeExplorer()
@@ -154,5 +178,63 @@ describe('with selection off', () => {
     await wrapper.findAll('.s99ab-tile')[1]!.trigger('keydown', { key: ' ' })
 
     expect(wrapper.emitted('open')?.[0]?.[0]).toEqual(expect.objectContaining({ id: 'one' }))
+  })
+})
+
+// The context menu leaves the focus on the tile but takes the keyboard while open.
+describe('with the menu open', () => {
+  const menu = { menu: '<v-list-item title="Open" link /><v-list-item title="Copy" link />' }
+
+  async function opened() {
+    const wrapper = mountExplorer({}, menu)
+    await flushPromises()
+    const tile = wrapper.findAll('.s99ab-tile')[1]!
+    await tile.trigger('contextmenu')
+    await flushPromises()
+    ;(tile.element as HTMLElement).focus()
+    return { wrapper, tile, grid: wrapper.find('.s99ab-explorer__grid') }
+  }
+
+  const items = () => [...document.querySelectorAll<HTMLElement>('.v-overlay__content .v-list-item')]
+
+  it('leaves the selection and the focus where they are on left and right', async () => {
+    const { wrapper, tile, grid } = await opened()
+
+    await grid.trigger('keydown', { key: 'ArrowRight' })
+
+    expect(document.activeElement).toBe(tile.element)
+    expect(picked(wrapper)).toEqual(['one'])
+  })
+
+  it('moves into the menu on down and up', async () => {
+    const { grid } = await opened()
+
+    await grid.trigger('keydown', { key: 'ArrowDown' })
+    expect(document.activeElement).toBe(items()[0])
+
+    items()[0]!.blur()
+    await grid.trigger('keydown', { key: 'ArrowUp' })
+    expect(document.activeElement).toBe(items().at(-1))
+  })
+
+  it('closes on escape and keeps the selection', async () => {
+    const { wrapper, grid } = await opened()
+
+    await grid.trigger('keydown', { key: 'Escape' })
+    await flushPromises()
+
+    expect(picked(wrapper)).toEqual(['one'])
+    expect(wrapper.findComponent({ name: 'VMenu' }).props('modelValue')).toBe(false)
+  })
+
+  it('gives the focus back to the tile when the menu took it and closed', async () => {
+    const { wrapper, tile, grid } = await opened()
+    await grid.trigger('keydown', { key: 'ArrowDown' })
+
+    items()[0]!.blur()
+    wrapper.findComponent({ name: 'VMenu' }).vm.$emit('update:modelValue', false)
+    await flushPromises()
+
+    expect(document.activeElement).toBe(tile.element)
   })
 })

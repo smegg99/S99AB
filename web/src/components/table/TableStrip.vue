@@ -23,7 +23,7 @@
         :aria-label="searchLabel"
         :placeholder="placeholder ?? searchLabel"
         class="table__input"
-        type="search"
+        type="text"
       >
 
       <!-- Only when there is something to clear. -->

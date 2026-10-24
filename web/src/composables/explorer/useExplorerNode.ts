@@ -292,7 +292,7 @@ export function useExplorerNode<T = unknown>(
     'tabindex': 0,
     // Carries the id, which the grid's keys and rubber band read from the DOM.
     [TILE_ATTR]: target.value.id,
-    'draggable': explorer.can.value.move && !disabled.value,
+    'draggable': explorer.canDrag(target.value),
     'aria-disabled': disabled.value || undefined,
     'aria-selected': selectable.value ? selected.value : undefined,
     'onClick': onClick,

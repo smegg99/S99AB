@@ -59,7 +59,7 @@ const slots = useSlots()
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: var(--s99ab-label-case);
 }
 
 .form-section__desc {

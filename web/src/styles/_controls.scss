@@ -106,3 +106,7 @@
 .v-btn--variant-text:not(.v-btn--icon).v-btn--disabled .v-btn__content {
   opacity: var(--s99ab-text-btn-rest);
 }
+
+/* A button's glyph columns must not shrink below their intrinsic width. */
+.v-btn__append,
+.v-btn__prepend { flex: none; }

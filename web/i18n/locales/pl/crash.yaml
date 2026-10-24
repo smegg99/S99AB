@@ -1,0 +1,84 @@
+# i18n/locales/pl/crash.yaml
+
+starting:
+  value: "Uruchamianie aplikacji {app}"
+  placeholders:
+    app: {type: string}
+titleStart:
+  value: "Nie udało się uruchomić aplikacji"
+titleCrash:
+  value: "Aplikacja nieoczekiwanie przestała działać"
+titleHang:
+  value: "Aplikacja nie odpowiada"
+titleHangStopped:
+  value: "Aplikacja przestała odpowiadać"
+titleKilled:
+  value: "Aplikacja nieoczekiwanie się zamknęła"
+messageConfig:
+  value: "Nie można odczytać pliku ustawień. Popraw go albo usuń, a potem uruchom aplikację {app} ponownie."
+  placeholders:
+    app: {type: string}
+messageStartup:
+  value: "Usuń przyczynę podaną niżej, a potem uruchom aplikację {app} ponownie."
+  placeholders:
+    app: {type: string}
+messageCrash:
+  value: "Coś w aplikacji {app} przestało działać. Wyślij raport, żeby można to było naprawić, a potem uruchom ją ponownie."
+  placeholders:
+    app: {type: string}
+messageHang:
+  value: "Może jeszcze skończyć to, co robi. Zaczekaj albo zamknij ją i wyślij raport."
+messageHangStopped:
+  value: "Aplikacja {app} została zamknięta, gdy nie odpowiadała. Wyślij raport, żeby można to było naprawić, a potem uruchom ją ponownie."
+  placeholders:
+    app: {type: string}
+messageKilled:
+  value: "Aplikacja {app} została zamknięta, zanim zdążyła cokolwiek zgłosić. Wyślij raport, żeby można to było naprawić, a potem uruchom ją ponownie."
+  placeholders:
+    app: {type: string}
+messageOom:
+  value: "Zabrakło pamięci w systemie i aplikacja {app} została zamknięta. Wyślij raport, a potem uruchom ją ponownie."
+  placeholders:
+    app: {type: string}
+file:
+  value: "Plik: {path}"
+  placeholders:
+    path: {type: string}
+details:
+  value: "Szczegóły"
+copy:
+  value: "Kopiuj raport"
+copied:
+  value: "Skopiowano"
+save:
+  value: "Zapisz raport"
+saved:
+  value: "Zapisano w {path}"
+  placeholders:
+    path: {type: string}
+email:
+  value: "Wyślij raport e-mailem"
+logs:
+  value: "Pokaż plik dziennika"
+restart:
+  value: "Uruchom ponownie"
+close:
+  value: "Zamknij"
+wait:
+  value: "Zaczekaj"
+kill:
+  value: "Zamknij i zgłoś"
+failed:
+  value: "Nie udało się: {error}"
+  placeholders:
+    error: {type: string}
+windowStart:
+  value: "nie można uruchomić"
+windowCrash:
+  value: "awaria"
+windowHang:
+  value: "nie odpowiada"
+windowHangStopped:
+  value: "przestała odpowiadać"
+windowKilled:
+  value: "nieoczekiwanie zamknięta"

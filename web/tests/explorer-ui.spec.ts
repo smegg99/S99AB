@@ -128,16 +128,25 @@ describe('UiExplorer', () => {
     expect(crumbs[1]!.classes()).toContain('s99ab-explorer__crumb--current')
   })
 
-  it('shows the empty state in a folder with nothing in it', async () => {
+  it('shows no empty state in a folder with nothing in it, only its up tile', async () => {
     const explorer = useExplorer({ load: () => Promise.resolve(seed()) })
     const wrapper = mountExplorer(explorer)
     await flushPromises()
     explorer.navigate('nested')
     await nextTick()
 
-    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
+    expect(wrapper.findComponent(EmptyState).exists()).toBe(false)
     // The up tile still renders in an empty folder.
     expect(wrapper.find('.s99ab-tile--up').exists()).toBe(true)
+  })
+
+  it('shows the empty state at the top with nothing in it', async () => {
+    const explorer = useExplorer({ load: () => Promise.resolve([]) })
+    const wrapper = mountExplorer(explorer)
+    await flushPromises()
+
+    expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
+    expect(wrapper.find('.s99ab-tile--up').exists()).toBe(false)
   })
 
   it('replaces every tile through the slot, keeping them keyed in the group', async () => {
@@ -231,6 +240,35 @@ describe('UiExplorer', () => {
     await nextTick()
 
     expect(wrapper.find('.s99ab-tile--skeleton').exists()).toBe(false)
+    expect(wrapper.findAll('.s99ab-tile')).toHaveLength(2)
+    vi.useRealTimers()
+  })
+
+  it('says a first load in the app\'s own words when it fills the loading slot', async () => {
+    vi.useFakeTimers()
+    let arrive: (nodes: ExplorerNode[]) => void = () => {}
+    const explorer = useExplorer({
+      load: () =>
+        new Promise<ExplorerNode[]>((resolve) => {
+          arrive = resolve
+        }),
+    })
+    const wrapper = mountExplorer(explorer, {
+      loading: () => h('p', { class: 'words' }, 'Loading...'),
+    })
+    await nextTick()
+    expect(wrapper.find('.words').exists()).toBe(false)
+
+    vi.advanceTimersByTime(300)
+    await nextTick()
+    expect(wrapper.find('.words').text()).toBe('Loading...')
+    expect(wrapper.find('.s99ab-tile--skeleton').exists()).toBe(false)
+
+    arrive(seed())
+    await flushPromises()
+    vi.advanceTimersByTime(600)
+    await nextTick()
+    expect(wrapper.find('.words').exists()).toBe(false)
     expect(wrapper.findAll('.s99ab-tile')).toHaveLength(2)
     vi.useRealTimers()
   })

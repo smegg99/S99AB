@@ -2,7 +2,6 @@
 //
 // Prose emitted by the markdown renderer, used by UiMarkdown in any context.
 
-/* Prose is held to a measure. */
 .s99ab-md {
   max-width: var(--s99ab-measure);
   line-height: 1.6;
@@ -36,7 +35,7 @@
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.14em;
-  text-transform: uppercase;
+  text-transform: var(--s99ab-label-case);
 }
 
 /* A bold run leading a line ("Linux x86_64:") is a label and takes the brighter ink. */

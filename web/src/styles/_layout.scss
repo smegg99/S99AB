@@ -76,3 +76,15 @@ img {
   margin-inline: calc(-1 * var(--s99ab-pad));
   border-bottom: 1px solid rgb(var(--v-theme-line));
 }
+
+/* WebKit's sticky origin includes the scrolling body's padding. */
+.s99ab-sticky-head {
+  position: sticky;
+  z-index: 2;
+  top: calc(-1 * var(--s99ab-scroll-inset, 0px));
+}
+
+:root {
+  /* Separates shrink priorities beyond WebKit's 1/64px rounding, avoiding stray ellipses. */
+  --s99ab-shrink-first: 1000000;
+}

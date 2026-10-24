@@ -74,17 +74,19 @@
         @click="folders.rename(explorer.current.value)"
       >
         <v-icon :icon="explorer.icons.value.rename" />
+        <!-- Shares the window-wide hint slot (primitives/internal/tooltip.ts). -->
         <v-tooltip
+          :model-value="hintTooltipOpen(renameHint)"
           :text="renameLabel"
           activator="parent"
+          @update:model-value="(open: boolean) => setHintTooltipOpen(renameHint, open)"
         />
       </v-btn>
 
-      <!-- The tooltip is on the wrapper because a disabled button fires no
-           pointer events, and the depth cap is what disables it. -->
-      <div
+      <UiDisabledHint
         v-if="explorer.can.value.create"
-        class="d-flex"
+        :reason="canCreate ? '' : createTooltip"
+        :label="createLabel"
       >
         <v-btn
           :aria-label="createLabel"
@@ -95,12 +97,15 @@
           @click="folders.create()"
         >
           <v-icon :icon="explorer.icons.value.create" />
+          <v-tooltip
+            :model-value="hintTooltipOpen(createHint)"
+            :disabled="!canCreate"
+            :text="createTooltip"
+            activator="parent"
+            @update:model-value="(open: boolean) => setHintTooltipOpen(createHint, open)"
+          />
         </v-btn>
-        <v-tooltip
-          :text="createTooltip"
-          activator="parent"
-        />
-      </div>
+      </UiDisabledHint>
     </div>
   </div>
 </template>
@@ -112,6 +117,8 @@ import { useExplorerCrumbs } from '../../composables/explorer/useExplorerCrumbs'
 import { useExplorerFolders } from '../../composables/explorer/useExplorerFolders'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 import { useTranslate } from '../../composables/useTranslate'
+import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
+import UiDisabledHint from '../primitives/DisabledHint.vue'
 
 const explorer = useExplorerContext()
 const folders = useExplorerFolders(explorer)
@@ -130,6 +137,9 @@ const {
 } = useExplorerCrumbs(explorer)
 
 const picked = computed(() => selection?.nodes.value ?? [])
+/** Owner keys for the two tooltips in the window-wide hint slot. */
+const renameHint = {}
+const createHint = {}
 
 const createLabel = computed(() => t('explorer.newFolder', 'New folder'))
 const renameLabel = computed(() => t('explorer.renameFolder', 'Rename folder'))

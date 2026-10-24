@@ -1,7 +1,6 @@
 // web/src/composables/explorer/internal/types.ts
 //
-// What an app hands the explorer. The methods a source implements set the features;
-// load() alone gives a read-only tree.
+// What an app hands the explorer. Implemented methods enable features; load() alone is read-only.
 
 import type {
   ExplorerBehaviour,
@@ -32,6 +31,11 @@ export interface ExplorerSource<T = unknown> {
   /** The whole tree, flat; ancestors are needed for the path and depth cap. */
   load: () => Promise<ExplorerNode<T>[]>
   move?: (move: ExplorerMove) => Promise<void>
+  /**
+   * Whether node may go into parentId (null is the root), on top of the layer's rules.
+   * Asked with the node's own parent to decide whether it can be picked up at all.
+   */
+  canMove?: (node: ExplorerNode<T>, parentId: string | null) => boolean
   createFolder?: (input: ExplorerFolderInput) => Promise<void>
   renameFolder?: (id: string, input: ExplorerFolderInput) => Promise<void>
   /** Without recursive, the app decides what happens to the contents. */

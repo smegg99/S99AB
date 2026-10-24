@@ -1,6 +1,7 @@
 // web/tests/toast-host.spec.ts
 
 import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
@@ -321,10 +322,7 @@ describe('UiToastHost', () => {
     })
   })
 
-  /*
-   * Newest nearest the pinned edge, so the oldest (which expires first) leaves
-   * from the far end without moving the others.
-   */
+  // Newest nearest the pinned edge, so the oldest leaves from the far end.
   describe('order', () => {
     it('draws the newest first in a bottom stack', async () => {
       const toast = useToast()
@@ -367,10 +365,7 @@ describe('UiToastHost', () => {
     })
   })
 
-  /*
-   * Each toast is placed from the stack's edge by the toasts nearer that edge,
-   * so one leaving cannot move another.
-   */
+  // A toast is placed by the toasts nearer the edge, so one leaving cannot move another.
   describe('placement', () => {
     it('sits the toast nearest the edge flat against it', async () => {
       const toast = useToast()
@@ -455,5 +450,36 @@ describe('toast stack placement', () => {
 
   it.each(['bottom-start', 'bottom', 'bottom-end'])('sits on the window edge at %s', (position) => {
     expect(rule(position)).toContain('inset-block-end: var(--s99ab-toast-bottom)')
+  })
+})
+
+// ---------------------------------------------------------------- layer ----
+
+// This run cannot load Vuetify's CSS, so its z-index defaults are read from the
+// installed sources.
+describe('toast stack layer', () => {
+  const config = readFileSync(resolve(process.cwd(), 'src/styles/_config.scss'), 'utf8')
+  const installed = createRequire(import.meta.url)
+  const vuetifySource = (path: string) => readFileSync(installed.resolve(`vuetify/lib/${path}`), 'utf8')
+
+  /** The first number pattern captures in source. */
+  function number(source: string, pattern: RegExp): number {
+    const found = pattern.exec(source)
+    if (!found) throw new Error(`no match for ${pattern}; read the source again`)
+    return Number(found[1])
+  }
+
+  const toast = number(config, /^\$toast-z:\s*(\d+)\s*!default;/m)
+  // The first menu or tooltip; every overlay opened over another adds 10.
+  const overlay = number(vuetifySource('components/VOverlay/VOverlay.js'), /zIndex:\s*\{\s*type:\s*\[Number, String\],\s*default:\s*(\d+)/)
+  const dialog = number(vuetifySource('components/VDialog/VDialog.js'), /zIndex:\s*(\d+)/)
+
+  it('stands under the first menu or tooltip, so under every overlay and dialog', () => {
+    expect(toast).toBeLessThan(overlay)
+    expect(toast).toBeLessThan(dialog)
+  })
+
+  it('stands over Vuetify\'s layout, which starts at 1000', () => {
+    expect(toast).toBeGreaterThan(number(vuetifySource('composables/layout.js'), /ROOT_ZINDEX = (\d+)/))
   })
 })

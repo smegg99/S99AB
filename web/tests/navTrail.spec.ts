@@ -349,10 +349,13 @@ const router = createRouter({
   routes: [{ path: '/:rest(.*)', component: { template: '<div />' } }],
 })
 
+/** The components inComponent mounted, unmounted after each test. */
+const mounted: { unmount: () => void }[] = []
+
 /** Runs the composable inside a mounted component, as a real call site is. */
 function inComponent<T>(fn: () => T): T {
   let out!: T
-  mount(
+  mounted.push(mount(
     defineComponent({
       setup() {
         out = fn()
@@ -360,12 +363,17 @@ function inComponent<T>(fn: () => T): T {
       },
     }),
     { global: { plugins: [router] } },
-  )
+  ))
   return out
 }
 
 describe('useNavTrail', () => {
-  afterEach(() => resetMotion())
+  // A mounted scroll spy keeps looking for its region for two seconds, past the
+  // test environment's teardown.
+  afterEach(() => {
+    for (const wrapper of mounted.splice(0)) wrapper.unmount()
+    resetMotion()
+  })
 
   // TrailPoint has only x and y; the node's `half` is dropped.
   const at = (node: { x: number, y: number } | undefined) => ({ x: node?.x, y: node?.y })

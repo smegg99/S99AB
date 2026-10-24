@@ -73,7 +73,7 @@ samp,
   font-weight: 700;
   letter-spacing: var(--s99ab-label-track);
   line-height: 1.4;
-  text-transform: uppercase;
+  text-transform: var(--s99ab-label-case);
 }
 
 /* Text drawn directly on the ground, which an app can make arbitrarily busy:
@@ -89,4 +89,11 @@ samp,
 
 .text-break-all {
   word-break: break-all;
+}
+
+// A name cut short draws its letters apart: WebKitGTK clipped the ellipsis
+// after a cut "ffl" ligature to one dot ("Plan (offl.").
+.text-truncate,
+.s99ab-tile__title {
+  font-variant-ligatures: no-common-ligatures;
 }

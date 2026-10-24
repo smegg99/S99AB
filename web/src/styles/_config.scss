@@ -38,6 +38,8 @@ $font-size: 0.96875rem !default;
 /// Small tracked capitals: panel titles, nav group labels, section headings.
 $label-size: 0.8rem !default;
 $label-track: 0.08em !default;
+/// Whether those labels are capitalized. `none` leaves them as written.
+$label-case: uppercase !default;
 
 $measure: 62ch !default;
 
@@ -271,22 +273,29 @@ $vt-cover-hold: 140ms !default;
 
 // ---------------------------------------------------------------- toasts ----
 
-/// The stack's fixed width. Shrink-to-fit would resize every toast as others come and go.
+/// The fixed stack width; fits a sentence-long error in two or three lines.
 $toast-w: 420px !default;
 
-/// Above Vuetify's v-overlay layer at 2400.
-$toast-z: 2500 !default;
+/// Under every Vuetify overlay (2000 and up) and over the layout (about 1000).
+/// Move it with Vuetify's overlay z-index.
+$toast-z: 1999 !default;
 
-/// A top-pinned stack's start, clearing the app bar. A shell without a bar can set $pad.
+/// Where a top-pinned stack starts, below the app bar. Set to $pad without a bar.
 $toast-top: calc(#{$strip-h} + #{$pad}) !default;
+/// Where a bottom-pinned stack ends.
 $toast-bottom: $pad !default;
 
+/// The slowest arrival in the layer; leaving is shorter.
 $toast-enter: 420ms !default;
 $toast-leave: 260ms !default;
-/// Moving within the stack. Slower than enter so the stack settles after an arrival.
+/// Moving to a new place in the stack. Slower than enter, so the stack settles
+/// after the arrival.
 $toast-move: 460ms !default;
+/// How far it travels on the way in.
 $toast-travel: 24px !default;
+/// How far on the way out; the exit is mostly a fade.
 $toast-exit-travel: 10px !default;
+/// Between one toast and the next.
 $toast-gap: $control-gap !default;
 
 /// The repeat count and the "+N still waiting" marker.

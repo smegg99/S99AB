@@ -3,7 +3,7 @@
   <div>
     <v-label
       :text="label"
-      class="text-caption mb-2"
+      class="s99ab-swatches__label"
     />
 
     <div

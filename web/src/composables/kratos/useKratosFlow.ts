@@ -14,6 +14,7 @@ import type {
 
 export * from './internal/types'
 export * from './internal/nodes'
+export { isKratosEmail, kratosMessageText, kratosRules, type Rule } from './internal/rules'
 export { kratosRefreshSession, kratosSignOut, type KratosFlowApi, type KratosFlowOptions, type KratosSuccess } from './internal/api'
 
 /** `kind` may be a getter, so a destructured prop stays reactive. */
@@ -121,7 +122,7 @@ export function useKratosFlow(
     forgetFlowInLocation()
     pending.value = true
     failed.value = false
-    // Kept: a restart from a dead flow emptied the fields and shows why.
+    // Tells the user why a restart from a dead flow emptied the fields.
     notice.value = why
     try {
       load(await createFlow())
@@ -167,7 +168,7 @@ export function useKratosFlow(
       load(id ? await readOrCreateFlow(id) : await createFlow())
     }
     catch (err) {
-      // Reported, not navigated: where a signed-in user belongs is the app's call.
+      // Reported only; the app decides where a signed-in user goes.
       if (err instanceof AlreadySignedIn) {
         notice.value = 'signedIn'
         return

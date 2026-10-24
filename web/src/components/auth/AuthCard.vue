@@ -10,7 +10,7 @@
       :icon="icon"
       :subtitle="subtitle"
     >
-    <!-- The flow's name on the right of the head, dropped when there is no app
+      <!-- The flow's name on the right of the head, dropped when there is no app
          name so the strip does not say "Sign in" twice. The mark is in UiAuthPage. -->
       <template
         v-if="appName"

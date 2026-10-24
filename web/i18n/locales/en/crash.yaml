@@ -1,0 +1,117 @@
+# i18n/locales/en/crash.yaml
+#
+# UiBootScreen and UiCrashScreen. {app} is the app's name as the screen got it.
+
+starting:
+  value: "Starting {app}"
+  description: "UiBootScreen's screen-reader label while the app starts"
+  placeholders:
+    app: {type: string}
+titleStart:
+  value: "The app could not start"
+  description: "UiCrashScreen heading for a settings or startup failure"
+titleCrash:
+  value: "The app stopped unexpectedly"
+  description: "UiCrashScreen heading after the app died from a crash"
+titleHang:
+  value: "The app is not responding"
+  description: "UiCrashScreen heading while the app has stopped responding"
+titleHangStopped:
+  value: "The app stopped responding"
+  description: "UiCrashScreen heading after a hung app was closed from the screen"
+titleKilled:
+  value: "The app closed unexpectedly"
+  description: "UiCrashScreen heading after the app ended without a crash trace or a clean exit"
+messageConfig:
+  value: "The settings file could not be read. Fix it or delete it, then start {app} again."
+  description: "UiCrashScreen, the settings file failed to load"
+  placeholders:
+    app: {type: string}
+messageStartup:
+  value: "Fix the cause below, then start {app} again."
+  description: "UiCrashScreen, a startup failure other than the settings file"
+  placeholders:
+    app: {type: string}
+messageCrash:
+  value: "Something inside {app} failed. Send the report so it can be fixed, then restart."
+  description: "UiCrashScreen, after a crash"
+  placeholders:
+    app: {type: string}
+messageHang:
+  value: "It may still finish what it is doing. Wait, or close it and send a report."
+  description: "UiCrashScreen, while the app is not responding and still runs"
+messageHangStopped:
+  value: "{app} was closed while it was not responding. Send the report so it can be fixed, then restart."
+  description: "UiCrashScreen, after a hung app was closed from the screen"
+  placeholders:
+    app: {type: string}
+messageKilled:
+  value: "{app} was closed before it could report anything. Send the report so it can be fixed, then restart."
+  description: "UiCrashScreen, the app was killed, for example by the system or a task manager"
+  placeholders:
+    app: {type: string}
+messageOom:
+  value: "The system ran out of memory and closed {app}. Send the report, then restart."
+  description: "UiCrashScreen, the kernel killed the app for memory"
+  placeholders:
+    app: {type: string}
+file:
+  value: "File: {path}"
+  description: "UiCrashScreen, the file the failure is about"
+  placeholders:
+    path: {type: string}
+details:
+  value: "Details"
+  description: "UiCrashScreen, the toggle that shows the full report"
+copy:
+  value: "Copy report"
+  description: "UiCrashScreen action, puts the report on the clipboard"
+copied:
+  value: "Copied"
+  description: "UiCrashScreen copy action, for the moment after it worked"
+save:
+  value: "Save report"
+  description: "UiCrashScreen action, writes the report to a file"
+saved:
+  value: "Saved to {path}"
+  description: "UiCrashScreen, where the report was saved"
+  placeholders:
+    path: {type: string}
+email:
+  value: "Email report"
+  description: "UiCrashScreen action, opens the mail client with the report"
+logs:
+  value: "Show log file"
+  description: "UiCrashScreen action, shows the log file in the file manager"
+restart:
+  value: "Restart"
+  description: "UiCrashScreen action, starts the app again"
+close:
+  value: "Close"
+  description: "UiCrashScreen action, closes the screen"
+wait:
+  value: "Wait"
+  description: "UiCrashScreen action while the app is not responding: hide the screen and give it more time"
+kill:
+  value: "Close and report"
+  description: "UiCrashScreen action while the app is not responding: close it and show the report"
+failed:
+  value: "That did not work: {error}"
+  description: "UiCrashScreen, an action failed. error is the reason as the app reported it"
+  placeholders:
+    error: {type: string}
+windowStart:
+  value: "could not start"
+  description: "Window title after the app's name, for a settings or startup failure"
+windowCrash:
+  value: "crashed"
+  description: "Window title after the app's name, after a crash"
+windowHang:
+  value: "not responding"
+  description: "Window title after the app's name, while the app does not respond"
+windowHangStopped:
+  value: "stopped responding"
+  description: "Window title after the app's name, after a hung app was closed"
+windowKilled:
+  value: "closed unexpectedly"
+  description: "Window title after the app's name, after the app was killed"

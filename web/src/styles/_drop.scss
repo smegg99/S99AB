@@ -1,0 +1,50 @@
+// web/src/styles/_drop.scss
+//
+// Drop target: accent wash, grid and frame, drawn by ::before and ::after, so the
+// element must be positioned. --open drops the frame's bottom edge.
+
+.s99ab-drop::before,
+.s99ab-drop::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  content: '';
+  pointer-events: none;
+}
+
+.s99ab-drop::before {
+  background: rgba(var(--v-theme-accent), 0.22);
+  -webkit-mask-image:
+    linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  mask-image:
+    linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  -webkit-mask-size: 8px 8px;
+  mask-size: 8px 8px;
+}
+
+.s99ab-drop::after {
+  border: 2px solid rgb(var(--v-theme-accent));
+  background: rgba(var(--v-theme-accent), 0.08);
+}
+
+.s99ab-drop--open::after {
+  border-bottom: 0;
+}
+
+// The pane under an --open slot: the top edge is two strips either side of the
+// slot box (--s99ab-drop-slot-left, --s99ab-drop-slot-width). Top corners must be square.
+.s99ab-drop--slot::after {
+  border-top: 0;
+  background:
+    linear-gradient(rgb(var(--v-theme-accent)), rgb(var(--v-theme-accent))) 0 0 / calc(var(--s99ab-drop-slot-left) + 2px) 2px no-repeat border-box,
+    linear-gradient(rgb(var(--v-theme-accent)), rgb(var(--v-theme-accent))) calc(var(--s99ab-drop-slot-left) + var(--s99ab-drop-slot-width) - 2px) 0 / 100% 2px no-repeat border-box,
+    rgba(var(--v-theme-accent), 0.08);
+}
+
+/* A pointer drag crossing a field must not move its caret in WebKitGTK. */
+.s99ab-pressing input,
+.s99ab-pressing textarea {
+  pointer-events: none;
+}

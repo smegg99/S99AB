@@ -22,7 +22,7 @@ describe('UiKbd', () => {
   }
 
   it('spaces the parts out, so a combination reads as one', () => {
-    expect(mount(Kbd, { props: { keys: 'shift+?' } }).text()).toBe('shift + ?')
+    expect(mount(Kbd, { props: { keys: 'shift+?' } }).text()).toBe('Shift + ?')
   })
 
   // A hardcoded Ctrl is wrong on a Mac. The platform resolves after mount, hence the tick.
@@ -30,19 +30,18 @@ describe('UiKbd', () => {
     withPlatform('MacIntel')
     const onMac = mount(Kbd, { props: { keys: 'mod+k' } })
     await nextTick()
-    expect(onMac.text()).toBe('Cmd + k')
+    expect(onMac.text()).toBe('Cmd + K')
 
     withPlatform('Linux x86_64')
     const elsewhere = mount(Kbd, { props: { keys: 'mod+k' } })
     await nextTick()
-    expect(elsewhere.text()).toBe('Ctrl + k')
+    expect(elsewhere.text()).toBe('Ctrl + K')
   })
 
-  // The server has no navigator and renders Ctrl; resolving during render would
-  // cause a hydration mismatch on macOS.
+  // The first render matches the server, which has no navigator and renders Ctrl.
   it('renders the server-safe cap first, on a Mac too', () => {
     withPlatform('MacIntel')
-    expect(mount(Kbd, { props: { keys: 'mod+k' } }).text()).toBe('Ctrl + k')
+    expect(mount(Kbd, { props: { keys: 'mod+k' } }).text()).toBe('Ctrl + K')
   })
 
   it('renders a kbd, not a chip: it is something you press', () => {

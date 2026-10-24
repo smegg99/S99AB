@@ -102,8 +102,50 @@
 }
 
 
-/* Card sections use one inset. The title wraps, at a smaller size than
-   Vuetify's 1.25rem/2 nowrap. */
+/* UiDialogCard on a UiPanel. The body scrolls and the keys stay; its top padding
+   leaves room for an outlined field's floating label. */
+.s99ab-dialog {
+  min-height: 0;
+  max-height: calc(100vh - 2 * var(--s99ab-pad));
+}
+
+.s99ab-dialog.panel > .panel__body {
+  gap: var(--s99ab-pad);
+}
+
+/* A dialog title wraps instead of truncating: there is no tooltip for the full text. */
+.s99ab-dialog.panel > .panel__head > .panel__title {
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+
+.s99ab-dialog__body {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--s99ab-pad);
+  padding-top: var(--s99ab-field-label-overhang);
+  overflow-y: auto;
+}
+
+.s99ab-dialog__text {
+  margin: 0;
+  color: rgb(var(--v-theme-ink2));
+}
+
+.s99ab-dialog__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--s99ab-control-gap);
+}
+
+.s99ab-dialog__spacer {
+  flex: 1 1 auto;
+}
+
+/* Vuetify card sections in an overlay not built on UiDialogCard: one inset, and a
+   smaller title that wraps instead of Vuetify's 1.25rem nowrap. */
 .v-overlay .v-card-title {
   padding: var(--s99ab-pad) var(--s99ab-pad) 4px;
   color: rgb(var(--v-theme-ink));
@@ -126,4 +168,10 @@
 .v-overlay .v-card-actions {
   padding: var(--s99ab-pad-tight) var(--s99ab-pad) var(--s99ab-pad);
   gap: var(--s99ab-control-gap);
+}
+
+/* Matches the transition-free overlay defaults and avoids an empty WebKit frame on close. */
+.v-overlay__scrim.fade-transition-enter-active,
+.v-overlay__scrim.fade-transition-leave-active {
+  transition: none;
 }

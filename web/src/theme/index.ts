@@ -51,7 +51,7 @@ export const DEFAULTS: VuetifyOptions['defaults'] = {
   // shifting when a field turns invalid. Strip controls use `hide-details`.
   VTextField: { variant: 'outlined', density: 'compact' },
   VTextarea: { variant: 'outlined', density: 'compact' },
-  VSelect: { variant: 'outlined', density: 'compact' },
+  VSelect: { variant: 'outlined', density: 'compact', transition: false },
   VAutocomplete: { variant: 'outlined', density: 'compact' },
   VCombobox: { variant: 'outlined', density: 'compact' },
   VFileInput: { variant: 'outlined', density: 'compact' },
@@ -69,10 +69,11 @@ export const DEFAULTS: VuetifyOptions['defaults'] = {
   VDataTableServer: { density: 'comfortable', hover: true },
   VExpansionPanels: { variant: 'accordion', elevation: 0 },
 
-  VDialog: { scrollable: true },
-  VTooltip: { location: 'bottom' },
-  VMenu: { location: 'bottom' },
-  VProgressLinear: { height: 2, rounded: false },
+  VDialog: { scrollable: true, transition: false },
+  VTooltip: { location: 'bottom', transition: false },
+  VMenu: { location: 'bottom', transition: false },
+  VProgressLinear: { height: 2, rounded: false, transition: false },
+  VBadge: { transition: false },
 }
 
 export interface ThemeOptions {

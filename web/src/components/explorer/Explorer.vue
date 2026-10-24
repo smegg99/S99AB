@@ -2,11 +2,14 @@
 <template>
   <!-- A fixed toolbar above an independently scrolling grid. -->
   <div
+    ref="root"
     :style="tileStyle"
     :data-tile-hover="explorer.tile.value.hover"
     :data-tile-variant="explorer.tile.value.variant"
     :data-tile-menu="explorer.tile.value.menu"
     class="s99ab-explorer"
+    :class="{ 's99ab-explorer--multiline': titleLines > 1 }"
+    @keydown.capture="onMenuKeydown"
   >
     <UiExplorerToolbar>
       <template #actions>
@@ -29,21 +32,24 @@
       class="s99ab-explorer__scroll"
       @mousedown="onMousedown"
     >
-      <!-- The skeleton uses the grid's columns, gap and tile, and is named for
-           the status region. -->
-      <div
+      <!-- Skeleton tiles in the real grid, so nothing moves when the tiles arrive. -->
+      <slot
         v-if="firstLoad"
-        :aria-label="loadingLabel"
-        class="s99ab-explorer__grid"
-        role="status"
-        aria-busy="true"
+        name="loading"
       >
         <div
-          v-for="n in placeholders"
-          :key="n"
-          class="s99ab-tile s99ab-tile--skeleton"
-        />
-      </div>
+          :aria-label="loadingLabel"
+          class="s99ab-explorer__grid"
+          role="status"
+          aria-busy="true"
+        >
+          <div
+            v-for="n in placeholders"
+            :key="n"
+            class="s99ab-tile s99ab-tile--skeleton"
+          />
+        </div>
+      </slot>
 
       <UiErrorState
         v-else-if="explorer.error.value"
@@ -69,8 +75,9 @@
           </template>
         </UiExplorerGrid>
 
+        <!-- Top level only: inside a folder the up tile is always present. -->
         <slot
-          v-if="isEmpty"
+          v-if="isEmpty && !hasGrid"
           name="empty"
         >
           <UiEmptyState
@@ -89,6 +96,7 @@
     </div>
 
     <v-menu
+      ref="menu"
       v-model="menuOpen"
       :target="menuAt"
     >
@@ -128,7 +136,7 @@
 </template>
 
 <script setup lang="ts" generic="T = unknown">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, useTemplateRef, watch } from 'vue'
 import UiEmptyState from '../state/EmptyState.vue'
 import UiErrorState from '../state/ErrorState.vue'
 import UiExplorerGrid from './ExplorerGrid.vue'
@@ -150,23 +158,22 @@ import type { ExplorerNode } from '../../composables/explorer/useExplorerTree'
 import { useToast } from '../../composables/toast/useToast'
 import { useTranslate } from '../../composables/useTranslate'
 
-// The whole explorer in one tag. A screen supplies the source, what opening a
-// leaf does, and its own menu entries.
+// The whole explorer in one tag; the screen supplies the source, leaf opening and menu entries.
 const {
   explorer,
   tileMin,
+  titleLines = 1,
   emptyTitle,
   emptyText,
   autoLoad = true,
   acceptFiles = false,
 } = defineProps<{
-  /**
-   * Read once at setup and provided below. To show a different tree, key the
-   * <UiExplorer> instead of swapping this prop.
-   */
+  /** Read once at setup; key the component to show a different tree. */
   explorer: ExplorerApi<T>
   /** Grid column floor in px. Overrides the app config for this instance. */
   tileMin?: number
+  /** Maximum title lines; one keeps the normal single-line ellipsis. */
+  titleLines?: number
   emptyTitle?: string
   emptyText?: string
   /** Loads on mount unless the screen already has. */
@@ -198,6 +205,7 @@ const slots = defineSlots<{
   selection?: (props: { nodes: ExplorerNode<T>[] }) => unknown
   tile?: (props: { node: ExplorerNode<T> }) => unknown
   empty?: () => unknown
+  loading?: () => unknown
   menu?: (props: { node: ExplorerNode<T> }) => unknown
 }>()
 
@@ -208,7 +216,10 @@ const config = useExplorerConfig()
 const folders = useExplorerFolders(explorer)
 const selection = useExplorerSelection(explorer, selected)
 const { firstLoad, placeholders, isEmpty, hasGrid, gridKey } = useExplorerGridState(explorer)
+const root = useTemplateRef<HTMLElement>('root')
+const menu = useTemplateRef<{ contentEl?: HTMLElement }>('menu')
 const {
+  onKeydown: onMenuKeydown,
   menuOpen,
   menuAt,
   menuNode,
@@ -225,6 +236,8 @@ const {
   pinWords: () => config.pin,
   hasSlot: () => !!slots.menu,
   files: acceptFiles ? (parentId, files) => emit('files', parentId, files) : undefined,
+  root: () => root.value,
+  content: () => menu.value?.contentEl,
 })
 
 provideExplorer(explorer)
@@ -262,8 +275,7 @@ const bandStyle = computed(() => ({
   height: `${band.value?.height ?? 0}px`,
 }))
 
-/** A press between or below the tiles. Deselects on mousedown, so the deselect
- *  and a following rubber band are one gesture. */
+/** Deselects on mousedown, so deselect and a following rubber band are one gesture. */
 function onMousedown(event: MouseEvent) {
   const onTile = (event.target as HTMLElement | null)?.closest('.s99ab-tile')
   if (!onTile && !(event.ctrlKey || event.metaKey)) selection.clear()
@@ -272,6 +284,7 @@ function onMousedown(event: MouseEvent) {
 }
 
 const tileStyle = computed(() => ({
+  '--s99ab-title-lines': Math.max(1, Math.floor(titleLines)),
   '--s99ab-tile-min': `${tileMin ?? config.tileMin}px`,
   '--s99ab-tile-aspect': String(explorer.tile.value.aspect),
   '--s99ab-tile-fit': explorer.tile.value.fit,

@@ -1,85 +1,89 @@
 <!-- web/src/components/explorer/ExplorerFolderDialog.vue -->
 <template>
-  <v-card>
-    <v-card-title>{{ title }}</v-card-title>
+  <UiDialogCard :title="title">
+    <!-- Prevented, so WebKit does not also press the button that gets focus back. -->
+    <v-text-field
+      v-model="draft"
+      :label="nameLabel"
+      :rules="rules"
+      autofocus
+      @focus="pickName"
+      @keydown.enter.prevent="save"
+    />
 
-    <v-card-text class="d-flex flex-column ga-4">
+    <UiExplorerSwatches
+      v-model="tint"
+      :label="accentLabel"
+      :options="accents"
+      :default-label="defaultLabel"
+    />
+
+    <UiExplorerGlyphs
+      v-if="fields.icon"
+      v-model="glyph"
+      :label="iconLabel"
+      :options="config.folderIcons"
+      :fallback="config.icons.folder"
+      :default-label="defaultLabel"
+    />
+
+    <!-- The URL beside a preview of its image. -->
+    <div
+      v-if="fields.image"
+      class="d-flex ga-4 align-center"
+    >
       <v-text-field
-        v-model="draft"
-        :label="nameLabel"
-        :rules="rules"
-        autofocus
-        @keydown.enter="save"
+        v-model="picture"
+        :label="imageLabel"
+        clearable
+        hide-details
+        @keydown.enter.prevent="save"
       />
-
-      <UiExplorerSwatches
-        v-model="tint"
-        :label="accentLabel"
-        :options="accents"
-        :default-label="defaultLabel"
+      <UiThumb
+        v-if="picture"
+        :src="picture"
+        :alt="draft"
+        size="56"
       />
-
-      <UiExplorerGlyphs
-        v-if="fields.icon"
-        v-model="glyph"
-        :label="iconLabel"
-        :options="config.folderIcons"
-        :fallback="config.icons.folder"
-        :default-label="defaultLabel"
-      />
-
-      <!-- The URL field beside a preview of what it resolves to. -->
-      <div
-        v-if="fields.image"
-        class="d-flex ga-4 align-center"
-      >
-        <v-text-field
-          v-model="picture"
-          :label="imageLabel"
-          clearable
-          hide-details
-          @keydown.enter="save"
-        />
-        <UiThumb
-          v-if="picture"
-          :src="picture"
-          :alt="draft"
-          size="56"
-        />
-      </div>
-    </v-card-text>
-
-    <v-card-actions>
-      <v-spacer />
+    </div>
+    <template #actions>
       <v-btn
         variant="text"
         @click="close()"
       >
         {{ cancelLabel }}
       </v-btn>
-      <v-btn
-        :disabled="!canSave"
-        color="accent"
-        @click="save"
+      <!-- Flat, as in ConfirmDialog. -->
+      <UiDisabledHint
+        :reason="canSave ? '' : t('explorer.nameRequired', 'A name is required.')"
+        :label="confirmLabel"
       >
-        {{ confirmLabel }}
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+        <v-btn
+          :disabled="!canSave"
+          color="accent"
+          variant="flat"
+          @click="save"
+        >
+          {{ confirmLabel }}
+        </v-btn>
+      </UiDisabledHint>
+    </template>
+  </UiDialogCard>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import UiExplorerGlyphs from './ExplorerGlyphs.vue'
 import UiExplorerSwatches from './ExplorerSwatches.vue'
+import UiDialogCard from '../overlay/DialogCard.vue'
+import UiDisabledHint from '../primitives/DisabledHint.vue'
 import UiThumb from '../primitives/Thumb.vue'
 import { useDialog } from '../../composables/useDialog'
 import { useExplorerConfig } from '../../composables/explorer/useExplorerConfig'
 import type { ExplorerFolderDraft } from '../../composables/explorer/useExplorerFolders'
 import { useTranslate } from '../../composables/useTranslate'
 
-// Name, tint, and whichever of icon and image the app's folders have. Resolves
-// a value and persists nothing, so it serves both create and rename.
+// Folder name, tint, and the app's optional icon and image; persists nothing, so it serves create and rename.
 const { name = '', accent = '', icon = '', image = '' } = defineProps<{
   title: string
   name?: string
@@ -93,6 +97,14 @@ const t = useTranslate()
 const config = useExplorerConfig()
 
 const draft = ref(name)
+// Selects the old name on first focus only, so a later click still places the caret.
+let picked = !name
+function pickName(event: FocusEvent) {
+  const input = event.target as HTMLInputElement | null
+  if (picked || !input) return
+  picked = true
+  input.select()
+}
 const tint = ref(accent)
 const glyph = ref(icon)
 const picture = ref(image)

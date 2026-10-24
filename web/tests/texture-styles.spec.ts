@@ -138,7 +138,7 @@ describe('per-plane textures', () => {
     (plane) => {
       expect(sheet).toContain(`:where(:root[data-tex-#{$plane}='#{$name}'])`)
       expect(sheet).toContain(`--s99ab-tex-#{$plane}-mask`)
-    // The mixin reads this plane's value before the global one.
+      // The mixin reads this plane's value before the global one.
       expect(sheet).toContain(
         `var(--s99ab-tex-#{$plane}-mask, var(--s99ab-tex-mask, none))`,
       )

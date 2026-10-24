@@ -54,17 +54,17 @@
   text-transform: none;
 }
 
-/* Icon-only buttons are square, at --s99ab-control-h so they follow the row
-   levelling. `aspect-ratio` makes the square, so a component setting its own
-   height still gets one. */
+/* Explicit dimensions keep icon keys square in WebKit's min-content columns. */
 .v-btn--icon:not(.v-tab) {
-  width: auto;
-  height: var(--s99ab-control-h);
-  /* Drops the min-height from _controls.scss, which a height cannot override. */
-  min-width: 0;
+  width: var(--s99ab-icon-size, var(--s99ab-control-h));
+  height: var(--s99ab-icon-size, var(--s99ab-control-h));
+  min-width: var(--s99ab-icon-size, var(--s99ab-control-h));
   min-height: 0;
-  aspect-ratio: 1;
   border-radius: var(--s99ab-radius);
+}
+
+.v-field__append-inner > .v-btn.v-btn--icon {
+  --s99ab-icon-size: var(--s99ab-control-h-dense);
 }
 
 /* One frosting for everything floating over the backdrop. Each surface states
@@ -90,3 +90,33 @@
 .v-alert.text-error .v-alert__prepend .v-icon { color: rgb(var(--v-theme-danger-lit)); }
 .v-alert.text-warning .v-alert__prepend .v-icon { color: rgb(var(--v-theme-warn-lit)); }
 .v-alert.text-info .v-alert__prepend .v-icon { color: rgb(var(--v-theme-info-lit)); }
+
+// A native button wears WebKitGTK's grey face unless told otherwise. Here a
+// button is drawn by its own class, so the default is no face at all.
+:where(.v-application, .v-overlay-container) :where(button:not(.v-btn)) {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+
+:root { --s99ab-shadow-ink: rgb(0 0 0 / 0.5); }
+.v-theme--light { --s99ab-shadow-ink: rgb(20 18 24 / 0.22); }
+
+/* A separate gradient survives WebKit's clipping of negative-inset box shadows. */
+.s99ab-shadow-start::before {
+  position: absolute;
+  inset: 0 calc(100% + 1px) 0 auto;
+  width: 24px;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(to left, var(--s99ab-shadow-ink), color-mix(in srgb, var(--s99ab-shadow-ink) 40%, transparent) 8px, transparent);
+}
+.v-theme--light .s99ab-shadow-start::before {
+  background: linear-gradient(to left, color-mix(in srgb, var(--s99ab-shadow-ink) 60%, transparent), color-mix(in srgb, var(--s99ab-shadow-ink) 16%, transparent) 8px, transparent);
+}

@@ -1,6 +1,6 @@
 {
   "name": "@smegg99/s99ab",
-  "version": "1.6.1",
+  "version": "1.7.0",
   "type": "module",
   "private": false,
   "license": "MIT",
@@ -8,15 +8,20 @@
   "main": "./web/nuxt.config.ts",
   "files": [
     "web",
-    "contracts"
+    "contracts",
+    "!web/tests",
+    "!web/vitest.config.ts"
   ],
   "exports": {
     ".": "./web/nuxt.config.ts",
     "./styles": "./web/src/styles/index.scss",
+    "./tabs": "./web/src/tabs.ts",
     "./types": "./web/src/types.ts",
     "./theme": "./web/src/theme/index.ts",
     "./appearance": "./web/src/appearance.ts",
-    "./i18n": "./web/i18n/index.ts"
+    "./i18n": "./web/i18n/index.ts",
+    "./kratos": "./web/src/composables/kratos/useKratosFlow.ts",
+    "./browser": "./web/src/browser.ts"
   },
   "peerDependencies": {
     "@firecms/neat": "^0.8.0 || ^1.0.0",
@@ -33,6 +38,7 @@
   },
   "packageManager": "pnpm@11.3.0",
   "devDependencies": {
+    "@fontsource-variable/overpass": "^5.3.0",
     "@nuxt/eslint-config": "^1.17.0",
     "@pinia/colada": "^1.4.4",
     "@types/node": "^26.4.1",
@@ -73,7 +79,6 @@
     }
   },
   "dependencies": {
-    "@fontsource-variable/overpass": "^5.3.0",
     "@material/material-color-utilities": "^0.4.0"
   }
 }

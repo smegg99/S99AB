@@ -3,7 +3,7 @@
   <div>
     <v-label
       :text="label"
-      class="text-caption mb-2"
+      class="s99ab-swatches__label"
     />
 
     <!-- The group carries the name and the chosen tint for screen readers. -->

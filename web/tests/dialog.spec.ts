@@ -1,6 +1,6 @@
 // web/tests/dialog.spec.ts
 
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -160,6 +160,116 @@ describe('lifetime', () => {
 
     expect(dialogEntries[0]!.opts.persistent).toBe(true)
     expect(dialogEntries[0]!.opts.width).toBe('lg')
+  })
+})
+
+describe('focus', () => {
+  /** After the task the focus comes back in. */
+  const handedBack = () => new Promise(resolve => setTimeout(resolve))
+
+  // The host renders no activator, so Vuetify has nothing to give it back to.
+  it('goes back to what had it when the dialog opened', async () => {
+    const button = document.createElement('button')
+    document.body.append(button)
+    button.focus()
+    void useDialog().openDialog(Stub)
+    button.blur()
+
+    closeDialog(dialogEntries[0]!.id)
+    await handedBack()
+
+    expect(document.activeElement).toBe(button)
+    button.remove()
+  })
+
+  // A script focus matches :focus-visible and Vuetify opens a tooltip on it, so
+  // the ring comes back only for a keyboard open.
+  it.each([
+    ['keydown', true],
+    ['pointerdown', false],
+  ])('comes back with the focus ring only when opened from the keyboard, whatever ring the opener had (%s)', async (press, ring) => {
+    const button = document.createElement('button')
+    document.body.append(button)
+    button.focus()
+    vi.spyOn(button, 'matches').mockImplementation(selector => !ring && selector === ':focus-visible')
+    const focus = vi.spyOn(button, 'focus')
+    button.dispatchEvent(new Event(press, { bubbles: true }))
+    void useDialog().openDialog(Stub)
+    button.blur()
+    window.dispatchEvent(new Event(ring ? 'pointerdown' : 'keydown'))
+
+    closeDialog(dialogEntries[0]!.id)
+    await handedBack()
+
+    expect(focus).toHaveBeenLastCalledWith({ preventScroll: true, focusVisible: ring })
+    button.remove()
+  })
+
+  // WebKit rings whatever holds the focus after an unhandled keydown.
+  it('comes back only after the event that closed the dialog', async () => {
+    const button = document.createElement('button')
+    document.body.append(button)
+    button.focus()
+    void useDialog().openDialog(Stub)
+    button.blur()
+
+    closeDialog(dialogEntries[0]!.id)
+    await nextTick()
+    expect(document.activeElement).not.toBe(button)
+
+    await handedBack()
+    expect(document.activeElement).toBe(button)
+    button.remove()
+  })
+
+  it('comes back from the dialog\'s own field still holding it a task later', async () => {
+    const button = document.createElement('button')
+    const field = document.createElement('input')
+    document.body.append(button, field)
+    button.focus()
+    void useDialog().openDialog(Stub)
+    field.focus()
+
+    closeDialog(dialogEntries[0]!.id)
+    await handedBack()
+
+    expect(document.activeElement).toBe(button)
+    button.remove()
+    field.remove()
+  })
+
+  // The app may move the focus once the dialog resolves.
+  it('leaves the focus where the app moved it after the dialog closed', async () => {
+    const button = document.createElement('button')
+    const field = document.createElement('input')
+    const row = document.createElement('div')
+    row.tabIndex = 0
+    document.body.append(button, field, row)
+    button.focus()
+    void useDialog().openDialog(Stub)
+    field.focus()
+
+    closeDialog(dialogEntries[0]!.id)
+    row.focus()
+    await handedBack()
+
+    expect(document.activeElement).toBe(row)
+    button.remove()
+    field.remove()
+    row.remove()
+  })
+
+  it('stays put when what had it is gone', async () => {
+    const button = document.createElement('button')
+    document.body.append(button)
+    button.focus()
+    void useDialog().openDialog(Stub)
+    button.remove()
+
+    closeDialog(dialogEntries[0]!.id)
+    await handedBack()
+
+    expect(document.activeElement).not.toBe(button)
   })
 })
 
