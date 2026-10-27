@@ -3,10 +3,13 @@
 package db
 
 import (
-	"context"
 	"database/sql"
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/jackc/pgx/v5/stdlib"
+	"modernc.org/sqlite"
 )
 
 // Rebind converts `?` placeholders to the driver's own form, skipping quoted
@@ -52,12 +55,14 @@ func Placeholders(n int) string {
 	return "(" + strings.Repeat("?, ", n-1) + "?)"
 }
 
-// Detect names the driver behind an open pool by calling a Postgres-only
-// function; an error there means SQLite.
-func Detect(ctx context.Context, conn *sql.DB) string {
-	var version string
-	if err := conn.QueryRowContext(ctx, "SELECT version()").Scan(&version); err == nil {
-		return Postgres
+// Detect names the driver behind an open pool from its type, without a query.
+func Detect(conn *sql.DB) (string, error) {
+	switch d := conn.Driver().(type) {
+	case *stdlib.Driver:
+		return Postgres, nil
+	case *sqlite.Driver:
+		return SQLite, nil
+	default:
+		return "", fmt.Errorf("%w: %T", ErrDriver, d)
 	}
-	return SQLite
 }

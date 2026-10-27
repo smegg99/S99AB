@@ -35,7 +35,7 @@ func TestQueueOnPostgres(t *testing.T) {
 	if err := outbox.Migrate(ctx, conn); err != nil {
 		t.Fatalf("migrate: %v", err)
 	}
-	if got := db.Detect(ctx, conn); got != db.Postgres {
+	if got, _ := db.Detect(conn); got != db.Postgres {
 		t.Fatalf("Detect = %q, want postgres", got)
 	}
 

@@ -17,7 +17,13 @@ var (
 	ErrNoHandler = errors.New("outbox: no handler for kind")
 	ErrKind      = errors.New("outbox: kind is required")
 	ErrNotFound  = errors.New("outbox: no such job")
+	ErrClosed    = errors.New("outbox: worker is closed")
 )
+
+// stampLayout has a fixed width, so stamps compared as TEXT sort as times; RFC3339Nano trims zeros.
+const stampLayout = "2006-01-02T15:04:05.000000000Z"
+
+func stamp(t time.Time) string { return t.UTC().Format(stampLayout) }
 
 // Handler does the work. It must be idempotent: a crash after the work but
 // before the row is marked done means it runs again.
@@ -41,6 +47,8 @@ type Options struct {
 	// Lease is how long a claimed job stays invisible to other workers; it must
 	// outlast the slowest handler. Zero means 5 minutes.
 	Lease time.Duration
+	// OnError receives a background pass that failed (claiming, or recording a result). Nil drops it.
+	OnError func(error)
 }
 
 func (o *Options) defaults() {
@@ -107,7 +115,11 @@ func schemaFor(driver string) string {
 // Migrate creates the table for the driver detected from the pool. Idempotent
 // DDL keeps it out of the app's migration version sequence.
 func Migrate(ctx context.Context, conn *sql.DB) error {
-	return MigrateWith(ctx, conn, db.Detect(ctx, conn))
+	driver, err := db.Detect(conn)
+	if err != nil {
+		return fmt.Errorf("outbox: migrate: %w", err)
+	}
+	return MigrateWith(ctx, conn, driver)
 }
 
 // MigrateWith is Migrate with a known driver, skipping the probe.
@@ -143,7 +155,7 @@ func Enqueue(ctx context.Context, tx Tx, kind string, payload []byte, opts ...Op
 	for _, opt := range opts {
 		opt(&s)
 	}
-	now := time.Now().UTC().Format(time.RFC3339Nano)
+	now := stamp(time.Now())
 
 	_, err := tx.ExecContext(ctx, db.Rebind(s.driver,
 		`INSERT INTO outbox (kind, payload, attempts, next_try_at, created_at)
