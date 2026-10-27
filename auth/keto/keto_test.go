@@ -4,6 +4,7 @@ package keto_test
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"slices"
@@ -278,5 +279,37 @@ func TestListFollowsEveryPage(t *testing.T) {
 	}
 	if !slices.Equal(got, []string{"a", "b"}) {
 		t.Fatalf("objects = %v, want [a b] - the second page was dropped", got)
+	}
+}
+
+// Keto matches an empty field as any value, so these would delete or list far more than meant.
+func TestEmptySelectorsAreRefusedBeforeAnyRequest(t *testing.T) {
+	requests := 0
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		_, _ = w.Write([]byte(`{"relation_tuples":[]}`))
+	}))
+	defer srv.Close()
+	c, err := keto.New(keto.Options{ReadURL: srv.URL, WriteURL: srv.URL})
+	if err != nil {
+		t.Fatalf("new: %v", err)
+	}
+	ctx := context.Background()
+
+	calls := map[string]error{
+		"delete without subject":  c.Delete(ctx, keto.Tuple{Namespace: "doc", Object: "a", Relation: keto.RelViewer}),
+		"delete without relation": c.Delete(ctx, keto.Tuple{Namespace: "doc", Object: "a", Subject: "alice"}),
+		"delete without object":   c.Delete(ctx, keto.Tuple{Namespace: "doc", Relation: keto.RelViewer, Subject: "alice"}),
+	}
+	_, calls["subjects without object"] = c.Subjects(ctx, "doc", "", keto.RelViewer)
+	_, calls["objects without subject"] = c.Objects(ctx, "doc", "", keto.RelViewer)
+	_, calls["objects without namespace"] = c.Objects(ctx, "", "alice", keto.RelViewer)
+	for name, err := range calls {
+		if !errors.Is(err, keto.ErrSelector) {
+			t.Errorf("%s: err = %v, want ErrSelector", name, err)
+		}
+	}
+	if requests != 0 {
+		t.Fatalf("%d requests reached Keto", requests)
 	}
 }

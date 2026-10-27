@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -24,6 +25,19 @@ const (
 	// Viewer may only read.
 	RelViewer Relation = "viewer"
 )
+
+// ErrSelector refuses an empty field Keto would match as any value, widening a delete or a list.
+var ErrSelector = errors.New("keto: empty selector")
+
+// selector returns ErrSelector naming the first empty field.
+func selector(fields ...string) error {
+	for i := 0; i+1 < len(fields); i += 2 {
+		if fields[i+1] == "" {
+			return fmt.Errorf("%w: %s", ErrSelector, fields[i])
+		}
+	}
+	return nil
+}
 
 // Tuple is one permission fact: subject holds relation on namespace:object.
 type Tuple struct {
@@ -145,6 +159,9 @@ func (c *Client) Write(ctx context.Context, t Tuple) error {
 
 // Delete removes a tuple. Removing a missing tuple succeeds.
 func (c *Client) Delete(ctx context.Context, t Tuple) error {
+	if err := selector("namespace", t.Namespace, "object", t.Object, "relation", string(t.Relation), "subject", t.Subject); err != nil {
+		return err
+	}
 	query := url.Values{}
 	query.Set("namespace", t.Namespace)
 	query.Set("object", t.Object)
@@ -171,6 +188,9 @@ func (c *Client) Delete(ctx context.Context, t Tuple) error {
 
 // Subjects lists who holds a relation on an object.
 func (c *Client) Subjects(ctx context.Context, namespace, object string, rel Relation) ([]string, error) {
+	if err := selector("namespace", namespace, "object", object, "relation", string(rel)); err != nil {
+		return nil, err
+	}
 	query := url.Values{}
 	query.Set("namespace", namespace)
 	query.Set("object", object)
@@ -190,6 +210,9 @@ func (c *Client) Subjects(ctx context.Context, namespace, object string, rel Rel
 
 // Objects lists what a subject holds a relation on.
 func (c *Client) Objects(ctx context.Context, namespace, subject string, rel Relation) ([]string, error) {
+	if err := selector("namespace", namespace, "subject", subject, "relation", string(rel)); err != nil {
+		return nil, err
+	}
 	query := url.Values{}
 	query.Set("namespace", namespace)
 	query.Set("relation", string(rel))
