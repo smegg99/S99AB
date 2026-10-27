@@ -3,6 +3,7 @@
 package db_test
 
 import (
+	"context"
 	"embed"
 	"errors"
 	"io/fs"
@@ -54,7 +55,7 @@ func TestWALIsOn(t *testing.T) {
 func TestMigrateIsRepeatable(t *testing.T) {
 	conn := db.TestDB(t, migrations(t))
 
-	if err := db.Migrate(conn, migrations(t), db.SQLite); err != nil {
+	if err := db.Migrate(context.Background(), conn, migrations(t), db.SQLite); err != nil {
 		t.Fatalf("second migrate: %v", err)
 	}
 	if _, err := conn.Exec(`INSERT INTO parent (id) VALUES (1)`); err != nil {
@@ -62,11 +63,11 @@ func TestMigrateIsRepeatable(t *testing.T) {
 	}
 }
 
-// goose keeps its base FS in package state; Migrate must reset it.
+// A later Migrate runs only its own set, never an earlier caller's.
 func TestMigrateDoesNotLeakBaseFS(t *testing.T) {
-	_ = db.TestDB(t, migrations(t)) // sets goose's base FS to the parent/child set
+	_ = db.TestDB(t, migrations(t))
 
-	second, err := db.Open(db.Config{Driver: db.SQLite, DSN: filepath.Join(t.TempDir(), "b.db")})
+	second, err := db.Open(context.Background(), db.Config{Driver: db.SQLite, DSN: filepath.Join(t.TempDir(), "b.db")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +78,7 @@ func TestMigrateDoesNotLeakBaseFS(t *testing.T) {
 			Data: []byte("-- +goose Up\nCREATE TABLE other (id INTEGER PRIMARY KEY);\n"),
 		},
 	}
-	if err := db.Migrate(second, other, db.SQLite); err != nil {
+	if err := db.Migrate(context.Background(), second, other, db.SQLite); err != nil {
 		t.Fatalf("migrate with a different fs: %v", err)
 	}
 
@@ -93,13 +94,13 @@ func TestMigrateDoesNotLeakBaseFS(t *testing.T) {
 func TestEmptyMigrationsIsAnError(t *testing.T) {
 	conn := db.TestDB(t, nil)
 
-	if err := db.Migrate(conn, fstest.MapFS{}, db.SQLite); err == nil {
+	if err := db.Migrate(context.Background(), conn, fstest.MapFS{}, db.SQLite); err == nil {
 		t.Fatal("empty migration set was accepted; a wrong //go:embed path would pass")
 	}
 }
 
 func TestUnsupportedDriverIsRejected(t *testing.T) {
-	if _, err := db.Open(db.Config{Driver: "mysql", DSN: "x"}); !errors.Is(err, db.ErrDriver) {
+	if _, err := db.Open(context.Background(), db.Config{Driver: "mysql", DSN: "x"}); !errors.Is(err, db.ErrDriver) {
 		t.Fatalf("err = %v, want ErrDriver", err)
 	}
 	if err := db.Verify("mysql"); !errors.Is(err, db.ErrDriver) {
@@ -113,7 +114,7 @@ func TestUnsupportedDriverIsRejected(t *testing.T) {
 func TestOpenCreatesParentDir(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "deeper", "app.db")
 
-	conn, err := db.Open(db.Config{Driver: db.SQLite, DSN: path})
+	conn, err := db.Open(context.Background(), db.Config{Driver: db.SQLite, DSN: path})
 	if err != nil {
 		t.Fatalf("open in a missing dir: %v", err)
 	}
@@ -123,7 +124,7 @@ func TestOpenCreatesParentDir(t *testing.T) {
 func TestOpenPreservesAnExistingQueryString(t *testing.T) {
 	dsn := "file:" + filepath.Join(t.TempDir(), "nested", "a.db") + "?mode=rwc"
 
-	conn, err := db.Open(db.Config{Driver: db.SQLite, DSN: dsn})
+	conn, err := db.Open(context.Background(), db.Config{Driver: db.SQLite, DSN: dsn})
 	if err != nil {
 		t.Fatalf("open with an existing query string: %v", err)
 	}
@@ -141,7 +142,7 @@ func TestOpenPreservesAnExistingQueryString(t *testing.T) {
 func TestCallerCannotOverrideAManagedPragma(t *testing.T) {
 	dsn := filepath.Join(t.TempDir(), "b.db") + "?_pragma=foreign_keys(0)"
 
-	conn, err := db.Open(db.Config{Driver: db.SQLite, DSN: dsn})
+	conn, err := db.Open(context.Background(), db.Config{Driver: db.SQLite, DSN: dsn})
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}

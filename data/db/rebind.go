@@ -12,8 +12,8 @@ import (
 	"modernc.org/sqlite"
 )
 
-// Rebind converts `?` placeholders to the driver's own form, skipping quoted
-// string literals.
+// Rebind converts `?` placeholders to the driver's own form. It skips string literals, quoted
+// identifiers, comments and the jsonb ?| and ?& operators; write jsonb's bare ? as jsonb_exists().
 func Rebind(driver, query string) string {
 	if driver != Postgres {
 		return query
@@ -23,20 +23,45 @@ func Rebind(driver, query string) string {
 	b.Grow(len(query) + 8)
 
 	n := 0
-	inString := false
 	for i := 0; i < len(query); i++ {
 		c := query[i]
 		switch {
-		case c == '\'':
-			// '' inside a string is an escaped quote, not the end of one.
-			if inString && i+1 < len(query) && query[i+1] == '\'' {
-				b.WriteString("''")
-				i++
-				continue
+		case c == '\'' || c == '"':
+			// A doubled quote inside is an escaped one, not the end.
+			j := i + 1
+			for j < len(query) {
+				if query[j] == c {
+					if j+1 < len(query) && query[j+1] == c {
+						j += 2
+						continue
+					}
+					break
+				}
+				j++
 			}
-			inString = !inString
-			b.WriteByte(c)
-		case c == '?' && !inString:
+			end := min(j+1, len(query))
+			b.WriteString(query[i:end])
+			i = end - 1
+		case c == '-' && strings.HasPrefix(query[i:], "--"):
+			end := strings.IndexByte(query[i:], '\n')
+			if end < 0 {
+				end = len(query) - i
+			}
+			b.WriteString(query[i : i+end])
+			i += end - 1
+		case c == '/' && strings.HasPrefix(query[i:], "/*"):
+			end := strings.Index(query[i+2:], "*/")
+			if end < 0 {
+				end = len(query) - i - 2
+			} else {
+				end += 2
+			}
+			b.WriteString(query[i : i+2+end])
+			i += 2 + end - 1
+		case c == '?' && i+1 < len(query) && (query[i+1] == '|' || query[i+1] == '&'):
+			b.WriteString(query[i : i+2])
+			i++
+		case c == '?':
 			n++
 			b.WriteByte('$')
 			b.WriteString(strconv.Itoa(n))

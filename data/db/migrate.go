@@ -3,6 +3,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"io/fs"
@@ -10,43 +11,43 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-// Migrate applies ordered .sql files from an embedded FS through goose as a
-// library, so no CLI is needed.
-func Migrate(conn *sql.DB, fsys fs.FS, driver string) error {
-	if err := Verify(driver); err != nil {
+// Migrate applies ordered .sql files from an embedded FS through goose as a library, so no CLI is
+// needed. Each call has its own goose provider, so concurrent callers never share state.
+func Migrate(ctx context.Context, conn *sql.DB, fsys fs.FS, driver string) error {
+	p, err := provider(conn, fsys, driver)
+	if err != nil {
 		return err
 	}
-
-	goose.SetBaseFS(fsys)
-	defer goose.SetBaseFS(nil) // package-level state; leaving it set breaks the next caller
-
-	goose.SetLogger(goose.NopLogger())
-
-	if err := goose.SetDialect(driver); err != nil {
-		return fmt.Errorf("db: goose dialect %s: %w", driver, err)
-	}
-	if err := goose.Up(conn, "."); err != nil {
+	if _, err := p.Up(ctx); err != nil {
 		return fmt.Errorf("db: migrate: %w", err)
 	}
 	return nil
 }
 
 // MigrateDown rolls back one migration. For local recovery, not deploys.
-func MigrateDown(conn *sql.DB, fsys fs.FS, driver string) error {
-	if err := Verify(driver); err != nil {
+func MigrateDown(ctx context.Context, conn *sql.DB, fsys fs.FS, driver string) error {
+	p, err := provider(conn, fsys, driver)
+	if err != nil {
 		return err
 	}
-
-	goose.SetBaseFS(fsys)
-	defer goose.SetBaseFS(nil)
-
-	goose.SetLogger(goose.NopLogger())
-
-	if err := goose.SetDialect(driver); err != nil {
-		return fmt.Errorf("db: goose dialect %s: %w", driver, err)
-	}
-	if err := goose.Down(conn, "."); err != nil {
+	if _, err := p.Down(ctx); err != nil {
 		return fmt.Errorf("db: migrate down: %w", err)
 	}
 	return nil
+}
+
+func provider(conn *sql.DB, fsys fs.FS, driver string) (*goose.Provider, error) {
+	dialect := goose.DialectSQLite3
+	switch driver {
+	case SQLite:
+	case Postgres:
+		dialect = goose.DialectPostgres
+	default:
+		return nil, fmt.Errorf("%w: %q", ErrDriver, driver)
+	}
+	p, err := goose.NewProvider(dialect, conn, fsys)
+	if err != nil {
+		return nil, fmt.Errorf("db: migrate: %w", err)
+	}
+	return p, nil
 }

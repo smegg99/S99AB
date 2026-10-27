@@ -4,6 +4,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"os"
@@ -34,7 +35,7 @@ type Config struct {
 }
 
 // Open connects and, on SQLite, forces WAL, foreign_keys and busy_timeout.
-func Open(cfg Config) (*sql.DB, error) {
+func Open(ctx context.Context, cfg Config) (*sql.DB, error) {
 	var (
 		conn *sql.DB
 		err  error
@@ -61,7 +62,7 @@ func Open(cfg Config) (*sql.DB, error) {
 
 	applyPool(conn, cfg)
 
-	if err := conn.Ping(); err != nil {
+	if err := conn.PingContext(ctx); err != nil {
 		conn.Close()
 		return nil, fmt.Errorf("db: ping %s: %w", cfg.Driver, err)
 	}

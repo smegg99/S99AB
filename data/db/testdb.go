@@ -14,7 +14,7 @@ import (
 func TestDB(t *testing.T, migrations fs.FS) *sql.DB {
 	t.Helper()
 
-	conn, err := Open(Config{
+	conn, err := Open(t.Context(), Config{
 		Driver: SQLite,
 		DSN:    filepath.Join(t.TempDir(), "test.db"),
 	})
@@ -24,7 +24,7 @@ func TestDB(t *testing.T, migrations fs.FS) *sql.DB {
 	t.Cleanup(func() { conn.Close() })
 
 	if migrations != nil {
-		if err := Migrate(conn, migrations, SQLite); err != nil {
+		if err := Migrate(t.Context(), conn, migrations, SQLite); err != nil {
 			t.Fatalf("test db migrate: %v", err)
 		}
 	}

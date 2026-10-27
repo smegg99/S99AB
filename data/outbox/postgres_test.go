@@ -21,7 +21,7 @@ func TestQueueOnPostgres(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	conn, err := db.Open(db.Config{Driver: db.Postgres, DSN: dsn})
+	conn, err := db.Open(context.Background(), db.Config{Driver: db.Postgres, DSN: dsn})
 	if err != nil {
 		t.Fatalf("open: %v", err)
 	}
