@@ -93,7 +93,8 @@ func bucket(t *testing.T) *storage.Bucket {
 
 func key(body string) string {
 	sum := sha256.Sum256([]byte(body))
-	return storage.Key("uploads", hex.EncodeToString(sum[:]))
+	k, _ := storage.Key("uploads", hex.EncodeToString(sum[:]))
+	return k
 }
 
 func TestBucketPutGet(t *testing.T) {

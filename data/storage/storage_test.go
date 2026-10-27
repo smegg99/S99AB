@@ -97,9 +97,10 @@ func TestKeysThatEscapeAreRejected(t *testing.T) {
 }
 
 func TestKeyIsContentAddressed(t *testing.T) {
-	key := storage.Key("uploads", "abcd1234ef")
+	digest := "abcd" + strings.Repeat("0", 60)
+	key, err := storage.Key("uploads", digest)
 
-	if key != "uploads/ab/cd/abcd1234ef" {
+	if err != nil || key != "uploads/ab/cd/"+digest {
 		t.Fatalf("key = %q, want the two-level fan-out", key)
 	}
 }

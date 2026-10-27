@@ -58,7 +58,10 @@ func Accept(ctx context.Context, st Storage, r io.Reader, opts AcceptOptions) (*
 
 	sum := sha256.Sum256(buf.Bytes())
 	digest := hex.EncodeToString(sum[:])
-	key := Key(opts.Prefix, digest)
+	key, err := Key(opts.Prefix, digest)
+	if err != nil {
+		return nil, err
+	}
 
 	// Identical bytes are already stored.
 	exists, err := st.Exists(ctx, key)

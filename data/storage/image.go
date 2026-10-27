@@ -16,14 +16,17 @@ import (
 // MaxDimension caps a requested resize.
 const MaxDimension = 4096
 
+// MaxPixels caps a decoded image: a small file can declare a canvas that needs gigabytes.
+const MaxPixels = 40_000_000
+
 var ErrNotImage = fmt.Errorf("storage: not an image")
 
 // Sanitise re-encodes an image to drop metadata such as EXIF GPS, applying the
 // EXIF orientation first.
 func Sanitise(r io.Reader) (*bytes.Buffer, string, error) {
-	img, err := imaging.Decode(r, imaging.AutoOrientation(true))
+	img, err := decode(r)
 	if err != nil {
-		return nil, "", fmt.Errorf("%w: %v", ErrNotImage, err)
+		return nil, "", err
 	}
 
 	var out bytes.Buffer
@@ -73,9 +76,9 @@ func Derive(ctx context.Context, st Storage, key string, opts ResizeOptions) (st
 	}
 	defer src.Close()
 
-	img, err := imaging.Decode(src, imaging.AutoOrientation(true))
+	img, err := decode(src)
 	if err != nil {
-		return "", fmt.Errorf("%w: %v", ErrNotImage, err)
+		return "", err
 	}
 
 	var out bytes.Buffer
@@ -86,6 +89,23 @@ func Derive(ctx context.Context, st Storage, key string, opts ResizeOptions) (st
 		return "", err
 	}
 	return derived, nil
+}
+
+// decode reads the header first and refuses a canvas over MaxPixels before allocating it.
+func decode(r io.Reader) (image.Image, error) {
+	var head bytes.Buffer
+	cfg, _, err := image.DecodeConfig(io.TeeReader(r, &head))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrNotImage, err)
+	}
+	if int64(cfg.Width)*int64(cfg.Height) > MaxPixels {
+		return nil, fmt.Errorf("%w: %dx%d px", ErrTooLarge, cfg.Width, cfg.Height)
+	}
+	img, err := imaging.Decode(io.MultiReader(&head, r), imaging.AutoOrientation(true))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrNotImage, err)
+	}
+	return img, nil
 }
 
 // fit never enlarges.
