@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 var ErrNoIdentity = errors.New("kratosauth: no such identity")
@@ -25,7 +26,7 @@ func NewAdmin(baseURL string, client *http.Client) (*Admin, error) {
 		return nil, fmt.Errorf("kratosauth: admin base URL is required")
 	}
 	if client == nil {
-		client = &http.Client{}
+		client = &http.Client{Timeout: 10 * time.Second}
 	}
 	return &Admin{baseURL: baseURL, client: client}, nil
 }

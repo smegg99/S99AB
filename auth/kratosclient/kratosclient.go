@@ -66,8 +66,7 @@ type Client struct {
 	base       string
 }
 
-// New builds a client for a Kratos public URL. A nil http.Client uses the
-// default one, which has no timeout: pass one that does.
+// New builds a client for a Kratos public URL. A nil http.Client gets one with a 10 s timeout.
 func New(publicURL string, httpClient *http.Client) (*Client, error) {
 	parsed, err := url.Parse(publicURL)
 	if err != nil {
@@ -80,7 +79,7 @@ func New(publicURL string, httpClient *http.Client) (*Client, error) {
 	parsed.Path = strings.TrimRight(parsed.Path, "/")
 	parsed.RawPath = ""
 	if httpClient == nil {
-		httpClient = http.DefaultClient
+		httpClient = &http.Client{Timeout: 10 * time.Second}
 	}
 	return &Client{httpClient: httpClient, base: parsed.String()}, nil
 }

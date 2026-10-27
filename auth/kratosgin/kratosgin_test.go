@@ -193,7 +193,7 @@ func TestUnreachableKratosIs503NotAnonymous(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	w := do(engine(c), "/public", "")
+	w := do(engine(c), "/public", "ory_kratos_session=abc")
 	if w.Code != http.StatusServiceUnavailable {
 		t.Fatalf("code = %d, want 503", w.Code)
 	}
@@ -279,6 +279,7 @@ func TestTraitDecodesArbitraryFields(t *testing.T) {
 	c := fakeKratos(t, http.StatusOK, activeSession)
 
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("Cookie", "ory_kratos_session=abc")
 	identity, err := c.Whoami(req.Context(), req)
 	if err != nil {
 		t.Fatal(err)
@@ -302,7 +303,9 @@ func TestUndecodableWhoamiIs503NotAnonymous(t *testing.T) {
 	r := engine(fakeKratos(t, http.StatusOK, `<html>502 Bad Gateway</html>`))
 
 	w := httptest.NewRecorder()
-	r.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/public", nil))
+	req := httptest.NewRequest(http.MethodGet, "/public", nil)
+	req.Header.Set("Cookie", "ory_kratos_session=abc")
+	r.ServeHTTP(w, req)
 
 	if w.Code != http.StatusServiceUnavailable {
 		t.Fatalf("status = %d, want 503; a caller was served as anonymous during an outage", w.Code)

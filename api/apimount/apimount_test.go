@@ -44,8 +44,11 @@ func TestHealthAnswersWhileKratosIsDown(t *testing.T) {
 	if code := get(r, "/api/v1/health", "").Code; code != http.StatusOK {
 		t.Fatalf("health = %d, want 200 with Kratos down", code)
 	}
-	if code := get(r, "/api/v1/items", "").Code; code != http.StatusServiceUnavailable {
-		t.Fatalf("items = %d, want 503 with Kratos down", code)
+	if code := get(r, "/api/v1/items", "ory_kratos_session=abc").Code; code != http.StatusServiceUnavailable {
+		t.Fatalf("items with a session = %d, want 503 with Kratos down", code)
+	}
+	if code := get(r, "/api/v1/items", "").Code; code != http.StatusOK {
+		t.Fatalf("anonymous items = %d, want 200: no credential needs no Kratos", code)
 	}
 }
 

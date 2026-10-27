@@ -30,8 +30,30 @@ func whoami(t *testing.T, status int, body string) *kratosauth.Client {
 	return client
 }
 
+// request carries a session cookie; Whoami makes no call without a credential.
 func request() *http.Request {
-	return httptest.NewRequest(http.MethodGet, "/", nil)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r.Header.Set("Cookie", "ory_kratos_session=abc")
+	return r
+}
+
+// An anonymous request must not cost a round trip, nor fail when Kratos is down.
+func TestWhoamiWithoutCredentialsMakesNoCall(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	t.Cleanup(server.Close)
+	client, err := kratosauth.New(kratosauth.Options{PublicURL: server.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = client.Whoami(context.Background(), httptest.NewRequest(http.MethodGet, "/", nil))
+	if !errors.Is(err, kratosauth.ErrNoSession) || calls != 0 {
+		t.Fatalf("err = %v after %d calls, want ErrNoSession and no call", err, calls)
+	}
 }
 
 func TestWhoamiResolvesAnActiveSession(t *testing.T) {

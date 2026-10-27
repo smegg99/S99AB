@@ -110,8 +110,12 @@ func New(opts Options) (*Client, error) {
 	return &Client{opts: opts}, nil
 }
 
-// Whoami validates the request's cookie or session token with Kratos.
+// Whoami validates the request's cookie or session token with Kratos. A request with neither is
+// ErrNoSession without a call.
 func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error) {
+	if r.Header.Get("Cookie") == "" && r.Header.Get("X-Session-Token") == "" && r.Header.Get("Authorization") == "" {
+		return nil, ErrNoSession
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
 		c.opts.PublicURL+"/sessions/whoami", nil)
 	if err != nil {
