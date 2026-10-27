@@ -5,7 +5,8 @@ package apipage
 import "strings"
 
 // Order builds ORDER BY from sort using only strings from allowed, dropping
-// unknown fields. fallback must not be empty, or pages have no stable order.
+// unknown fields, then fallback's terms for columns sort did not name. fallback
+// must end in a unique column, or pages have no stable order.
 func Order(sort string, allowed []string, fallback string) string {
 	clauses := make([]string, 0, len(allowed))
 	seen := make(map[string]bool, len(allowed))
@@ -26,8 +27,12 @@ func Order(sort string, allowed []string, fallback string) string {
 		clauses = append(clauses, column+direction)
 	}
 
-	if len(clauses) == 0 {
-		return fallback
+	for _, term := range strings.Split(fallback, ",") {
+		term = strings.TrimSpace(term)
+		column, _, _ := strings.Cut(term, " ")
+		if term != "" && !seen[column] {
+			clauses = append(clauses, term)
+		}
 	}
 	return strings.Join(clauses, ", ")
 }

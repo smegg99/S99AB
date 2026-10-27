@@ -14,9 +14,9 @@ var columns = []string{"name", "created_at", "size"}
 // The `-` prefix is the contract's descending marker.
 func TestOrderReadsTheContractSyntax(t *testing.T) {
 	for _, tc := range []struct{ sort, want string }{
-		{"name", "name ASC"},
-		{"-created_at", "created_at DESC"},
-		{"name,-created_at", "name ASC, created_at DESC"},
+		{"name", "name ASC, id ASC"},
+		{"-created_at", "created_at DESC, id ASC"},
+		{"name,-created_at", "name ASC, created_at DESC, id ASC"},
 	} {
 		if got := apipage.Order(tc.sort, columns, "id ASC"); got != tc.want {
 			t.Fatalf("%q -> %q, want %q", tc.sort, got, tc.want)
@@ -45,7 +45,7 @@ func TestNothingFromTheRequestReachesTheClause(t *testing.T) {
 }
 
 func TestUnknownFieldsAreDroppedNotRejected(t *testing.T) {
-	if got := apipage.Order("gone,name", columns, "id ASC"); got != "name ASC" {
+	if got := apipage.Order("gone,name", columns, "id ASC"); got != "name ASC, id ASC" {
 		t.Fatalf("got %q, want the known field alone", got)
 	}
 }
@@ -59,7 +59,21 @@ func TestNothingSurvivableFallsBack(t *testing.T) {
 }
 
 func TestARepeatedFieldIsOrderedOnce(t *testing.T) {
-	if got := apipage.Order("name,-name", columns, "id ASC"); got != "name ASC" {
+	if got := apipage.Order("name,-name", columns, "id ASC"); got != "name ASC, id ASC" {
 		t.Fatalf("got %q, want the first direction only", got)
+	}
+}
+
+// Sorting by a non-unique column needs the fallback after it, or rows with equal values move
+// between pages.
+func TestOrderEndsWithTheFallbackUnlessItsColumnIsSorted(t *testing.T) {
+	allowed := []string{"name", "id"}
+	for _, tc := range []struct{ sort, want string }{
+		{"name", "name ASC, created_at DESC, id DESC"},
+		{"-id", "id DESC, created_at DESC"},
+	} {
+		if got := apipage.Order(tc.sort, allowed, "created_at DESC, id DESC"); got != tc.want {
+			t.Errorf("%q -> %q, want %q", tc.sort, got, tc.want)
+		}
 	}
 }
