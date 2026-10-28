@@ -92,7 +92,7 @@ const hide = (el: Element) => {
 
 .s99ab-clock-roll-enter-active,
 .s99ab-clock-roll-leave-active {
-  transition: --s99ab-clock-turn var(--s99ab-s99ab-clock-roll, 450ms) var(--s99ab-motion-easing);
+  transition: --s99ab-clock-turn var(--s99ab-clock-roll, 450ms) var(--s99ab-motion-easing);
 }
 
 .s99ab-clock-roll-enter-from {
