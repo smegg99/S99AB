@@ -85,6 +85,7 @@ import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useErrorAttempt } from '../../composables/state/useErrorAttempt'
 import { useTranslate } from '../../composables/useTranslate'
+import { inBrowser } from '../../browser/env'
 
 // Shows a translated message, never the raw error (URLs, stacks, proxy HTML).
 const { error, title, retryable = true, retrying = false } = defineProps<{
@@ -120,7 +121,7 @@ const retryLabel = computed(() => t('common.retry', 'Retry'))
 // Read from location at call time: works without a router, and a computed would
 // cache the first path since location is not reactive.
 function returnTo() {
-  if (typeof window === 'undefined') return ''
+  if (!inBrowser()) return ''
   return resolveReturnTo(
     window.location.pathname + window.location.search,
     window.location.origin,

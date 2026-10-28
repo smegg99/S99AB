@@ -5,6 +5,7 @@
 import { computed, type ComputedRef } from 'vue'
 import { useAuthPaths } from '../useAuthPaths'
 import type { KratosFlowKind } from './types'
+import { inBrowser } from '../../../browser/env'
 
 export interface AuthRoute {
   fullPath: string
@@ -100,7 +101,7 @@ function goToFlow(path: string) {
   if (!routing) return
 
   // Drops an auth route, so sign-in pressed on the sign-in page does not nest.
-  const origin = typeof window === 'undefined' ? 'http://localhost' : window.location.origin
+  const origin = !inBrowser() ? 'http://localhost' : window.location.origin
   const here = resolveReturnTo(routing.route().fullPath, origin)
   if (!path) return
 
@@ -122,7 +123,7 @@ export function useAuthFlowKind(fallback: KratosFlowKind = 'login'): ComputedRef
 /** The URL's return_to as a path; empty under SSR or when refused. */
 export function useReturnTo(): ComputedRef<string> {
   return computed(() => {
-    if (typeof window === 'undefined') return ''
+    if (!inBrowser()) return ''
     return resolveReturnTo(authRoute()?.query?.return_to, window.location.origin)
   })
 }

@@ -2,6 +2,7 @@
 
 import { reactive } from 'vue'
 import type { TextureSpec, PlaneName, TextureConfig, TextureConfigPatch } from '../useTexture'
+import { inBrowser } from '../../../browser/env'
 
 /**
  * Every texture with a file. `none` has no file and is added by `options`.
@@ -107,7 +108,7 @@ export function applyTexture(patch: TextureConfigPatch = {}) {
   configureTexture(patch)
 
   // SSR has no document; the stylesheet defaults apply until the client runs.
-  if (typeof document === 'undefined') return
+  if (!inBrowser()) return
 
   const root = document.documentElement
 

@@ -53,6 +53,7 @@ import UiEmptyState from './EmptyState.vue'
 import { authRoute, resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { useTranslate } from '../../composables/useTranslate'
+import { inBrowser } from '../../browser/env'
 
 // Shown to a signed-out user instead of an error.
 const { returnTo = '' } = defineProps<{
@@ -69,7 +70,7 @@ const slots = useSlots()
 // resolveReturnTo drops auth routes and returns a path, which Kratos accepts
 // without the origin being listed.
 const origin = () =>
-  (typeof window === 'undefined' ? '' : window.location.origin)
+  (!inBrowser() ? '' : window.location.origin)
 
 const back = computed(() =>
   resolveReturnTo(returnTo || authRoute()?.fullPath, origin()))

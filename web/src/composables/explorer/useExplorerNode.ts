@@ -13,6 +13,7 @@ import { useTranslate } from '../useTranslate'
 
 import { noActions, useExplorerActions, dragHasFiles } from './internal/actions'
 import { pickMods } from '../../browser/keys'
+import { inBrowser } from '../../browser/env'
 
 /** Tile actions the screen owns: opening a leaf and the context menu. */
 export interface ExplorerActions<T = unknown> {
@@ -30,7 +31,7 @@ const EDGE = 0.38
 /** Replaces the drag image with a small pill holding a clone of the tile's icon element. */
 function setDragImage(event: DragEvent, node: ExplorerNode, carrying: number, many: string) {
   const transfer = event.dataTransfer
-  if (!transfer || typeof document === 'undefined') return
+  if (!transfer || !inBrowser()) return
 
   const preview = document.createElement('div')
   preview.className = 's99ab-explorer-ghost'

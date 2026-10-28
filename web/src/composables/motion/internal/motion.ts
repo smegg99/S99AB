@@ -2,6 +2,7 @@
 
 import { reactive } from 'vue'
 import { mediaMatches } from '../../../browser/media'
+import { inBrowser } from '../../../browser/env'
 
 /** `reduced` keeps fades and drops movement; `off` removes both. */
 export type MotionLevel = 'system' | 'full' | 'reduced' | 'off'
@@ -59,7 +60,7 @@ export function resolveLevel(level: MotionLevel): ResolvedMotionLevel {
 
 /** Writes the level onto the document root; CSS handles the rest. */
 export function applyMotionLevel(level: MotionLevel) {
-  if (typeof document === 'undefined') return
+  if (!inBrowser()) return
   document.documentElement.dataset.motion = level
 }
 

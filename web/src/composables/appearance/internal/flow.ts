@@ -1,6 +1,7 @@
 // web/src/composables/appearance/internal/flow.ts
 
 import { reactive } from 'vue'
+import { inBrowser } from '../../../browser/env'
 
 export const config = reactive<GroundConfig>({
   kind: 'flow',
@@ -53,7 +54,7 @@ export function groundConfig(): GroundConfig {
  * set the washes' strength. Called by the plugin and on runtime changes.
  */
 export function applyGround() {
-  if (typeof document === 'undefined') return
+  if (!inBrowser()) return
   document.documentElement.setAttribute('data-ground', config.kind)
 }
 
@@ -80,7 +81,7 @@ export function releaseSlot() {
 
 /** Whether WebGL is available at all. */
 export function supportsWebgl(): boolean {
-  if (typeof document === 'undefined') return false
+  if (!inBrowser()) return false
 
   try {
     // A separate probe canvas: testing takes a context, and a canvas with a

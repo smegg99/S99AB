@@ -4,6 +4,7 @@ import { getCurrentInstance, onMounted, onScopeDispose, ref, watch, type Ref } f
 import { useRoute, useRouter } from 'vue-router'
 import { quietScroll, regionInset, scrollSettling } from './internal/scroll'
 import { REGION, tick } from './internal/region'
+import { inBrowser } from '../../browser/env'
 
 // Mirrors the on-screen section of a long page into the URL hash with `replace`.
 // A scroll listener: IntersectionObserver cannot answer "last section whose top has passed".
@@ -115,7 +116,7 @@ export function useScrollSpy(ids: () => string[]): ScrollSpy {
    * waits for the region, bounded so a nav outside a shell stops looking.
    */
   async function attach() {
-    if (typeof document === 'undefined') return
+    if (!inBrowser()) return
 
     region?.removeEventListener('scroll', onScroll)
     region = null

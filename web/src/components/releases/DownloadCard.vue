@@ -96,6 +96,7 @@ import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useDownloads } from '../../composables/releases/useReleases'
 import { useTranslate } from '../../composables/useTranslate'
 import { useCssNumber } from '../../composables/useCssNumber'
+import { inBrowser } from '../../browser/env'
 
 // The newest version, a tab per platform with the user's marked, and every
 // format that platform ships.
@@ -126,6 +127,6 @@ const emptyText = computed(() => t('release.noneText', 'Nothing has been publish
 const emptyAction = computed(() => (releasesUrl ? allReleasesLabel.value : undefined))
 
 function open(url: string) {
-  if (url && typeof window !== 'undefined') window.open(url, '_blank', 'noopener')
+  if (url && inBrowser()) window.open(url, '_blank', 'noopener')
 }
 </script>

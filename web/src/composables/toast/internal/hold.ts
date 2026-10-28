@@ -4,6 +4,7 @@ import { onBeforeUnmount, ref } from 'vue'
 import { POSITIONS } from './config'
 import { pause, resume, visibleAt } from './queue'
 import { useToast } from '../useToast'
+import { inBrowser } from '../../../browser/env'
 
 /** Pauses a toast's countdown on hover or hidden tab; the host binds its paused class to isPaused. */
 export function useToastHold() {
@@ -45,7 +46,7 @@ export function useToastHold() {
     }
   }
 
-  if (typeof document !== 'undefined') {
+  if (inBrowser()) {
     document.addEventListener('visibilitychange', onVisibility)
     onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisibility))
   }

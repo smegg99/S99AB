@@ -3,6 +3,7 @@
 import { reactive } from 'vue'
 import { motionLevel, resolveLevel } from '../../motion/internal/motion'
 import { readStored } from '../../../browser/storage'
+import { inBrowser } from '../../../browser/env'
 
 /**
  * How the screen changes appearance. `cover`, `cover-in`, `veil` and the `wipe`
@@ -161,7 +162,7 @@ export type StartViewTransition = (callback: () => void) => { finished: Promise<
  * `unknown` because the DOM types declare it as always present.
  */
 export function viewTransitions(): StartViewTransition | null {
-  if (typeof document === 'undefined') return null
+  if (!inBrowser()) return null
 
   const start = (document as unknown as { startViewTransition?: unknown }).startViewTransition
   return typeof start === 'function'
@@ -237,7 +238,7 @@ export function runThemeTransition(
 
 /** Whether an element can be animated at all here. */
 export function canAnimate(): boolean {
-  return typeof document !== 'undefined'
+  return inBrowser()
     && typeof document.body?.animate === 'function'
 }
 
@@ -315,7 +316,7 @@ export function runCover(
 
 /** A knob as a number, or the fallback before the stylesheet loads. */
 export function knob(name: string, fallback: number): number {
-  if (typeof document === 'undefined') return fallback
+  if (!inBrowser()) return fallback
 
   const raw = getComputedStyle(document.documentElement).getPropertyValue(name)
   const value = Number.parseFloat(raw)
@@ -338,7 +339,7 @@ export function coverHold(): number {
 }
 
 export function centre(): TransitionOrigin {
-  if (typeof window === 'undefined') return { x: 0, y: 0 }
+  if (!inBrowser()) return { x: 0, y: 0 }
   return { x: window.innerWidth / 2, y: window.innerHeight / 2 }
 }
 
@@ -347,7 +348,7 @@ export function centre(): TransitionOrigin {
  * each axis. A length, since circle() rejects `farthest-corner`.
  */
 export function coverRadius(point: TransitionOrigin): number {
-  if (typeof window === 'undefined') return 0
+  if (!inBrowser()) return 0
 
   const x = Math.max(point.x, window.innerWidth - point.x)
   const y = Math.max(point.y, window.innerHeight - point.y)
@@ -356,7 +357,7 @@ export function coverRadius(point: TransitionOrigin): number {
 
 /** Applies the change with page CSS transitions suppressed for one frame. */
 export function applyInstantly(apply: () => void) {
-  if (typeof document === 'undefined') {
+  if (!inBrowser()) {
     apply()
     return
   }

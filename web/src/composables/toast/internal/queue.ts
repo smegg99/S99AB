@@ -5,6 +5,7 @@
 import { reactive } from 'vue'
 import { POSITIONS, config } from './config'
 import type { Toast, ToastKind, ToastOptions, ToastPosition, ToastUpdate } from './types'
+import { inBrowser } from '../../../browser/env'
 
 function emptyQueues(): Record<ToastPosition, Toast[]> {
   const out = {} as Record<ToastPosition, Toast[]>
@@ -104,7 +105,7 @@ export function clear(position?: ToastPosition) {
  * is shared across requests.
  */
 export function show(kind: ToastKind, text: string, opts: ToastOptions = {}): number {
-  if (typeof window === 'undefined') return 0
+  if (!inBrowser()) return 0
 
   const position = opts.position ?? config.position
   const timeout = opts.timeout ?? config.timeout[kind]

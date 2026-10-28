@@ -8,6 +8,7 @@ import { resolveReturnTo } from './route'
 import { useAuthPaths } from '../useAuthPaths'
 import type { KratosFlow, KratosMessage, KratosNode } from './types'
 import { kratosFetch, returnToQuery } from './transport'
+import { inBrowser } from '../../../browser/env'
 
 /** One `continue_with` entry; list order is not priority (see nextStop). */
 export interface KratosContinueWith {
@@ -64,7 +65,7 @@ export interface KratosFlowApi {
 
 /** Ends the session by navigating to the one-shot `logout_url`. */
 export async function kratosSignOut(options: { returnTo?: string } = {}): Promise<void> {
-  if (typeof window === 'undefined') return
+  if (!inBrowser()) return
 
   // Absolute on this origin: Kratos redirects server-side and would resolve a
   // path (or an empty value) against its own base_url host.
@@ -88,7 +89,7 @@ export async function kratosSignOut(options: { returnTo?: string } = {}): Promis
 // Drops the host from a Kratos URL so the session cookie follows; with
 // `underBasePath`, URLs outside the proxy (an OIDC provider) are left alone.
 export function onThisOrigin(url: string, underBasePath = false): string {
-  if (!url || typeof window === 'undefined') return url
+  if (!url || !inBrowser()) return url
 
   try {
     const parsed = new URL(url, window.location.origin)
@@ -105,14 +106,14 @@ export function onThisOrigin(url: string, underBasePath = false): string {
 
 /** Re-confirms a signed-in user via a `refresh=true` login flow. */
 export function kratosRefreshSession(options: { returnTo?: string } = {}): void {
-  if (typeof window === 'undefined') return
+  if (!inBrowser()) return
 
   const to = resolveReturnTo(options.returnTo, window.location.origin)
   window.location.href = `${config.basePath}/self-service/login/browser?refresh=true${returnToQuery(to, '&')}`
 }
 
 export function flowIdFromLocation(): string | null {
-  if (typeof window === 'undefined') return null
+  if (!inBrowser()) return null
   return new URLSearchParams(window.location.search).get('flow')
 }
 

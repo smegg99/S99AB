@@ -12,6 +12,7 @@ import type {
   KratosSuccess,
 } from './internal/api'
 import { kratosFetch, returnToQuery } from './internal/transport'
+import { inBrowser } from '../../browser/env'
 
 export type {
   KratosConfig,
@@ -96,7 +97,7 @@ export function useKratosFlow(
 
   /** Drops ?flow= from the URL so a dead flow does not return on reload. */
   function forgetFlowInLocation() {
-    if (typeof window === 'undefined') return
+    if (!inBrowser()) return
     const url = new URL(window.location.href)
     if (!url.searchParams.has('flow')) return
     url.searchParams.delete('flow')
@@ -175,7 +176,7 @@ export function useKratosFlow(
   /** Navigates away after a successful flow. */
   function finish(body: KratosSuccess) {
     leaving.value = true
-    if (typeof window === 'undefined') return
+    if (!inBrowser()) return
     // Prefers the verification hand-off over the post-signup redirect.
     const to = nextStop(body)
     // `||` because an empty returnTo would reload this page. Success redirects
@@ -213,7 +214,7 @@ export function useKratosFlow(
         const { redirect_browser_to: to } = ((await res.json().catch(() => null)) ?? {}) as {
           redirect_browser_to?: string
         }
-        if (typeof window !== 'undefined' && to) {
+        if (inBrowser() && to) {
           // Kept on this origin: the session cookie lives on the browsed host,
           // and the refresh flow needs it.
           leaving.value = true

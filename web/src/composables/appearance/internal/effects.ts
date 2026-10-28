@@ -3,6 +3,7 @@
 import { reactive, ref } from 'vue'
 import { applyMotionLevel, motionLevel } from '../../motion/internal/motion'
 import type { EffectsConfig, EffectsConfigPatch } from '../useEffects'
+import { inBrowser } from '../../../browser/env'
 
 // Set by the layer plugin from `s99ab.performance`.
 export const config = reactive<EffectsConfig>({
@@ -28,7 +29,7 @@ export const liteState = ref<boolean>(config.liteDefault)
  */
 export function applyLite(on: boolean) {
   liteState.value = on
-  if (typeof document !== 'undefined') {
+  if (inBrowser()) {
     const root = document.documentElement
     if (on) root.setAttribute('data-s99ab-lite', '')
     else root.removeAttribute('data-s99ab-lite')

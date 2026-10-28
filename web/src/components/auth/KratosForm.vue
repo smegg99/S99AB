@@ -112,6 +112,7 @@ import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { useReturnTo } from '../../composables/kratos/useAuthRoute'
 import { resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useTranslate } from '../../composables/useTranslate'
+import { inBrowser } from '../../browser/env'
 
 // A login or registration screen in one tag. Kratos decides the fields.
 const { kind, autoStart = true, returnTo = '', seed } = defineProps<{
@@ -148,7 +149,7 @@ const routeReturnTo = useReturnTo()
 const target = computed(() => {
   // The prop is sanitised too: absolute URLs become paths (Kratos refuses
   // unlisted ones) and auth routes are dropped.
-  const origin = typeof window === 'undefined' ? '' : window.location.origin
+  const origin = !inBrowser() ? '' : window.location.origin
   return resolveReturnTo(returnTo, origin) || routeReturnTo.value
 })
 
@@ -203,7 +204,7 @@ const signedInAlready = computed(() => notice.value === 'signedIn' && !flow.valu
 const signedOut = computed(() => notice.value === 'signedOut' && !flow.value)
 
 // Returns here after signing in.
-const here = computed(() => (typeof window === 'undefined'
+const here = computed(() => (!inBrowser()
   ? ''
   : window.location.pathname + window.location.search))
 

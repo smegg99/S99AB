@@ -1,6 +1,7 @@
 // web/src/composables/explorer/internal/accents.ts
 
 import { hexChannels } from '../../../theme/color'
+import { inBrowser } from '../../../browser/env'
 // Runtime folder tints, emitted as the same two rules the _explorer.scss `@each`
 // writes per accent, so every data-accent consumer picks them up.
 
@@ -48,7 +49,7 @@ export function explorerAccentCss(accents: Record<string, string>): string {
  * Its position lets it override equally specific stylesheet tints.
  */
 export function applyExplorerAccents(accents: Record<string, string>) {
-  if (typeof document === 'undefined') return
+  if (!inBrowser()) return
 
   const css = explorerAccentCss(accents)
   const existing = document.getElementById(STYLE_ID)

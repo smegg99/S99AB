@@ -1,6 +1,7 @@
 // web/src/composables/useCssNumber.ts
 
 import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue'
+import { inBrowser } from '../browser/env'
 
 /**
  * A `:root` custom property as a live number, for knobs Vuetify takes as props
@@ -11,7 +12,7 @@ export function useCssNumber(name: string, fallback: number): Ref<number> {
   let observer: MutationObserver | null = null
 
   function read() {
-    if (typeof document === 'undefined') return
+    if (!inBrowser()) return
 
     const raw = getComputedStyle(document.documentElement).getPropertyValue(name)
     const parsed = Number.parseFloat(raw)

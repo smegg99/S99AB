@@ -2,6 +2,7 @@
 
 import { type Component, reactive } from 'vue'
 import { isEditable } from '../browser/input'
+import { inBrowser } from '../browser/env'
 
 export interface ShortcutDef {
   /** `mod+s`, `escape`, `shift+/`. `mod` is Cmd on macOS, Ctrl elsewhere. */
@@ -117,7 +118,7 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 export function listen() {
-  if (listening || typeof window === 'undefined') return
+  if (listening || !inBrowser()) return
   window.addEventListener('keydown', onKeydown)
   listening = true
 }

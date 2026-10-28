@@ -12,6 +12,7 @@ import {
 } from 'vue'
 import type { ExplorerApi } from '../useExplorer'
 import { useTranslate } from '../../useTranslate'
+import { inBrowser } from '../../../browser/env'
 
 export interface ExplorerCrumb {
   key: string
@@ -59,7 +60,7 @@ export function useExplorerCrumbs<T = unknown>(explorer: ExplorerApi<T>) {
   })
 
   watch(crumbs, () => {
-    if (typeof window === 'undefined') return
+    if (!inBrowser()) return
     void nextTick(() => {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(syncScroll)

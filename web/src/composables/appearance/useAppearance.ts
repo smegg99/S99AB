@@ -7,6 +7,7 @@ import { originOf, runThemeTransition, type ThemeTransition } from './internal/t
 
 import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, themePref, contrastPref } from './internal/appearance'
 import { readStored, writeStored, eraseStored } from '../../browser/storage'
+import { inBrowser } from '../../browser/env'
 
 /**
  * Light/dark and contrast. Light and dark are the two registered themes;
@@ -101,7 +102,7 @@ export function useAppearance(keys: () => AppearanceKeys = () => ({})) {
     if (nextHigh !== high.value) {
       rebuildThemes(theme.themes.value, { high: nextHigh })
 
-      if (typeof document !== 'undefined') {
+      if (inBrowser()) {
         const root = document.documentElement
         if (nextHigh) root.setAttribute('data-contrast', 'high')
         else root.removeAttribute('data-contrast')

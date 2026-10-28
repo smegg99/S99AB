@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { config } from './types'
 import type { SessionIdentity, SessionStore, SessionHost } from '../useSession'
 import { kratosFetch } from './transport'
+import { inBrowser } from '../../../browser/env'
 
 let host: SessionHost | null = null
 
@@ -27,8 +28,6 @@ export function store(): SessionStore {
 // server a module-scope promise would leak across requests.
 let inFlight: Promise<void> | null = null
 
-export const browser = () => typeof window !== 'undefined'
-
 export async function whoami(): Promise<SessionIdentity | null> {
   const res = await kratosFetch(`${config.basePath}/sessions/whoami`)
   // 401 means signed out.
@@ -42,11 +41,11 @@ export async function loadSession(force = false): Promise<void> {
   const state = store()
   if (state.loaded.value && !force) return
 
-  const read = browser() ? whoami : host?.read
+  const read = inBrowser() ? whoami : host?.read
   // No window and no host reader: stay unloaded, so `ready` means unknown.
   if (!read) return
 
-  if (browser() && inFlight && !force) return inFlight
+  if (inBrowser() && inFlight && !force) return inFlight
 
   const run = (async () => {
     state.pending.value = true
@@ -60,10 +59,10 @@ export async function loadSession(force = false): Promise<void> {
     }
     finally {
       state.pending.value = false
-      if (browser()) inFlight = null
+      if (inBrowser()) inFlight = null
     }
   })()
 
-  if (browser()) inFlight = run
+  if (inBrowser()) inFlight = run
   return run
 }
