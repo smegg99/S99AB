@@ -1,7 +1,8 @@
 // web/src/internal/dialog.ts
 
 import { type Component, markRaw, reactive } from 'vue'
-import { focused, pressedByKey } from '../composables/primitives/internal/opener'
+import { focused } from '../composables/primitives/internal/opener'
+import { pressedByKey } from '../browser/input'
 
 export type DialogWidth = 'sm' | 'md' | 'lg' | 'full'
 

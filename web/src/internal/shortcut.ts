@@ -1,6 +1,7 @@
 // web/src/internal/shortcut.ts
 
 import { type Component, reactive } from 'vue'
+import { isEditable } from '../browser/input'
 
 export interface ShortcutDef {
   /** `mod+s`, `escape`, `shift+/`. `mod` is Cmd on macOS, Ctrl elsewhere. */
@@ -92,12 +93,6 @@ function normalise(keys: string): string {
     .join('+')
 }
 
-function inEditable(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false
-  if (target.isContentEditable) return true
-  return ['input', 'textarea', 'select'].includes(target.tagName.toLowerCase())
-}
-
 function onKeydown(event: KeyboardEvent) {
   const combo = comboOf(event)
 
@@ -109,7 +104,7 @@ function onKeydown(event: KeyboardEvent) {
       if (!def) return false
       if (def.desktopOnly && !desktop) return false
       if (normalise(resolveKeys(b.id) ?? '') !== combo) return false
-      if (!b.opts.allowInInput && inEditable(event.target)) return false
+      if (!b.opts.allowInInput && isEditable(event.target)) return false
       return b.opts.when ? b.opts.when() : true
     })
 

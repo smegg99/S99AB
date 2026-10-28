@@ -2,7 +2,7 @@
 
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   closeAllDialogs,
   closeDialog,
@@ -11,6 +11,7 @@ import {
   resetDialogs,
 } from '../src/internal/dialog'
 import { useDialog } from '../src/composables/useDialog'
+import { installInputMode } from '../src/browser/input'
 
 const Stub = defineComponent({ name: 'Stub', setup: () => () => h('div') })
 
@@ -28,6 +29,13 @@ function inComponent<T>(fn: () => T): T {
   }))
   return out
 }
+
+// The input plugin tracks key and pointer presses in an app; here the spec does.
+let stopInputMode = () => {}
+beforeEach(() => {
+  stopInputMode = installInputMode()
+})
+afterEach(() => stopInputMode())
 
 describe('opening', () => {
   it('adds an entry and leaves the promise pending', async () => {

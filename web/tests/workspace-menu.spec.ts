@@ -1,5 +1,5 @@
 // web/tests/workspace-menu.spec.ts
-import { afterAll, afterEach, beforeAll, describe, expect, it, onTestFinished, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { createVuetify } from 'vuetify'
@@ -7,6 +7,7 @@ import * as components from 'vuetify/components'
 import DisabledHint from '../src/components/primitives/DisabledHint.vue'
 import WorkspaceMenu from '../src/components/tabs/WorkspaceMenu.vue'
 import { closeContextMenu, openContextMenu, useContextMenuState } from '../src/composables/tabs/internal/contextMenu'
+import { installInputMode } from '../src/browser/input'
 
 const vuetify = createVuetify({ components, defaults: { VMenu: { transition: false, scrollStrategy: 'none' }, VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
 beforeAll(() => {
@@ -20,6 +21,13 @@ afterEach(() => {
   closeContextMenu()
   wrapper?.unmount()
 })
+
+// The input plugin tracks key and pointer presses in an app; here the spec does.
+let stopInputMode = () => {}
+beforeEach(() => {
+  stopInputMode = installInputMode()
+})
+afterEach(() => stopInputMode())
 
 describe('workspace disabled menu entries', () => {
   it('explains a disabled action without executing it or closing the menu', async () => {
