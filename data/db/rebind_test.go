@@ -16,6 +16,7 @@ func TestRebind(t *testing.T) {
 		{"quoted identifier", `SELECT "odd?name" FROM t WHERE a = ?`, `SELECT "odd?name" FROM t WHERE a = $1`},
 		{"line comment", "SELECT a -- why?\nFROM t WHERE a = ?", "SELECT a -- why?\nFROM t WHERE a = $1"},
 		{"block comment", `SELECT /* a? b? */ a FROM t WHERE a = ?`, `SELECT /* a? b? */ a FROM t WHERE a = $1`},
+		{"string concatenation", `SELECT * FROM t WHERE a LIKE '%'||?||'%' AND b = ?`, `SELECT * FROM t WHERE a LIKE '%'||$1||'%' AND b = $2`},
 		{"jsonb any and all keys", `SELECT * FROM t WHERE tags ?| ? AND tags ?& ?`, `SELECT * FROM t WHERE tags ?| $1 AND tags ?& $2`},
 	}
 	for _, c := range cases {

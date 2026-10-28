@@ -58,7 +58,7 @@ func Rebind(driver, query string) string {
 			}
 			b.WriteString(query[i : i+2+end])
 			i += 2 + end - 1
-		case c == '?' && i+1 < len(query) && (query[i+1] == '|' || query[i+1] == '&'):
+		case c == '?' && jsonbOperator(query[i+1:]):
 			b.WriteString(query[i : i+2])
 			i++
 		case c == '?':
@@ -70,6 +70,15 @@ func Rebind(driver, query string) string {
 		}
 	}
 	return b.String()
+}
+
+// jsonbOperator reports whether rest follows a `?` that is jsonb's ?| or ?&, not a placeholder before
+// || (concatenation) or &&.
+func jsonbOperator(rest string) bool {
+	if rest == "" || (rest[0] != '|' && rest[0] != '&') {
+		return false
+	}
+	return len(rest) < 2 || rest[1] != rest[0]
 }
 
 // Placeholders builds an `(?, ?, ?)` list for an IN clause of n values.
