@@ -13,7 +13,7 @@
       :label="fieldLabel"
       :rules="options.rules"
       :error-messages="refused"
-      :disabled="busy"
+      :readonly="busy"
       autofocus
       @update:model-value="refused = ''"
       @keydown.enter.prevent="submit"
@@ -40,6 +40,7 @@
     <template #actions>
       <v-btn
         variant="text"
+        :disabled="busy"
         @click="close()"
       >
         {{ cancelText }}
@@ -72,7 +73,7 @@ import { useTranslate } from '../../composables/useTranslate'
 
 const { options } = defineProps<{ options: PromptOptions }>()
 
-const { close } = useDialog<string>()
+const { close, hold } = useDialog<string>()
 const t = useTranslate()
 
 const draft = ref(options.value ?? '')
@@ -85,6 +86,7 @@ const fieldLabel = computed(() => options.label ?? t('common.value', 'Value'))
 const confirmText = computed(() => options.confirmLabel ?? t('common.confirm', 'Confirm'))
 const cancelText = computed(() => options.cancelLabel ?? t('common.cancel', 'Cancel'))
 const pendingText = computed(() => t('common.pending', 'Wait for it to finish.'))
+const failedText = computed(() => t('error.unknown', 'Something went wrong.'))
 
 /** The first failing rule's message, or true. */
 const failed = computed(() => {
@@ -100,15 +102,23 @@ const blocked = computed(() => {
   return typeof failed.value === 'string' ? failed.value : ''
 })
 
-/** Runs a save or the second action; a refusal stays under the field, else the dialog closes with `answer`. */
+/**
+ * Runs a save or the second action, holding the dialog open meanwhile. A refusal or a throw stays
+ * under the field; success closes with `answer`.
+ */
 async function run(work: () => Promise<string | undefined>, answer?: string) {
   busy.value = true
+  hold(true)
   let said: string | undefined
   try {
     said = await work()
   }
+  catch {
+    said = failedText.value
+  }
   finally {
     busy.value = false
+    hold(false)
   }
   if (said) refused.value = said
   else close(answer)

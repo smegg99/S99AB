@@ -6,17 +6,18 @@ import * as directives from 'vuetify/directives'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
-import { DIALOG_CLOSE, type PromptOptions } from '../src/composables/useDialog'
+import { DIALOG_CLOSE, DIALOG_HOLD, type PromptOptions } from '../src/composables/useDialog'
 
 const vuetify = createVuetify({ components, directives })
 
 function open(options: PromptOptions) {
   const close = vi.fn()
+  const hold = vi.fn()
   const wrapper = mount(PromptDialog, {
     props: { options },
-    global: { plugins: [vuetify], provide: { [DIALOG_CLOSE]: close } },
+    global: { plugins: [vuetify], provide: { [DIALOG_CLOSE]: close, [DIALOG_HOLD]: hold } },
   })
-  return { wrapper, close }
+  return { wrapper, close, hold }
 }
 
 const buttons = (wrapper: ReturnType<typeof open>['wrapper']) => wrapper.findAll('button')
@@ -60,5 +61,41 @@ describe('UiPromptDialog', () => {
     await flushPromises()
     expect(run).toHaveBeenCalled()
     expect(close).toHaveBeenCalledWith(undefined)
+  })
+
+  it('shows a save that throws under the field, stays open and can be tried again', async () => {
+    const submit = vi.fn().mockRejectedValueOnce(new Error('network down'))
+    const { wrapper, close } = open({ title: 'Name it', confirmLabel: 'Save', value: 'A', submit })
+    await byText(wrapper, 'Save').trigger('click')
+    await flushPromises()
+    expect(close).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('Something went wrong.')
+    expect(byText(wrapper, 'Save').attributes('disabled')).toBeUndefined()
+  })
+
+  it('holds the dialog open, with cancel off, until the save settles', async () => {
+    let settle!: (said?: string) => void
+    const submit = vi.fn(() => new Promise<string | undefined>((resolve) => {
+      settle = resolve
+    }))
+    const { wrapper, close, hold } = open({ title: 'Name it', confirmLabel: 'Save', cancelLabel: 'Cancel', value: 'A', submit })
+    await byText(wrapper, 'Save').trigger('click')
+    expect(hold).toHaveBeenLastCalledWith(true)
+    expect(byText(wrapper, 'Cancel').attributes('disabled')).toBeDefined()
+    await byText(wrapper, 'Cancel').trigger('click')
+    expect(close).not.toHaveBeenCalled()
+    settle()
+    await flushPromises()
+    expect(hold).toHaveBeenLastCalledWith(false)
+    expect(close).toHaveBeenCalledWith('A')
+  })
+
+  it('keeps the field focusable while a save runs', async () => {
+    const submit = vi.fn(() => new Promise<string | undefined>(() => {}))
+    const { wrapper } = open({ title: 'Name it', confirmLabel: 'Save', value: 'A', submit })
+    await byText(wrapper, 'Save').trigger('click')
+    const input = wrapper.find('input')
+    expect(input.attributes('disabled')).toBeUndefined()
+    expect(input.attributes('readonly')).toBeDefined()
   })
 })

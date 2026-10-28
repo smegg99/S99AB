@@ -33,6 +33,8 @@ export interface DialogEntry {
   opener: HTMLElement | null
   /** Whether a key opened the dialog; only then does the opener get its focus ring back. */
   openerRing: boolean
+  /** Set by the dialog while its work runs: backdrop and escape do not close it. */
+  held: boolean
 }
 
 export interface ConfirmOptions {
@@ -60,6 +62,7 @@ export interface PromptOptions {
 
 /** Injection key for the resolver of the dialog a component is rendered in. */
 export const DIALOG_CLOSE = Symbol('s99ab:dialog-close')
+export const DIALOG_HOLD = Symbol('s99ab:dialog-hold')
 
 // The open stack, at module level. Exported raw for the host; consumers get the
 // readonly view from useDialog().
@@ -108,6 +111,7 @@ function openDialog<T = unknown>(
       resolve: resolve as (value?: unknown) => void,
       opener: focused(),
       openerRing: pressedByKey(),
+      held: false,
     })
   })
 }
@@ -168,9 +172,10 @@ const noop = () => {}
  * is injected by the host, so a dialog needs no close prop or id.
  */
 export function useDialog<T = unknown>() {
-  const close = getCurrentInstance()
-    ? inject<(value?: T) => void>(DIALOG_CLOSE, noop)
-    : noop
+  const inDialog = getCurrentInstance()
+  const close = inDialog ? inject<(value?: T) => void>(DIALOG_CLOSE, noop) : noop
+  /** Inside a dialog, keeps backdrop and escape from closing it while `on`. */
+  const hold: (on: boolean) => void = inDialog ? inject(DIALOG_HOLD, noop) : noop
 
   return {
     entries: readonly(entries),
@@ -178,6 +183,7 @@ export function useDialog<T = unknown>() {
     confirm,
     prompt,
     close,
+    hold,
     closeAll: closeAllDialogs,
   }
 }

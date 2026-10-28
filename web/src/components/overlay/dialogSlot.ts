@@ -3,6 +3,7 @@
 import { type Component, defineComponent, h, type PropType, provide } from 'vue'
 import {
   DIALOG_CLOSE,
+  DIALOG_HOLD,
   type DialogEntry,
   closeDialog,
 } from '../../composables/useDialog'
@@ -19,6 +20,9 @@ export default defineComponent({
   },
   setup(props) {
     provide(DIALOG_CLOSE, (value?: unknown) => closeDialog(props.entry.id, value))
+    provide(DIALOG_HOLD, (on: boolean) => {
+      props.entry.held = on
+    })
     return () => h(props.entry.component as Component, props.entry.props)
   },
 })

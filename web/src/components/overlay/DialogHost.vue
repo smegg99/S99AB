@@ -5,7 +5,7 @@
     :key="entry.id"
     :model-value="entry.open"
     :aria-label="entry.opts.label"
-    :persistent="entry.opts.persistent"
+    :persistent="entry.opts.persistent || entry.held"
     :max-width="widthOf(entry.opts.width)"
     scrollable
     @update:model-value="onBackdrop(entry)"
