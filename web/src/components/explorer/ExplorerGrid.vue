@@ -33,8 +33,8 @@
 import UiExplorerTile from './ExplorerTile.vue'
 import UiExplorerUpTile from './ExplorerUpTile.vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
-import { useExplorerKeys } from '../../composables/explorer/useExplorerKeys'
-import { dragHasFiles, useExplorerActions } from '../../composables/explorer/useExplorerNode'
+import { useExplorerKeys } from '../../composables/explorer/internal/keys'
+import { dragHasFiles, useExplorerActions } from '../../composables/explorer/internal/actions'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 
 // Injected, so the grid can sit anywhere under <UiExplorer>.

@@ -1,8 +1,8 @@
 // web/tests/explorer-marquee.spec.ts
 
 import { describe, expect, it } from 'vitest'
-import { covered } from '../src/composables/explorer/useExplorerMarquee'
-import { TILE_ATTR } from '../src/composables/explorer/useExplorerKeys'
+import { covered } from '../src/composables/explorer/internal/marquee'
+import { TILE_ATTR } from '../src/composables/explorer/internal/keys'
 
 /** A grid of tiles at given boxes; happy-dom has no layout, so the geometry is fed directly. */
 function grid(boxes: Record<string, [number, number, number, number]>): HTMLElement {

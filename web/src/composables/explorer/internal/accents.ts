@@ -1,4 +1,4 @@
-// web/src/composables/explorer/useExplorerAccents.ts
+// web/src/composables/explorer/internal/accents.ts
 
 // Runtime folder tints, emitted as the same two rules the _explorer.scss `@each`
 // writes per accent, so every data-accent consumer picks them up.

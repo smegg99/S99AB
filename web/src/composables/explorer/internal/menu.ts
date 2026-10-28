@@ -1,12 +1,12 @@
-// web/src/composables/explorer/useExplorerMenu.ts
+// web/src/composables/explorer/internal/menu.ts
 
 // State and labels for the <UiExplorer> tile context menu; tiles reach it through injected actions.
 
 import { computed, shallowRef, watch } from 'vue'
-import { TILE_ATTR } from './useExplorerKeys'
-import { provideExplorerActions } from './useExplorerNode'
-import type { ExplorerNode } from './useExplorerTree'
-import { useTranslate } from '../useTranslate'
+import { TILE_ATTR } from './keys'
+import { provideExplorerActions } from './actions'
+import type { ExplorerNode } from './tree'
+import { useTranslate } from '../../useTranslate'
 
 export interface ExplorerMenuHost<T> {
   open: (node: ExplorerNode<T>) => void

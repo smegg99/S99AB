@@ -1,10 +1,10 @@
-// web/src/composables/explorer/useExplorerDrag.ts
+// web/src/composables/explorer/internal/drag.ts
 
 // Explorer drag state on native HTML5 drag and drop: the browser handles autoscroll,
 // escape and the drop cursor, and Vue keeps owning the DOM.
 
 import { computed, type Ref, shallowRef } from 'vue'
-import type { ExplorerNode } from './useExplorerTree'
+import type { ExplorerNode } from './tree'
 
 /** What the drag needs from the explorer. */
 export interface ExplorerDragHost<T = unknown> {

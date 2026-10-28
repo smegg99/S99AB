@@ -95,7 +95,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
-import type { ExplorerNode } from '../../composables/explorer/useExplorerTree'
+import type { ExplorerNode } from '../../composables/explorer/internal/tree'
 import { useExplorerNode } from '../../composables/explorer/useExplorerNode'
 import { useTranslate } from '../../composables/useTranslate'
 

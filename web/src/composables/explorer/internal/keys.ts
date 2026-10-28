@@ -1,4 +1,4 @@
-// web/src/composables/explorer/useExplorerKeys.ts
+// web/src/composables/explorer/internal/keys.ts
 
 // Grid keyboard: arrows move focus and selection, ctrl moves focus only, shift
 // extends, space picks. Enter is handled by the tile.

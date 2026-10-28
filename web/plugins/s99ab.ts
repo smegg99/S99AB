@@ -22,11 +22,8 @@ import { registerDialogPresets } from '../src/internal/dialog'
 import { configureDelay, type DelayConfig } from '../src/internal/delay'
 import type { EventSourceConfig } from '../src/composables/useEventSource'
 import { configureEventSource } from '../src/internal/eventSource'
-import {
-  applyExplorerTints,
-  configureExplorer,
-  type ExplorerConfigPatch,
-} from '../src/composables/explorer/useExplorerConfig'
+import type { ExplorerConfigPatch } from '../src/composables/explorer/useExplorerConfig'
+import { applyExplorerTints, configureExplorer } from '../src/composables/explorer/internal/config'
 import type { GroundConfig } from '../src/composables/appearance/internal/flow'
 import { applyGround, configureGround } from '../src/composables/appearance/internal/flow'
 import {

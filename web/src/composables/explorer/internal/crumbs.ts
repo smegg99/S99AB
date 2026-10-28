@@ -1,4 +1,4 @@
-// web/src/composables/explorer/useExplorerCrumbs.ts
+// web/src/composables/explorer/internal/crumbs.ts
 
 // Explorer toolbar breadcrumbs: crumb model, crumb drop targets and the scroll that keeps the open folder in view.
 
@@ -10,8 +10,8 @@ import {
   ref,
   watch,
 } from 'vue'
-import type { ExplorerApi } from './useExplorer'
-import { useTranslate } from '../useTranslate'
+import type { ExplorerApi } from '../useExplorer'
+import { useTranslate } from '../../useTranslate'
 
 export interface ExplorerCrumb {
   key: string

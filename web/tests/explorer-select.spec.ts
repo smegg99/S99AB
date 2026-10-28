@@ -3,9 +3,9 @@
 import { ref } from 'vue'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { disposeExplorer, useExplorer } from '../src/composables/explorer/useExplorer'
-import { configureExplorer } from '../src/composables/explorer/useExplorerConfig'
-import { useExplorerSelection } from '../src/composables/explorer/useExplorerSelection'
-import type { ExplorerNode } from '../src/composables/explorer/useExplorerTree'
+import { configureExplorer } from '../src/composables/explorer/internal/config'
+import { useExplorerSelection } from '../src/composables/explorer/internal/selection'
+import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
 
 // docs, note, sheet, photo: one folder and three leaves at the root, so a
 // shift-range has something to run over. `sheet` is disabled.

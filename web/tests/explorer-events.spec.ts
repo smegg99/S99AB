@@ -10,8 +10,8 @@ import {
 import {
   bindExplorerEvents,
   createExplorerEvents,
-} from '../src/composables/explorer/useExplorerEvents'
-import type { ExplorerNode } from '../src/composables/explorer/useExplorerTree'
+} from '../src/composables/explorer/internal/events'
+import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
 
 function seed(): ExplorerNode[] {
   return [

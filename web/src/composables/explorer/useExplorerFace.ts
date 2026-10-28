@@ -5,7 +5,7 @@
 
 import { computed, ref, watch } from 'vue'
 import { useExplorerContext } from './useExplorer'
-import type { ExplorerNode } from './useExplorerTree'
+import type { ExplorerNode } from './internal/tree'
 
 export interface ExplorerFaceState {
   isFolder: () => boolean

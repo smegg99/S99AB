@@ -80,7 +80,7 @@ import UiDisabledHint from '../primitives/DisabledHint.vue'
 import UiThumb from '../primitives/Thumb.vue'
 import { useDialog } from '../../composables/useDialog'
 import { useExplorerConfig } from '../../composables/explorer/useExplorerConfig'
-import type { ExplorerFolderDraft } from '../../composables/explorer/useExplorerFolders'
+import type { ExplorerFolderDraft } from '../../composables/explorer/internal/folders'
 import { useTranslate } from '../../composables/useTranslate'
 
 // Folder name, tint, and the app's optional icon and image; persists nothing, so it serves create and rename.

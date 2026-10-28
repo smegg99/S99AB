@@ -9,7 +9,7 @@ import {
   isDescendant,
   pathOf,
   subtreeHeight,
-} from '../src/composables/explorer/useExplorerTree'
+} from '../src/composables/explorer/internal/tree'
 
 function folder(id: string, parentId: string | null, position = 0, name = id): ExplorerNode {
   return { id, parentId, kind: 'folder', name, position }

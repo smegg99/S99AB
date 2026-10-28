@@ -28,8 +28,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
-import { TILE_ATTR } from '../../composables/explorer/useExplorerKeys'
-import { dragHasFiles, useExplorerActions } from '../../composables/explorer/useExplorerNode'
+import { TILE_ATTR } from '../../composables/explorer/internal/keys'
+import { dragHasFiles, useExplorerActions } from '../../composables/explorer/internal/actions'
 import { useTranslate } from '../../composables/useTranslate'
 
 const KEY = 'up'

@@ -8,7 +8,7 @@ import {
   type ExplorerSource,
   useExplorer,
 } from '../src/composables/explorer/useExplorer'
-import type { ExplorerNode } from '../src/composables/explorer/useExplorerTree'
+import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
 
 // docs
 // +-- deep          (folder)

@@ -1,13 +1,13 @@
-// web/src/composables/explorer/useExplorerFolders.ts
+// web/src/composables/explorer/internal/folders.ts
 
 // Folder dialogs (new, rename, delete) shared by the toolbar and context menu.
 // Kept out of useExplorer so that composable imports no components.
 
-import ExplorerFolderDialog from '../../components/explorer/ExplorerFolderDialog.vue'
-import type { ExplorerApi } from './useExplorer'
-import type { ExplorerNode } from './useExplorerTree'
-import { useDialog } from '../useDialog'
-import { useTranslate } from '../useTranslate'
+import ExplorerFolderDialog from '../../../components/explorer/ExplorerFolderDialog.vue'
+import type { ExplorerApi } from '../useExplorer'
+import type { ExplorerNode } from './tree'
+import { useDialog } from '../../useDialog'
+import { useTranslate } from '../../useTranslate'
 
 export interface ExplorerFolderDraft {
   name: string

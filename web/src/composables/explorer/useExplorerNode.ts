@@ -3,21 +3,15 @@
 // Tile behaviour: drag and drop, click semantics and drag-state classes.
 // Any element becomes a tile by spreading `bind`.
 
-import {
-  computed,
-  inject,
-  type InjectionKey,
-  type MaybeRefOrGetter,
-  onScopeDispose,
-  provide,
-  toValue,
-} from 'vue'
+import { computed, type MaybeRefOrGetter, onScopeDispose, toValue } from 'vue'
 import { useExplorerContext } from './useExplorer'
 import { useExplorerFace } from './useExplorerFace'
-import { TILE_ATTR } from './useExplorerKeys'
+import { TILE_ATTR } from './internal/keys'
 import { useExplorerSelectionContext } from './useExplorerSelection'
-import type { ExplorerNode } from './useExplorerTree'
+import type { ExplorerNode } from './internal/tree'
 import { useTranslate } from '../useTranslate'
+
+import { noActions, useExplorerActions, dragHasFiles } from './internal/actions'
 
 /** Tile actions the screen owns: opening a leaf and the context menu. */
 export interface ExplorerActions<T = unknown> {
@@ -29,27 +23,8 @@ export interface ExplorerActions<T = unknown> {
   files?: (parentId: string | null, files: File[]) => void
 }
 
-export const explorerActionsKey: InjectionKey<ExplorerActions> = Symbol(
-  's99ab:explorer-actions',
-)
-
-export function provideExplorerActions<T>(actions: ExplorerActions<T>) {
-  provide(explorerActionsKey, actions as ExplorerActions)
-}
-
-const noActions: ExplorerActions = { open: () => {}, menu: () => {} }
-
-export function useExplorerActions(): ExplorerActions {
-  return inject(explorerActionsKey, noActions)
-}
-
 /** Fraction of a folder tile's width at each side that reorders a dragged folder instead of nesting it. */
 const EDGE = 0.38
-
-/** Whether a drag carries external files. */
-export function dragHasFiles(event: DragEvent): boolean {
-  return !!event.dataTransfer?.types.includes('Files')
-}
 
 /** Replaces the drag image with a small pill holding a clone of the tile's icon element. */
 function setDragImage(event: DragEvent, node: ExplorerNode, carrying: number, many: string) {

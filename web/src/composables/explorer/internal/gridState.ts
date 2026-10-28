@@ -1,10 +1,10 @@
-// web/src/composables/explorer/useExplorerGridState.ts
+// web/src/composables/explorer/internal/gridState.ts
 
 // Picks what <UiExplorer> draws: first-load placeholder, grid, or empty state.
 
 import { computed, shallowRef, watch } from 'vue'
-import { useDelayed } from '../useDelay'
-import type { ExplorerApi } from './useExplorer'
+import { useDelayed } from '../../useDelay'
+import type { ExplorerApi } from '../useExplorer'
 
 /** About a row and a half at the default tile size. */
 const FIRST_PLACEHOLDERS = 8

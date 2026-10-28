@@ -113,8 +113,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
-import { useExplorerCrumbs } from '../../composables/explorer/useExplorerCrumbs'
-import { useExplorerFolders } from '../../composables/explorer/useExplorerFolders'
+import { useExplorerCrumbs } from '../../composables/explorer/internal/crumbs'
+import { useExplorerFolders } from '../../composables/explorer/internal/folders'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 import { useTranslate } from '../../composables/useTranslate'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'

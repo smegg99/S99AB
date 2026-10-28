@@ -1,4 +1,4 @@
-// web/src/composables/explorer/useExplorerTree.ts
+// web/src/composables/explorer/internal/tree.ts
 
 // Non-reactive explorer tree functions over the whole flat array, which breadcrumbs
 // and the depth-cap check both need.

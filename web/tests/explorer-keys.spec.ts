@@ -7,8 +7,8 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import Explorer from '../src/components/explorer/Explorer.vue'
 import { disposeExplorer, useExplorer } from '../src/composables/explorer/useExplorer'
-import { configureExplorer } from '../src/composables/explorer/useExplorerConfig'
-import type { ExplorerNode } from '../src/composables/explorer/useExplorerTree'
+import { configureExplorer } from '../src/composables/explorer/internal/config'
+import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
 
 const vuetify = createVuetify({ components, directives })
 

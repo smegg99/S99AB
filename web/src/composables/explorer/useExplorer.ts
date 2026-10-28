@@ -3,36 +3,27 @@
 // File-manager explorer over an app-supplied tree source: one folder at a time,
 // drag to reorder or file, breadcrumbs back out.
 
-import {
-  computed,
-  inject,
-  type InjectionKey,
-  provide,
-  ref,
-  shallowRef,
-} from 'vue'
-import {
-  type ExplorerBehaviour,
-  explorerDefaults,
-  type ExplorerIcons,
-  type ExplorerTileStyle,
-} from './useExplorerConfig'
-import { createExplorerDrag } from './useExplorerDrag'
-import { createExplorerEvents } from './useExplorerEvents'
+import { computed, inject, provide, ref, shallowRef } from 'vue'
+import type { ExplorerBehaviour, ExplorerIcons, ExplorerTileStyle } from './useExplorerConfig'
+import { explorerDefaults } from './internal/config'
+import { createExplorerDrag } from './internal/drag'
+import { createExplorerEvents } from './internal/events'
 import {
   canMoveInto,
   type ExplorerNode,
   type ExplorerOrder,
   groupByParent,
   pathOf,
-} from './useExplorerTree'
+} from './internal/tree'
 import type {
   ExplorerFolderInput,
   ExplorerOptions,
   ExplorerSource,
 } from './internal/types'
 
-export * from './internal/types'
+import { explorerKey } from './internal/context'
+
+export type { ExplorerFolderInput, ExplorerMove, ExplorerOptions, ExplorerSource } from './internal/types'
 
 function createExplorer<T = unknown>(
   source: ExplorerSource<T>,
@@ -306,8 +297,6 @@ export function disposeExplorer(key?: string) {
   if (key === undefined) instances.clear()
   else instances.delete(key)
 }
-
-export const explorerKey: InjectionKey<ExplorerApi> = Symbol('s99ab:explorer')
 
 export function provideExplorer<T>(explorer: ExplorerApi<T>) {
   provide(explorerKey, explorer as ExplorerApi)

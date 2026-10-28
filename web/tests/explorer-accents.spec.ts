@@ -5,7 +5,7 @@ import {
   accentTriplet,
   applyExplorerAccents,
   explorerAccentCss,
-} from '../src/composables/explorer/useExplorerAccents'
+} from '../src/composables/explorer/internal/accents'
 
 const styleEl = () => document.getElementById('s99ab-explorer-accents')
 

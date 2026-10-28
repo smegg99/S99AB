@@ -1,11 +1,11 @@
-// web/src/composables/explorer/useExplorerEvents.ts
+// web/src/composables/explorer/internal/events.ts
 
 // Explorer events, raised by the composable so screens without <UiExplorer> get them too.
 // <UiExplorer> re-emits them as Vue events.
 
 import { onScopeDispose } from 'vue'
-import type { ExplorerFolderInput, ExplorerMove } from './internal/types'
-import type { ExplorerNode } from './useExplorerTree'
+import type { ExplorerFolderInput, ExplorerMove } from './types'
+import type { ExplorerNode } from './tree'
 
 export interface ExplorerEventMap<T = unknown> {
   /** `null` is the root, which has no node. */

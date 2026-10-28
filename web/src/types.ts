@@ -117,22 +117,22 @@ export type {
   ExplorerKind,
   ExplorerNode,
   ExplorerOrder,
-} from './composables/explorer/useExplorerTree'
+} from './composables/explorer/internal/tree'
 
 export type { ExplorerActions } from './composables/explorer/useExplorerNode'
 export type { ExplorerFaceState } from './composables/explorer/useExplorerFace'
 export type {
   ExplorerDrag,
   ExplorerDragHost,
-} from './composables/explorer/useExplorerDrag'
-export type { ExplorerFolderDraft } from './composables/explorer/useExplorerFolders'
+} from './composables/explorer/internal/drag'
+export type { ExplorerFolderDraft } from './composables/explorer/internal/folders'
 export type {
   ExplorerEventMap,
   ExplorerEventName,
   ExplorerEvents,
   ExplorerListener,
-} from './composables/explorer/useExplorerEvents'
-export type { ExplorerKeyHost } from './composables/explorer/useExplorerKeys'
+} from './composables/explorer/internal/events'
+export type { ExplorerKeyHost } from './composables/explorer/internal/keys'
 export type {
   ExplorerPickMods,
   ExplorerSelection,

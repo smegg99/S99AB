@@ -1,10 +1,10 @@
-// web/src/composables/explorer/useExplorerMarquee.ts
+// web/src/composables/explorer/internal/marquee.ts
 
 // Rubber-band selection from a press on empty space, using mouse events (the background is not draggable).
 // Bound to the scroll region, since the grid does not cover the empty space below the tiles.
 
 import { onScopeDispose, shallowRef } from 'vue'
-import { TILE_ATTR } from './useExplorerKeys'
+import { TILE_ATTR } from './keys'
 
 /** Band rectangle relative to the region it is drawn in. */
 export interface ExplorerBand {

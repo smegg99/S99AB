@@ -7,7 +7,7 @@ import type {
   ExplorerIcons,
   ExplorerTileStyle,
 } from '../useExplorerConfig'
-import type { ExplorerKind, ExplorerNode, ExplorerOrder } from '../useExplorerTree'
+import type { ExplorerKind, ExplorerNode, ExplorerOrder } from './tree'
 
 /** One reposition. `index` is the slot among the destination's children. */
 export interface ExplorerMove {
