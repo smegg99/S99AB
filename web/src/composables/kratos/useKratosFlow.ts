@@ -11,6 +11,7 @@ import type {
   KratosNotice,
   KratosSuccess,
 } from './internal/api'
+import { kratosFetch, returnToQuery } from './internal/transport'
 
 export type {
   KratosConfig,
@@ -56,32 +57,9 @@ export function useKratosFlow(
   // Set once the browser is navigating away, so the spinner stays up.
   const leaving = ref(false)
 
-  // fetch has no timeout; a proxy in front of a stopped Kratos never settles.
-  // Past this the request rejects into the error state with a retry.
-  const TIMEOUT_MS = 15_000
-
-  function deadline(): AbortSignal | undefined {
-    // Feature-detected: jsdom does not always have AbortSignal.timeout.
-    return typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal
-      ? AbortSignal.timeout(TIMEOUT_MS)
-      : undefined
-  }
-
-  function ask(url: string, init: RequestInit = {}) {
-    // The JSON accept header makes Kratos answer with the flow instead of a redirect.
-    return fetch(url, {
-      credentials: 'include',
-      signal: deadline(),
-      ...init,
-      headers: { accept: 'application/json', ...init.headers },
-    })
-  }
-
   async function createFlow(carryReturnTo = true): Promise<KratosFlow> {
-    const query = carryReturnTo && options.returnTo
-      ? `?return_to=${encodeURIComponent(options.returnTo)}`
-      : ''
-    const res = await ask(
+    const query = carryReturnTo ? returnToQuery(options.returnTo) : ''
+    const res = await kratosFetch(
       `${config.basePath}/self-service/${flowKind()}/browser${query}`,
     )
     if (!res.ok) {
@@ -108,7 +86,7 @@ export function useKratosFlow(
   }
 
   async function readFlow(id: string): Promise<KratosFlow> {
-    const res = await ask(
+    const res = await kratosFetch(
       `${config.basePath}/self-service/${flowKind()}/flows?id=${encodeURIComponent(id)}`,
     )
     // 410 expired, 403 wrong CSRF cookie, 404 unknown id: all fixed by a new flow.
@@ -222,7 +200,7 @@ export function useKratosFlow(
         if (typeof value === 'string') body.append(key, value)
       }
 
-      const res = await ask(action, { method: 'POST', body })
+      const res = await kratosFetch(action, { method: 'POST', body })
 
       // Next steps and validation failures both arrive as the flow with 400.
       if (res.status === 400) {

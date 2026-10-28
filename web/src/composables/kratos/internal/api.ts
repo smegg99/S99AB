@@ -7,6 +7,7 @@ import { config } from './types'
 import { resolveReturnTo } from './route'
 import { useAuthPaths } from '../useAuthPaths'
 import type { KratosFlow, KratosMessage, KratosNode } from './types'
+import { kratosFetch, returnToQuery } from './transport'
 
 /** One `continue_with` entry; list order is not priority (see nextStop). */
 export interface KratosContinueWith {
@@ -71,13 +72,7 @@ export async function kratosSignOut(options: { returnTo?: string } = {}): Promis
   const path = resolveReturnTo(options.returnTo, origin)
     || resolveReturnTo(useAuthPaths().homePath || '/', origin)
 
-  const ask = (to: string) => {
-    const query = to ? `?return_to=${encodeURIComponent(to)}` : ''
-    return fetch(`${config.basePath}/self-service/logout/browser${query}`, {
-      credentials: 'include',
-      headers: { accept: 'application/json' },
-    })
-  }
+  const ask = (to: string) => kratosFetch(`${config.basePath}/self-service/logout/browser${returnToQuery(to)}`)
 
   let res = await ask(path ? origin + path : '')
   // An unlisted return_to is refused with 400; sign out without it.
@@ -113,8 +108,7 @@ export function kratosRefreshSession(options: { returnTo?: string } = {}): void 
   if (typeof window === 'undefined') return
 
   const to = resolveReturnTo(options.returnTo, window.location.origin)
-  const query = to ? `&return_to=${encodeURIComponent(to)}` : ''
-  window.location.href = `${config.basePath}/self-service/login/browser?refresh=true${query}`
+  window.location.href = `${config.basePath}/self-service/login/browser?refresh=true${returnToQuery(to, '&')}`
 }
 
 export function flowIdFromLocation(): string | null {

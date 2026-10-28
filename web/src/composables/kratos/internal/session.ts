@@ -3,6 +3,7 @@
 import { ref } from 'vue'
 import { config } from './types'
 import type { SessionIdentity, SessionStore, SessionHost } from '../useSession'
+import { kratosFetch } from './transport'
 
 let host: SessionHost | null = null
 
@@ -29,10 +30,7 @@ let inFlight: Promise<void> | null = null
 export const browser = () => typeof window !== 'undefined'
 
 export async function whoami(): Promise<SessionIdentity | null> {
-  const res = await fetch(`${config.basePath}/sessions/whoami`, {
-    credentials: 'include',
-    headers: { accept: 'application/json' },
-  })
+  const res = await kratosFetch(`${config.basePath}/sessions/whoami`)
   // 401 means signed out.
   return res.ok
     ? ((await res.json()) as { identity: SessionIdentity }).identity
