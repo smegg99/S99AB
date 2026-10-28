@@ -87,3 +87,11 @@ func TestIsConnectionLostReadsWrappedErrors(t *testing.T) {
 		t.Fatal("a closed connection was not seen as lost")
 	}
 }
+
+// go-imap formats read errors with %v, so the chain is gone and only the text says what happened.
+func TestIsConnectionLostReadsGoIMAPsFlattenedErrors(t *testing.T) {
+	err := fmt.Errorf("in response: cannot read tag: %v", "read tcp 10.0.0.2:51000->10.0.0.1:143: read: connection reset by peer")
+	if !isConnectionLost(err) {
+		t.Fatal("a reset during login was not seen as lost")
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net"
+	"strings"
 	"syscall"
 )
 
@@ -44,9 +45,16 @@ func ValidateCredentials(cfg Config) error {
 	return nil
 }
 
+// isConnectionLost matches the error chain, then the text: go-imap formats read errors with %v.
 func isConnectionLost(err error) bool {
 	for _, lost := range []error{io.EOF, io.ErrUnexpectedEOF, io.ErrClosedPipe, net.ErrClosed, syscall.ECONNRESET, syscall.EPIPE} {
 		if errors.Is(err, lost) {
+			return true
+		}
+	}
+	text := err.Error()
+	for _, lost := range []string{"EOF", "connection reset", "broken pipe", "use of closed network connection"} {
+		if strings.Contains(text, lost) {
 			return true
 		}
 	}
