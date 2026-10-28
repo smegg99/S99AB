@@ -94,6 +94,8 @@ describe('useSession', () => {
   // Unknown is not signed out; a server render must not show a sign-in prompt to signed-in users.
   it('does not claim to be signed out before it has asked', () => {
     vi.unstubAllGlobals()
+    // A whoami that never answers is the state before the first answer, without the network.
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})))
     const s = useSession()
 
     expect(s.ready.value).toBe(false)
