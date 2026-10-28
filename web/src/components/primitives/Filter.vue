@@ -20,6 +20,7 @@
 
 <script setup lang="ts">
 import { onScopeDispose, ref, useTemplateRef, watch } from 'vue'
+import { debounced } from '../../browser/time'
 
 const { modelValue = '', label, debounce = 0 } = defineProps<{
   modelValue?: string
@@ -45,21 +46,18 @@ watch(() => modelValue, (value) => {
   shown.value = value
 })
 
-let timer: ReturnType<typeof setTimeout> | undefined
 function send(text: string) {
-  clearTimeout(timer)
+  later.cancel()
   if (text !== modelValue) emit('update:modelValue', text)
 }
-onScopeDispose(() => clearTimeout(timer))
+const later = debounced(send, () => debounce)
+onScopeDispose(later.cancel)
 
 function typed(value: string | null) {
   const text = value ?? ''
   shown.value = text
   if (!debounce || !text) send(text)
-  else {
-    clearTimeout(timer)
-    timer = setTimeout(() => send(text), debounce)
-  }
+  else later.run(text)
 }
 
 function escape() {

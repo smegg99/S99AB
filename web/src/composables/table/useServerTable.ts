@@ -3,10 +3,11 @@
 // Types and defaults live in ./internal and are re-exported here.
 
 import { useQuery } from '@pinia/colada'
-import { computed, type Ref, ref, toValue, watch } from 'vue'
+import { computed, type Ref, ref, toValue, watch, onScopeDispose } from 'vue'
 import { useDelayed } from '../useDelay'
 import { decodeSort, encodeSort, routerFor, tableConfig } from './internal/config'
 import type { Page, ServerTableOptions, SortItem, TableParams } from './internal/types'
+import { debounced } from '../../browser/time'
 
 export type {
   DataTableHeader,
@@ -54,14 +55,11 @@ export function useTableState(options: ServerTableOptions): TableState {
   const search = ref(initial[`${prefix}q`] ?? '')
   const debouncedSearch = ref(search.value)
 
-  let debounceHandle: ReturnType<typeof setTimeout> | undefined
-
-  watch(search, (value) => {
-    if (debounceHandle !== undefined) clearTimeout(debounceHandle)
-    debounceHandle = setTimeout(() => {
-      debouncedSearch.value = value
-    }, options.searchDebounce ?? 300)
-  })
+  const settleSearch = debounced((value: string) => {
+    debouncedSearch.value = value
+  }, options.searchDebounce ?? 300)
+  watch(search, value => settleSearch.run(value))
+  onScopeDispose(settleSearch.cancel)
 
   // A filter or page-size change resets the page number.
   watch([debouncedSearch, limit], () => {

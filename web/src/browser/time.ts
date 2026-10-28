@@ -10,3 +10,21 @@ export function clock(date: Date): string {
 export function untilNextSecond(date: Date): number {
   return 1000 - date.getMilliseconds()
 }
+
+/** Calls `fn` once `ms` has passed without another `run`, with the last arguments; `cancel` drops it. */
+export function debounced<A extends unknown[]>(fn: (...args: A) => void, ms: number | (() => number)) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  return {
+    run(...args: A) {
+      clearTimeout(timer)
+      timer = setTimeout(() => {
+        timer = undefined
+        fn(...args)
+      }, typeof ms === 'function' ? ms() : ms)
+    },
+    cancel() {
+      clearTimeout(timer)
+      timer = undefined
+    },
+  }
+}

@@ -2,7 +2,7 @@
 import { effectScope } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useNow } from '../src/composables/primitives/useNow'
-import { clock, untilNextSecond } from '../src/browser/time'
+import { clock, debounced, untilNextSecond } from '../src/browser/time'
 
 const at = (h: number, m: number, s: number, ms = 0) => new Date(2026, 8, 25, h, m, s, ms)
 
@@ -127,5 +127,36 @@ describe('the current time', () => {
     scope.stop()
     expect(vi.getTimerCount()).toBe(0)
     expect(listeners.size).toBe(0)
+  })
+})
+
+describe('debounced', () => {
+  beforeEach(() => vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] }))
+  afterEach(() => vi.useRealTimers())
+
+  it('runs once, with the last arguments, after the wait', async () => {
+    const fn = vi.fn()
+    const later = debounced(fn, 100)
+    later.run('a')
+    await vi.advanceTimersByTimeAsync(60)
+    later.run('b')
+    await vi.advanceTimersByTimeAsync(60)
+    expect(fn).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(40)
+    expect(fn).toHaveBeenCalledExactlyOnceWith('b')
+  })
+
+  it('drops a pending call on cancel and reads the wait each time', async () => {
+    const fn = vi.fn()
+    let wait = 100
+    const later = debounced(fn, () => wait)
+    later.run()
+    later.cancel()
+    await vi.advanceTimersByTimeAsync(200)
+    expect(fn).not.toHaveBeenCalled()
+    wait = 10
+    later.run()
+    await vi.advanceTimersByTimeAsync(10)
+    expect(fn).toHaveBeenCalledOnce()
   })
 })
