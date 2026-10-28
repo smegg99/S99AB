@@ -98,6 +98,22 @@ export default defineNuxtConfig({
 - `apipage.Order` always ends with the fallback's columns.
 - `daemon.Listen` refuses a path that holds anything but a socket.
 
+These keep their signatures but behave differently:
+
+- `kratosauth.Client.Whoami` looks for the session cookie by name
+  (`Options.SessionCookie`, default `ory_kratos_session`, plus Ory Network's
+  `ory_session_*`). Other cookies alone are no session. `kratosauthtest.Fake`
+  maps that cookie's value, not the whole `Cookie` header.
+- Keto `Delete`, `Subjects` and `Objects` return `ErrSelector` for an empty
+  field instead of matching everything.
+- `storage.Sanitise` and `storage.Derive` return `ErrTooLarge` for an image
+  over `MaxPixels` (40 megapixels).
+- The Kratos admin and flow clients default to a 10 s timeout.
+- `outbox.Worker.Drain` returns results it could not record, and a panicking
+  handler counts as a failed attempt.
+- `sse.WriteEvent` returns `ErrField` for a line break in an id or event type,
+  and `ErrEncode` for data it cannot encode; the handler skips such events.
+
 ## Development
 
 ```sh
