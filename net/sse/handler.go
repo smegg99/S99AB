@@ -5,6 +5,7 @@ package sse
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"time"
@@ -83,8 +84,14 @@ func Handler(b *Broker, opts ...HandlerOption) http.Handler {
 	})
 }
 
+// ErrField refuses an id or event type with a line break, which would end the field and start a forged one.
+var ErrField = errors.New("sse: line break in id or event type")
+
 // WriteEvent writes one text/event-stream event, one `data:` line per payload line.
 func WriteEvent(w io.Writer, ev Event) (int, error) {
+	if bytes.ContainsAny([]byte(ev.ID+ev.Type), "\r\n") {
+		return 0, ErrField
+	}
 	var buf bytes.Buffer
 	if ev.ID != "" {
 		buf.WriteString("id: ")
@@ -105,6 +112,7 @@ func WriteEvent(w io.Writer, ev Event) (int, error) {
 	if payload == nil {
 		buf.WriteString("data\n")
 	} else {
+		payload = bytes.ReplaceAll(bytes.ReplaceAll(payload, []byte("\r\n"), []byte("\n")), []byte("\r"), []byte("\n"))
 		for _, line := range bytes.Split(payload, []byte{'\n'}) {
 			buf.WriteString("data: ")
 			buf.Write(line)

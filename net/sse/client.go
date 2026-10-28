@@ -20,6 +20,7 @@ const maxLine = 1 << 20
 func NewDecoder(r io.Reader) *Decoder {
 	sc := bufio.NewScanner(r)
 	sc.Buffer(make([]byte, 0, 64<<10), maxLine)
+	sc.Split(scanLines)
 	return &Decoder{sc: sc}
 }
 
@@ -80,4 +81,30 @@ func (d *Decoder) Decode() (Event, error) {
 		return Event{}, err
 	}
 	return Event{}, io.EOF
+}
+
+// scanLines splits on CRLF, CR or LF, the three line ends the format allows.
+func scanLines(data []byte, atEOF bool) (int, []byte, error) {
+	for i, c := range data {
+		switch c {
+		case '\n':
+			return i + 1, data[:i], nil
+		case '\r':
+			if i+1 < len(data) {
+				if data[i+1] == '\n' {
+					return i + 2, data[:i], nil
+				}
+				return i + 1, data[:i], nil
+			}
+			// A CR at the end of the buffer may be the start of a CRLF.
+			if atEOF {
+				return i + 1, data[:i], nil
+			}
+			return 0, nil, nil
+		}
+	}
+	if atEOF && len(data) > 0 {
+		return len(data), data, nil
+	}
+	return 0, nil, nil
 }
