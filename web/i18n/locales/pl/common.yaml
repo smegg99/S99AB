@@ -66,3 +66,6 @@ highContrast:
 pending:
   value: "Poczekaj, aż się skończy."
   description: "Why a dialog's key is disabled while what it started is still running (PromptDialog)"
+location:
+  value: "Położenie"
+  description: "UiBreadcrumbs' accessible name: the nav landmark that shows where the page sits"

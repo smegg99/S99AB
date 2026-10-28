@@ -52,6 +52,7 @@ export type I18nKey =
   | 'common.language'
   | 'common.linkNewTab'
   | 'common.loading'
+  | 'common.location'
   | 'common.menu'
   | 'common.noResults'
   | 'common.noResultsHint'
