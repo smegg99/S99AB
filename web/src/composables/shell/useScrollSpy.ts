@@ -3,31 +3,16 @@
 import { getCurrentInstance, onMounted, onScopeDispose, ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { quietScroll, regionInset, scrollSettling } from './internal/scroll'
+import { REGION, tick } from './internal/region'
 
 // Mirrors the on-screen section of a long page into the URL hash with `replace`.
 // A scroll listener: IntersectionObserver cannot answer "last section whose top has passed".
-
-/** The region UiAppShell scrolls. */
-const REGION = '.shell__main'
 
 /** Slack below the region's top, so rounding does not flicker between two sections. */
 const SLACK = 4
 
 /** How long to look for the region before giving up, in ms. */
 const PATIENCE = 2000
-
-/** One tick: rAF or a timeout, since rAF pauses in a hidden tab. */
-const tick = () => new Promise<void>((resolve) => {
-  let done = false
-  const once = () => {
-    if (done) return
-    done = true
-    resolve()
-  }
-
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(once)
-  setTimeout(once, 32)
-})
 
 export interface ScrollSpy {
   /** The section id the user is in, or empty above the first. */

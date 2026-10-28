@@ -11,6 +11,8 @@
  * - Within the current page: animate. Onto another page: jump.
  */
 
+import { REGION, tick } from './region'
+
 /** The route fields this module reads. */
 export interface ScrollRoute {
   path: string
@@ -21,9 +23,6 @@ export interface ScrollRoute {
 export interface ScrollSaved {
   top?: number
 }
-
-/** The region UiAppShell scrolls. */
-const REGION = '.shell__main'
 
 /**
  * Module state on a `Symbol.for` cell, because the layer can be loaded as two
@@ -68,19 +67,6 @@ async function land(main: Element, top: number, behavior: ScrollBehavior) {
     if (Math.abs(main.scrollTop - top) <= 2 || Date.now() > deadline) break
   }
 }
-
-/** One tick: rAF or a timeout, since rAF pauses in a hidden tab. */
-const tick = () => new Promise<void>((resolve) => {
-  let done = false
-  const once = () => {
-    if (done) return
-    done = true
-    resolve()
-  }
-
-  if (typeof requestAnimationFrame === 'function') requestAnimationFrame(once)
-  setTimeout(once, 32)
-})
 
 /**
  * Waits for an element to render (the region on first load, an anchor on a new
