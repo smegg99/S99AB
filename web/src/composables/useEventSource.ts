@@ -13,6 +13,8 @@ import {
   type Ref,
 } from 'vue'
 
+import { config } from '../internal/eventSource'
+
 /** connecting: reaching for the stream. open: attached. closed: given up. */
 export type EventSourceStatus = 'connecting' | 'open' | 'closed'
 
@@ -30,17 +32,6 @@ export interface EventSourceConfig {
   withCredentials: boolean
   /** Backoff once the browser has closed the stream. */
   reconnect: EventSourceReconnect
-}
-
-const config: EventSourceConfig = {
-  withCredentials: true,
-  reconnect: { delay: 1000, maxDelay: 15000, backoff: 2 },
-}
-
-/** Overrides the defaults every useEventSource inherits; `reconnect` is merged. */
-export function configureEventSource(patch: Partial<EventSourceConfig>): void {
-  if (patch.withCredentials !== undefined) config.withCredentials = patch.withCredentials
-  if (patch.reconnect) Object.assign(config.reconnect, patch.reconnect)
 }
 
 export function useEventSourceConfig(): Readonly<EventSourceConfig> {

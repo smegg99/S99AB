@@ -2,11 +2,8 @@
 
 import { effectScope, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  configureEventSource,
-  useEventSource,
-  useEventSourceConfig,
-} from '../src/composables/useEventSource'
+import { useEventSource, useEventSourceConfig } from '../src/composables/useEventSource'
+import { configureEventSource } from '../src/internal/eventSource'
 
 // happy-dom has no EventSource, so the tests supply one they control.
 class FakeEventSource {

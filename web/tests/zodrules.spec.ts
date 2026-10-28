@@ -4,7 +4,8 @@ import { defineComponent, h } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { fieldSchema, useZodForm, useZodRules, type ZodLike } from '../src/composables/useZodRules'
+import { useZodForm, useZodRules, type ZodLike } from '../src/composables/useZodRules'
+import { fieldSchema } from '../src/internal/zod'
 import { fakeI18n } from './fake-i18n'
 
 // Shaped like Hey API output for the demo contract, including optional-with-default.

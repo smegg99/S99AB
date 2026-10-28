@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { formatBytes, kindKey } from '../src/composables/releases/useReleases'
-import { detectOS } from '../src/composables/usePlatform'
+import { detectOS } from '../src/internal/platform'
 import { compareVersions } from '../src/composables/releases/useUpdateCheck'
 
 describe('compareVersions', () => {
