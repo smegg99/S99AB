@@ -1,9 +1,11 @@
 // web/src/composables/appearance/useAppearance.ts
 
-import { computed, onMounted, onScopeDispose, reactive, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, onScopeDispose, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { previewColors, rebuildThemes, themeState } from '../../theme'
-import { originOf, runThemeTransition, type ThemeTransition } from './useThemeTransition'
+import { originOf, runThemeTransition, type ThemeTransition } from './internal/themeTransition'
+
+import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, read, write, erase, themePref, contrastPref } from './internal/appearance'
 
 /**
  * Light/dark and contrast. Light and dark are the two registered themes;
@@ -29,38 +31,6 @@ export interface AppearanceConfig {
 
 export type AppearanceConfigPatch = Partial<AppearanceConfig>
 
-// Set once per app, so every toggle writes the same keys.
-const config = reactive<AppearanceConfig>({
-  storageKey: 's99ab.theme',
-  contrastKey: '',
-  lock: '',
-})
-
-/** Called by the layer's Nuxt plugin with the app's s99ab.appearance config. */
-export function configureAppearance(patch: AppearanceConfigPatch) {
-  Object.assign(config, patch)
-}
-
-export function appearanceConfig(): AppearanceConfig {
-  return config
-}
-
-/** Whether the OS is asking for more contrast. False where it cannot be asked. */
-export function prefersMoreContrast(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false
-  }
-  return window.matchMedia('(prefers-contrast: more)').matches
-}
-
-/** Whether the OS is asking for a dark palette. False where it cannot be asked. */
-export function prefersDark(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false
-  }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
 /**
  * An external source for the live appearance, such as a desktop shell's OS
  * watcher. A getter returning undefined falls through to the media query.
@@ -71,78 +41,9 @@ export interface AppearanceSource {
   accent?: () => string | undefined
 }
 
-// One per process; a shallowRef so a late registration reaches mounted toggles.
-const source = shallowRef<AppearanceSource>({})
-
-/**
- * Points the appearance at an external source, merged per axis. Used by the
- * s99wails bridge.
- */
-export function registerAppearanceSource(patch: AppearanceSource): void {
-  source.value = { ...source.value, ...patch }
-}
-
-/** Drops back to the OS media query on every axis. For tests and teardown. */
-export function resetAppearanceSource(): void {
-  source.value = {}
-}
-
-// Makes the OS preferences reactive, since matchMedia().matches is a plain read.
-// Listeners attach per call site, so they bind to the matchMedia present then.
-const systemTick = ref(0)
-
-/** Attaches to the current matchMedia and returns the teardown. */
-function listenForSystem(): () => void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {}
-  }
-
-  const bump = () => systemTick.value++
-  const lists = ['(prefers-color-scheme: dark)', '(prefers-contrast: more)']
-    .map(query => window.matchMedia(query))
-
-  for (const list of lists) list.addEventListener('change', bump)
-
-  return () => {
-    for (const list of lists) list.removeEventListener('change', bump)
-  }
-}
-
-function read(key: string): string | null {
-  try {
-    return localStorage.getItem(key)
-  }
-  catch {
-    // Private mode and blocked storage both throw.
-    return null
-  }
-}
-
-function write(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value)
-  }
-  catch {
-    // As above.
-  }
-}
-
-function erase(key: string) {
-  try {
-    localStorage.removeItem(key)
-  }
-  catch {
-    // As above.
-  }
-}
-
 /** The three settings each axis offers: two explicit picks and "follow the OS". */
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type ContrastMode = 'normal' | 'high' | 'system'
-
-// The user's pick per axis, as opposed to what it resolves to. Seeded from storage on mount.
-const themePref = ref<ThemeMode>('system')
-const contrastPref = ref<ContrastMode>('system')
 
 /**
  * Keys are getters so a changed prop is picked up. Unset, both come from

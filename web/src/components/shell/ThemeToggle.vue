@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { appearanceConfig } from '../../composables/appearance/useAppearance'
+import { appearanceConfig } from '../../composables/appearance/internal/appearance'
 import { useThemePreference } from '../../composables/appearance/useThemePreference'
 import { useTranslate } from '../../composables/useTranslate'
 

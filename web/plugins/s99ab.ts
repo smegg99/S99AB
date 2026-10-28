@@ -5,11 +5,8 @@
 import AuthDialog from '../src/components/auth/AuthDialog.vue'
 import ConfirmDialog from '../src/components/overlay/ConfirmDialog.vue'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
-import {
-  type AppearanceConfig,
-  appearanceConfig,
-  configureAppearance,
-} from '../src/composables/appearance/useAppearance'
+import type { AppearanceConfig } from '../src/composables/appearance/useAppearance'
+import { appearanceConfig, configureAppearance } from '../src/composables/appearance/internal/appearance'
 import { applyLite, configureEffects, effectsConfig } from '../src/composables/appearance/internal/effects'
 import {
   type AuthPaths,
@@ -41,22 +38,15 @@ import type { ReleasesConfig } from '../src/composables/releases/useReleases'
 import { configureReleases } from '../src/composables/releases/internal/api'
 import type { TableConfig } from '../src/composables/table/useServerTable'
 import { configureTable, registerTableRouter } from '../src/composables/table/internal/config'
-import {
-  configureThemeTransition,
-  type ThemeTransitionConfig,
-} from '../src/composables/appearance/useThemeTransition'
+import { configureThemeTransition, type ThemeTransitionConfig } from '../src/composables/appearance/internal/themeTransition'
 import ShortcutHelp from '../src/components/shortcut/ShortcutHelp.vue'
 import {
   registerShortcutHelp,
   registerShortcuts,
   type ShortcutMap,
 } from '../src/internal/shortcut'
-import {
-  applyTexture,
-  configureTexture,
-  type TextureConfigPatch,
-  useTexture,
-} from '../src/composables/appearance/useTexture'
+import { type TextureConfigPatch, useTexture } from '../src/composables/appearance/useTexture'
+import { applyTexture, configureTexture } from '../src/composables/appearance/internal/texture'
 import { configureToast, type ToastConfigPatch } from '../src/composables/toast/internal/config'
 import { type PaletteName, paletteTexture } from '../src/theme/palette'
 

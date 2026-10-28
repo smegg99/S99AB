@@ -6,11 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createVuetify, useTheme } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
-import {
-  registerAppearanceSource,
-  resetAppearanceSource,
-  useAppearance,
-} from '../src/composables/appearance/useAppearance'
+import { useAppearance } from '../src/composables/appearance/useAppearance'
+import { registerAppearanceSource, resetAppearanceSource } from '../src/composables/appearance/internal/appearance'
 import { s99abTheme } from '../src/theme'
 
 function fresh() {

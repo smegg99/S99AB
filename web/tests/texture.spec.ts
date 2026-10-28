@@ -3,14 +3,8 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { basename, resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import {
-  DEFAULT_PLANES,
-  applyTexture,
-  configureTexture,
-  TEXTURES,
-  textureConfig,
-  useTexture,
-} from '../src/composables/appearance/useTexture'
+import { useTexture } from '../src/composables/appearance/useTexture'
+import { DEFAULT_PLANES, applyTexture, configureTexture, TEXTURES, textureConfig } from '../src/composables/appearance/internal/texture'
 
 const root = document.documentElement
 
