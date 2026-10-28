@@ -2,7 +2,7 @@
 
 import { describe, expect, it } from 'vitest'
 import { covered } from '../src/composables/explorer/internal/marquee'
-import { TILE_ATTR } from '../src/composables/explorer/internal/keys'
+import { TILE_ATTR } from '../src/browser/tiles'
 
 /** A grid of tiles at given boxes; happy-dom has no layout, so the geometry is fed directly. */
 function grid(boxes: Record<string, [number, number, number, number]>): HTMLElement {

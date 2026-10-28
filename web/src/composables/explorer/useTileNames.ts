@@ -1,6 +1,6 @@
 // web/src/composables/explorer/useTileNames.ts
 import { onScopeDispose, shallowRef } from 'vue'
-import { tileOf } from '../../browser/tiles'
+import { tileOf, TILE_ATTR } from '../../browser/tiles'
 
 /**
  * Tooltip with a tile's full name when truncated, and with `badge` its corner number; bind with v-on on an Explorer grid.
@@ -14,7 +14,7 @@ export function useTileNames(badge?: (id: string) => string | null, delay = 0) {
   let pressed: string | null = null
   let timer: ReturnType<typeof setTimeout> | undefined
 
-  const idOf = (tile: HTMLElement) => tile.getAttribute('data-s99ab-tile')
+  const idOf = (tile: HTMLElement) => tile.getAttribute(TILE_ATTR)
 
   function hide() {
     clearTimeout(timer)

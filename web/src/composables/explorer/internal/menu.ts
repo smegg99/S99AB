@@ -3,7 +3,7 @@
 // State and labels for the <UiExplorer> tile context menu; tiles reach it through injected actions.
 
 import { computed, shallowRef, watch } from 'vue'
-import { TILE_ATTR } from './keys'
+import { tileById } from '../../../browser/tiles'
 import { provideExplorerActions } from './actions'
 import type { ExplorerNode } from './tree'
 import { useTranslate } from '../../useTranslate'
@@ -74,7 +74,8 @@ export function useExplorerMenu<T = unknown>(host: ExplorerMenuHost<T>) {
     const active = document.activeElement
     const kept = active && active !== document.body && !host.content?.()?.contains(active)
     if (open || id === undefined || kept) return
-    host.root?.()?.querySelector<HTMLElement>(`[${TILE_ATTR}="${CSS.escape(id)}"]`)?.focus()
+    const root = host.root?.()
+    if (root) tileById(root, id)?.focus()
   }, { flush: 'post' })
 
   return {

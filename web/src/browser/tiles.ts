@@ -1,5 +1,12 @@
 // web/src/browser/tiles.ts
-import type { Ref } from 'vue'
+
+/** The attribute every Explorer tile carries, holding its id. */
+export const TILE_ATTR = 'data-s99ab-tile'
+
+/** The tile drawn for `id` under root, if it is drawn. */
+export function tileById(root: ParentNode, id: string): HTMLElement | null {
+  return root.querySelector<HTMLElement>(`[${TILE_ATTR}="${CSS.escape(id)}"]`)
+}
 
 /** The Explorer tile an event happened in, if any. */
 export function tileOf(target: EventTarget | null): HTMLElement | null {
@@ -8,7 +15,7 @@ export function tileOf(target: EventTarget | null): HTMLElement | null {
 
 /** Resolves with an Explorer tile once drawn, or null after `patience` ms. */
 export function whenTile(root: HTMLElement, id: string, patience = 3000): Promise<HTMLElement | null> {
-  const find = () => root.querySelector<HTMLElement>(`[data-s99ab-tile="${CSS.escape(id)}"]`)
+  const find = () => tileById(root, id)
   const now = find()
   if (now) return Promise.resolve(now)
   return new Promise((resolve) => {
@@ -33,17 +40,17 @@ export function middleClick(open: (id: string) => void) {
       if (event.button === 1 && tileOf(event.target)) event.preventDefault()
     },
     auxclick(event: MouseEvent) {
-      const id = event.button === 1 ? tileOf(event.target)?.getAttribute('data-s99ab-tile') : null
+      const id = event.button === 1 ? tileOf(event.target)?.getAttribute(TILE_ATTR) : null
       if (id) open(id)
     },
   }
 }
 
 /** Shift+click toggles one tile instead of the layer's range pick. Bind as a capturing click handler on an Explorer grid. */
-export function shiftPick(picked: Ref<string[]>) {
+export function shiftPick(picked: { value: string[] }) {
   return (event: MouseEvent) => {
     if (!event.shiftKey) return
-    const id = tileOf(event.target)?.getAttribute('data-s99ab-tile')
+    const id = tileOf(event.target)?.getAttribute(TILE_ATTR)
     if (!id) return
     event.stopPropagation()
     event.preventDefault()

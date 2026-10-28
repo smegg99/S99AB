@@ -1,11 +1,9 @@
 // web/src/composables/explorer/internal/keys.ts
 
+import { TILE_ATTR } from '../../../browser/tiles'
 // Grid keyboard: arrows move focus and selection, ctrl moves focus only, shift
 // extends, space picks. Enter is handled by the tile.
 // Columns and tiles are read from the DOM; a custom tile must spread useExplorerNode's bindings.
-
-/** Marks a focusable tile, and carries its node id. */
-export const TILE_ATTR = 'data-s99ab-tile'
 
 export interface ExplorerKeyMods {
   ctrl: boolean

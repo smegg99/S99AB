@@ -4,7 +4,7 @@
 // Bound to the scroll region, since the grid does not cover the empty space below the tiles.
 
 import { onScopeDispose, shallowRef } from 'vue'
-import { TILE_ATTR } from './keys'
+import { TILE_ATTR } from '../../../browser/tiles'
 
 /** Band rectangle relative to the region it is drawn in. */
 export interface ExplorerBand {

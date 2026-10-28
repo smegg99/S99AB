@@ -6,7 +6,7 @@
 import { computed, type MaybeRefOrGetter, onScopeDispose, toValue } from 'vue'
 import { useExplorerContext } from './useExplorer'
 import { useExplorerFace } from './useExplorerFace'
-import { TILE_ATTR } from './internal/keys'
+import { TILE_ATTR } from '../../browser/tiles'
 import { useExplorerSelectionContext } from './useExplorerSelection'
 import type { ExplorerNode } from './internal/tree'
 import { useTranslate } from '../useTranslate'
