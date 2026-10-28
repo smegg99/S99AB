@@ -7,17 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createVuetify } from 'vuetify'
 import AppShell from '../src/components/shell/AppShell.vue'
 import Flow from '../src/components/shell/Flow.vue'
-import {
-  acquireSlot,
-  applyGround,
-  configureGround,
-  groundConfig,
-  groundShape,
-  flowStops,
-  liveInstances,
-  loadNeat,
-  releaseSlot,
-} from '../src/composables/appearance/useFlow'
+import { acquireSlot, applyGround, configureGround, groundConfig, groundShape, flowStops, liveInstances, loadNeat, releaseSlot } from '../src/composables/appearance/internal/flow'
 
 beforeEach(() => {
   while (liveInstances() > 0) releaseSlot()
@@ -82,7 +72,7 @@ describe('loading the library', () => {
   // a bare or computed specifier either becomes a build dependency or fails at runtime.
   it('names no module specifier of its own', () => {
     const source = readFileSync(
-      resolve(process.cwd(), 'src/composables/appearance/useFlow.ts'),
+      resolve(process.cwd(), 'src/composables/appearance/internal/flow.ts'),
       'utf8',
     )
 

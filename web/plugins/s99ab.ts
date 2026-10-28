@@ -10,11 +10,7 @@ import {
   appearanceConfig,
   configureAppearance,
 } from '../src/composables/appearance/useAppearance'
-import {
-  applyLite,
-  configureEffects,
-  effectsConfig,
-} from '../src/composables/appearance/useEffects'
+import { applyLite, configureEffects, effectsConfig } from '../src/composables/appearance/internal/effects'
 import {
   type AuthPaths,
   configureAuthPaths,
@@ -34,11 +30,8 @@ import {
   configureExplorer,
   type ExplorerConfigPatch,
 } from '../src/composables/explorer/useExplorerConfig'
-import {
-  applyGround,
-  configureGround,
-  type GroundConfig,
-} from '../src/composables/appearance/useFlow'
+import type { GroundConfig } from '../src/composables/appearance/internal/flow'
+import { applyGround, configureGround } from '../src/composables/appearance/internal/flow'
 import {
   configureKratos,
   type KratosConfig,

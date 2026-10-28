@@ -1,63 +1,8 @@
-// web/src/composables/appearance/useFlow.ts
+// web/src/composables/appearance/internal/flow.ts
 
 import { reactive } from 'vue'
 
-// The WebGL ground. Browsers cap live WebGL contexts and kill the oldest, so
-// canvases share a capped slot registry. @firecms/neat is an optional peer.
-
-/**
- * @firecms/neat options, named as neat names them so a gradient from
- * neat.firecms.co pastes in as-is.
- */
-export interface GroundShape {
-  speed: number
-  horizontalPressure: number
-  verticalPressure: number
-  waveFrequencyX: number
-  waveFrequencyY: number
-  waveAmplitude: number
-  shadows: number
-  highlights: number
-  colorBlending: number
-  /** Multiplies the saturation the theme's own stops already carry. */
-  colorSaturation: number
-  colorBrightness: number
-  wireframe: boolean
-}
-
-/**
- * What the app sits on. `flow` is the WebGL gradient over dimmed washes; `wash`
- * is the CSS washes at full strength, and the fallback when WebGL or motion is
- * unavailable; `none` is the flat background token.
- */
-export type GroundKind = 'flow' | 'wash' | 'none'
-
-export interface GroundConfig extends GroundShape {
-  kind: GroundKind
-  /** Live canvases allowed at once, the ground included. */
-  maxInstances: number
-  /** Fraction of device pixels the shader renders at. */
-  resolution: number
-  /**
-   * Gradient colours overriding the theme-derived stops. Empty follows the
-   * palette (`accent`, `warning`, `sunk`, `bg`).
-   */
-  colors: string[]
-  /** Shape overrides applied in the dark variant. */
-  dark: Partial<GroundShape>
-  /**
-   * A @firecms/neat licence key for 1.x, which draws a watermark in the canvas
-   * without one. 0.x needs none.
-   */
-  licenseKey: string
-  /**
-   * Loads @firecms/neat, e.g. `() => import('@firecms/neat')`. Supplied by the
-   * app, since the layer cannot import an optional peer. `unknown`, cast once in loadNeat.
-   */
-  loader?: () => Promise<unknown>
-}
-
-const config = reactive<GroundConfig>({
+export const config = reactive<GroundConfig>({
   kind: 'flow',
   maxInstances: 3,
   resolution: 0.8,
@@ -167,14 +112,8 @@ export function flowStops(colors: Record<string, string>, dark: boolean): string
   ]
 }
 
-export interface NeatInstance {
-  destroy: () => void
-  yOffset?: number
-}
-
-export type NeatConstructor = new (options: Record<string, unknown>) => NeatInstance
-
 let cached: NeatConstructor | null = null
+
 let warned = false
 
 /**
@@ -209,3 +148,67 @@ export async function loadNeat(): Promise<NeatConstructor | null> {
     return null
   }
 }
+
+// web/src/composables/appearance/useFlow.ts
+
+// The WebGL ground. Browsers cap live WebGL contexts and kill the oldest, so
+// canvases share a capped slot registry. @firecms/neat is an optional peer.
+
+/**
+ * @firecms/neat options, named as neat names them so a gradient from
+ * neat.firecms.co pastes in as-is.
+ */
+export interface GroundShape {
+  speed: number
+  horizontalPressure: number
+  verticalPressure: number
+  waveFrequencyX: number
+  waveFrequencyY: number
+  waveAmplitude: number
+  shadows: number
+  highlights: number
+  colorBlending: number
+  /** Multiplies the saturation the theme's own stops already carry. */
+  colorSaturation: number
+  colorBrightness: number
+  wireframe: boolean
+}
+
+/**
+ * What the app sits on. `flow` is the WebGL gradient over dimmed washes; `wash`
+ * is the CSS washes at full strength, and the fallback when WebGL or motion is
+ * unavailable; `none` is the flat background token.
+ */
+export type GroundKind = 'flow' | 'wash' | 'none'
+
+export interface GroundConfig extends GroundShape {
+  kind: GroundKind
+  /** Live canvases allowed at once, the ground included. */
+  maxInstances: number
+  /** Fraction of device pixels the shader renders at. */
+  resolution: number
+  /**
+   * Gradient colours overriding the theme-derived stops. Empty follows the
+   * palette (`accent`, `warning`, `sunk`, `bg`).
+   */
+  colors: string[]
+  /** Shape overrides applied in the dark variant. */
+  dark: Partial<GroundShape>
+  /**
+   * A @firecms/neat licence key for 1.x, which draws a watermark in the canvas
+   * without one. 0.x needs none.
+   */
+  licenseKey: string
+  /**
+   * Loads @firecms/neat, e.g. `() => import('@firecms/neat')`. Supplied by the
+   * app, since the layer cannot import an optional peer. `unknown`, cast once in loadNeat.
+   */
+  loader?: () => Promise<unknown>
+}
+
+export interface NeatInstance {
+  destroy: () => void
+  yOffset?: number
+}
+
+export type NeatConstructor = new (options: Record<string, unknown>) => NeatInstance

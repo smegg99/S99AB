@@ -16,16 +16,8 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useTheme } from 'vuetify'
-import {
-  acquireSlot,
-  groundConfig,
-  groundShape,
-  flowStops,
-  loadNeat,
-  type NeatInstance,
-  releaseSlot,
-  supportsWebgl,
-} from '../../composables/appearance/useFlow'
+import type { NeatInstance } from '../../composables/appearance/internal/flow'
+import { acquireSlot, groundConfig, groundShape, flowStops, loadNeat, releaseSlot, supportsWebgl } from '../../composables/appearance/internal/flow'
 import { useMotion } from '../../composables/motion/useMotion'
 import { motionLevel, resolveLevel } from '../../composables/motion/internal/motion'
 

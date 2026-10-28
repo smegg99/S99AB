@@ -27,7 +27,7 @@ export type {
   GroundConfig,
   GroundKind,
   GroundShape,
-} from './composables/appearance/useFlow'
+} from './composables/appearance/internal/flow'
 
 export type { ScrollRoute, ScrollSaved } from './composables/shell/internal/scroll'
 export type { ScrollSpy } from './composables/shell/useScrollSpy'
