@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -70,7 +71,10 @@ func Handler(b *Broker, opts ...HandlerOption) http.Handler {
 				if !ok {
 					return
 				}
-				if _, err := WriteEvent(w, ev); err != nil {
+				// A bad event is skipped; only a failed write means the client is gone.
+				if _, err := WriteEvent(w, ev); errors.Is(err, ErrField) || errors.Is(err, ErrEncode) {
+					continue
+				} else if err != nil {
 					return
 				}
 				flusher.Flush()
@@ -84,8 +88,12 @@ func Handler(b *Broker, opts ...HandlerOption) http.Handler {
 	})
 }
 
-// ErrField refuses an id or event type with a line break, which would end the field and start a forged one.
-var ErrField = errors.New("sse: line break in id or event type")
+var (
+	// ErrField refuses an id or event type with a line break, which would end the field and start a forged one.
+	ErrField = errors.New("sse: line break in id or event type")
+	// ErrEncode is data that could not be encoded as JSON.
+	ErrEncode = errors.New("sse: cannot encode data")
+)
 
 // WriteEvent writes one text/event-stream event, one `data:` line per payload line.
 func WriteEvent(w io.Writer, ev Event) (int, error) {
@@ -106,7 +114,7 @@ func WriteEvent(w io.Writer, ev Event) (int, error) {
 
 	payload, err := encode(ev.Data)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("%w: %w", ErrEncode, err)
 	}
 	// A data-less event is still a valid keep-alive frame.
 	if payload == nil {

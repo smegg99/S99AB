@@ -3,9 +3,14 @@
 package sse
 
 import (
+	"bufio"
+	"context"
 	"errors"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestWriteEventRefusesALineBreakInAField(t *testing.T) {
@@ -41,5 +46,30 @@ func TestDecodeReadsEveryLineEnd(t *testing.T) {
 		if err != nil || ev.Type != "tick" || ev.Data != "1" {
 			t.Errorf("%s: event %+v, err %v", name, ev, err)
 		}
+	}
+}
+
+// A bad event is that event's problem: the stream, and every other subscriber's, stays open.
+func TestHandlerSkipsAnEventItCannotFrame(t *testing.T) {
+	b := NewBroker()
+	srv := httptest.NewServer(Handler(b, WithHeartbeat(0)))
+	defer srv.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, srv.URL, nil)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer resp.Body.Close()
+
+	waitForSubscriber(t, b)
+	b.Publish(Event{Type: "bad\nevent: forged", Data: "x"})
+	b.Publish(Event{Type: "bad", Data: func() {}})
+	b.Publish(Event{Type: "tick", Data: "after"})
+
+	if !scanForLine(bufio.NewScanner(resp.Body), "data: after") {
+		t.Fatal("the stream ended at the bad event")
 	}
 }
