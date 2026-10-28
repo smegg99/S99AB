@@ -1,6 +1,7 @@
 // web/src/composables/shell/internal/trail.ts
 
 import type { NavGroup, NavLink } from '../../../types'
+import { linkMatches } from './nav'
 
 /**
  * One row of the trail, in render order. A heading is a row because it takes
@@ -175,18 +176,9 @@ export function activeRow(rows: TrailRow[], path: string, fullPath: string = pat
 
   for (const [i, row] of rows.entries()) {
     const link = row.link
-    if (!link || link.newTab) continue
-
-    const to = link.to
-    let hit: boolean
-
-    if (to.includes('#')) hit = fullPath === to
-    else if (link.exact) hit = path === to
-    else hit = path === to || path.startsWith(to === '/' ? '/' : `${to}/`)
-
-    if (hit && to.length > bestLength) {
+    if (link && linkMatches(link, path, fullPath) && link.to.length > bestLength) {
       best = i
-      bestLength = to.length
+      bestLength = link.to.length
     }
   }
 

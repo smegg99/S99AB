@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router'
 import type { NavGroup, NavLink } from '../../types'
 
 import { tail } from './internal/breadcrumbs'
+import { flattenLinks, linkMatches } from './internal/nav'
 
 // One step of the trail. `to` is kept for linking, though the bar renders plain text.
 export interface Crumb {
@@ -21,12 +22,12 @@ export function useBreadcrumbs(groups: MaybeRefOrGetter<NavGroup[]>) {
   const trail = computed<Crumb[]>(() => {
     const path = route?.path
     if (!path) return []
+    const fullPath = route.fullPath
 
     let best: { group?: string, item: NavLink } | undefined
     for (const group of toValue(groups)) {
-      for (const item of flatten(group.items)) {
-        const under = item.exact ? path === item.to : path === item.to || path.startsWith(item.to + '/')
-        if (under && (!best || item.to.length > best.item.to.length)) {
+      for (const item of flattenLinks(group.items)) {
+        if (linkMatches(item, path, fullPath) && (!best || item.to.length > best.item.to.length)) {
           best = { group: group.label, item }
         }
       }
@@ -41,8 +42,4 @@ export function useBreadcrumbs(groups: MaybeRefOrGetter<NavGroup[]>) {
   })
 
   return { trail }
-}
-
-function flatten(items: NavLink[]): NavLink[] {
-  return items.flatMap(i => (i.children ? [i, ...flatten(i.children)] : [i]))
 }
