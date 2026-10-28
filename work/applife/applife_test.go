@@ -134,3 +134,25 @@ func TestTimeoutBoundsAPlainCloserThatHangs(t *testing.T) {
 		t.Fatal("Shutdown waited on a hung closer past its timeout")
 	}
 }
+
+// A server holding a stream open uses the whole timeout; the logger and the store still close.
+func TestClosersAfterTheDeadlineStillRun(t *testing.T) {
+	hang := make(chan struct{})
+	defer close(hang)
+	var flushed bool
+	l := applife.New(applife.Options{
+		Timeout: 50 * time.Millisecond,
+		Closers: []applife.Closer{
+			applife.CloserFunc(func() error { flushed = true; return nil }),
+			applife.CloserFunc(func() error { <-hang; return nil }),
+		},
+	})
+
+	err := l.Shutdown()
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("Shutdown = %v, want the deadline from the hung closer", err)
+	}
+	if !flushed {
+		t.Fatal("the closer after the deadline never ran")
+	}
+}

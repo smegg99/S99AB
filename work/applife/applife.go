@@ -39,7 +39,7 @@ func WithContext(fn func(context.Context) error) Closer { return &ctxCloser{fn: 
 
 type Options struct {
 	// Timeout bounds the whole shutdown, not each closer: a closer still running at the deadline is
-	// left behind and the rest are skipped. Zero means 15s.
+	// left behind, and each closer after it still runs, for up to a second. Zero means 15s.
 	Timeout time.Duration
 	// Closers in construction order. Shutdown reverses them.
 	Closers []Closer
@@ -89,10 +89,6 @@ func (l *Lifecycle) shutdown() error {
 
 	var errs []error
 	for i := len(l.opts.Closers) - 1; i >= 0; i-- {
-		if err := ctx.Err(); err != nil {
-			errs = append(errs, fmt.Errorf("applife: %d closers skipped: %w", i+1, err))
-			break
-		}
 		errs = append(errs, closeOne(ctx, l.opts.Closers[i]))
 	}
 	return errors.Join(errs...)
@@ -102,12 +98,22 @@ func closeOne(ctx context.Context, c Closer) error {
 	if cc, ok := c.(contextCloser); ok {
 		return cc.closeContext(ctx)
 	}
+	// Past the deadline a closer still gets its turn: a logger or a store must not be skipped
+	// because a server held a stream open.
+	if ctx.Err() != nil {
+		late, cancel := context.WithTimeout(context.Background(), lateGrace)
+		defer cancel()
+		ctx = late
+	}
 	done := make(chan error, 1)
 	go func() { done <- c.Close() }()
 	select {
 	case err := <-done:
 		return err
 	case <-ctx.Done():
-		return fmt.Errorf("applife: close did not finish: %w", ctx.Err())
+		return fmt.Errorf("applife: close did not finish: %w", context.DeadlineExceeded)
 	}
 }
+
+// lateGrace is how long a closer reached after the deadline may run.
+const lateGrace = time.Second
