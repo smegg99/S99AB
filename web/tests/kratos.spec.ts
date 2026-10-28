@@ -11,7 +11,6 @@ import { isKratosHidden, isKratosInput, isKratosPrimary, isKratosSubmit, kratosI
 import { AUTH_FLOW_ROUTES, configureAuthFlowRoutes, registerAuthRouting, resolveReturnTo } from '../src/composables/kratos/internal/route'
 import { kratosRefreshSession, kratosSignOut } from '../src/composables/kratos/internal/api'
 import { fakeI18n } from './fake-i18n'
-
 // Real flows captured from Kratos v1.3.1; the form renders whatever shape Kratos sends.
 import login from './fixtures/login.json'
 import step1 from './fixtures/registration-step1.json'

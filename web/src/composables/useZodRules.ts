@@ -1,7 +1,6 @@
 // web/src/composables/useZodRules.ts
 
 import { useTranslate, type TranslateParams } from './useTranslate'
-
 import { DEFAULT_MESSAGES, FALLBACK, fieldSchema } from '../internal/zod'
 
 /** The slice of zod used here, typed structurally because zod is an optional peer. */

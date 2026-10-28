@@ -1,9 +1,9 @@
 // web/src/composables/table/internal/frame.ts
 
 import { computed, type Ref } from 'vue'
-import type { QueryLike } from '../../state/useAsyncState'
 import { useDelayed } from '../../useDelay'
 import { type TableBind, useTableConfig } from '../useServerTable'
+import type { QueryLike } from '../../state/useAsyncState'
 
 /** The part of useServerTable's return a table frame reads, typed structurally. */
 export interface TableLike {

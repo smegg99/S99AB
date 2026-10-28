@@ -2,9 +2,9 @@
 
 import { ref } from 'vue'
 import { config } from './types'
-import type { SessionIdentity, SessionStore, SessionHost } from '../useSession'
 import { kratosFetch } from './transport'
 import { inBrowser } from '../../../browser/env'
+import type { SessionIdentity, SessionStore, SessionHost } from '../useSession'
 
 let host: SessionHost | null = null
 

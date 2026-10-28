@@ -2,8 +2,8 @@
 
 import { reactive } from 'vue'
 import type { ThemeDefinition, VuetifyOptions } from 'vuetify'
-import type { Palette, PaletteName } from './palette'
 import { palette } from './palette'
+import type { Palette, PaletteName } from './palette'
 
 export {
   DEFAULT_ACCENT,

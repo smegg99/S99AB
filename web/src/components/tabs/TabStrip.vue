@@ -111,11 +111,11 @@
 
 <script setup lang="ts" generic="T extends WorkspaceTab">
 import { computed, nextTick, onMounted, onScopeDispose, ref, watch, type ComponentPublicInstance } from 'vue'
+import UiDisabledHint from '../primitives/DisabledHint.vue'
 import type { MenuEntry } from '../../composables/tabs/internal/contextMenu'
 import { openContextMenu, useContextMenuState } from '../../composables/tabs/internal/contextMenu'
 import { useTabDrag, type TabWorkspace, type NativeTabDrag } from '../../composables/tabs/internal/tabDrag'
 import type { WorkspaceTab } from '../../composables/tabs/useTabs'
-import UiDisabledHint from '../primitives/DisabledHint.vue'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
 import { titleWords } from '../../composables/tabs/internal/titleWords'
 import { drawChip } from '../../composables/tabs/internal/drawChip'

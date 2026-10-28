@@ -112,13 +112,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import UiDisabledHint from '../primitives/DisabledHint.vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
 import { useExplorerCrumbs } from '../../composables/explorer/internal/crumbs'
 import { useExplorerFolders } from '../../composables/explorer/internal/folders'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 import { useTranslate } from '../../composables/useTranslate'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
-import UiDisabledHint from '../primitives/DisabledHint.vue'
 
 const explorer = useExplorerContext()
 const folders = useExplorerFolders(explorer)

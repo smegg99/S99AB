@@ -29,9 +29,6 @@ import UiAuthCard from './AuthCard.vue'
 import type { KratosFlowKind } from '../../composables/kratos/useKratosFlow'
 import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
-// The plate slots are not forwarded; see the template.
-const FORWARDED = ['brand', 'prepend', 'append', 'form-prepend', 'form-append'] as const
-
 /**
  * The credential card in a dialog, for a session that expired mid-work. Kratos
  * still redirects on success; the dialog only avoids leaving the page first.
@@ -40,6 +37,9 @@ const { kind: initial = 'login', returnTo = '' } = defineProps<{
   kind?: KratosFlowKind
   returnTo?: string
 }>()
+
+// The plate slots are not forwarded; see the template.
+const FORWARDED = ['brand', 'prepend', 'append', 'form-prepend', 'form-append'] as const
 
 const forwarded = useForwardedSlots({ only: FORWARDED })
 

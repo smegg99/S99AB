@@ -4,7 +4,6 @@ import { computed, onMounted, onScopeDispose, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { previewColors, rebuildThemes, themeState } from '../../theme'
 import { originOf, runThemeTransition, type ThemeTransition } from './internal/themeTransition'
-
 import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, themePref, contrastPref } from './internal/appearance'
 import { readStored, writeStored, eraseStored } from '../../browser/storage'
 import { inBrowser } from '../../browser/env'

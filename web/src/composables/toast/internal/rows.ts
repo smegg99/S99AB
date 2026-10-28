@@ -2,10 +2,10 @@
 
 import { onBeforeUnmount, reactive } from 'vue'
 import { useMotion } from '../../motion/useMotion'
-import type { Toast, ToastPosition } from '../useToast'
 import { iconOf, progressOf } from './config'
 import { visibleAt } from './queue'
 import { stackLift } from './stack'
+import type { Toast, ToastPosition } from '../useToast'
 
 /** One toast with its render values resolved. */
 export interface ToastRow {

@@ -1,8 +1,8 @@
 // web/tests/datatable.spec.ts
 
+import { defineComponent, h, ref } from 'vue'
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
-import { defineComponent, h, ref } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import DataTable from '../src/components/table/DataTable.vue'

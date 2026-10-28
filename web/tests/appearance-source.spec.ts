@@ -1,11 +1,11 @@
 // web/tests/appearance-source.spec.ts
 
 import { defineComponent, h, nextTick } from 'vue'
-import { mount } from '@vue/test-utils'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createVuetify, useTheme } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
 import { useAppearance } from '../src/composables/appearance/useAppearance'
 import { registerAppearanceSource, resetAppearanceSource } from '../src/composables/appearance/internal/appearance'
 import { s99abTheme } from '../src/theme'

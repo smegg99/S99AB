@@ -1,7 +1,7 @@
 // web/tests/primitives.spec.ts
 
-import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import Kbd from '../src/components/shortcut/Kbd.vue'
 import SearchField from '../src/components/primitives/SearchField.vue'

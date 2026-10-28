@@ -2,10 +2,9 @@
 import type { MaybeRefOrGetter } from 'vue'
 import { computed, toValue } from 'vue'
 import { useRoute } from 'vue-router'
-import type { NavGroup, NavLink } from '../../types'
-
 import { tail } from './internal/breadcrumbs'
 import { flattenLinks, linkMatches } from './internal/nav'
+import type { NavGroup, NavLink } from '../../types'
 
 // One step of the trail. `to` is kept for linking, though the bar renders plain text.
 export interface Crumb {

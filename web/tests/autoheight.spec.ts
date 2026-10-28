@@ -1,7 +1,7 @@
 // web/tests/autoheight.spec.ts
 
-import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
+import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AutoHeight from '../src/components/motion/AutoHeight.vue'
 import { configureMotion } from '../src/composables/motion/internal/motion'

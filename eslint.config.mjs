@@ -25,5 +25,29 @@ export default createConfigForNuxt({
     },
   })
   .append({
+    // The standard's script order (C2) and import order (C6): vue, vuetify, components,
+    // composables, browser, then the rest, type-only imports last.
+    files: ['web/src/**/*.{ts,vue}', 'web/plugins/**/*.ts', 'web/tests/**/*.ts'],
+    rules: {
+      'vue/define-macros-order': ['error', {
+        order: ['defineOptions', 'defineProps', 'defineEmits', 'defineModel', 'defineSlots'],
+        defineExposeLast: true,
+      }],
+      'import/order': ['error', {
+        'groups': ['builtin', 'external', ['internal', 'parent', 'sibling', 'index'], 'object', 'type'],
+        'pathGroups': [
+          { pattern: 'vue', group: 'external', position: 'before' },
+          { pattern: 'vuetify{,/**}', group: 'external', position: 'before' },
+          { pattern: '{.,..,../..,../../..}/**/*.vue', group: 'parent', position: 'before' },
+          { pattern: '{.,..,../..,../../..}/{composables,**/composables}/**', group: 'parent' },
+          { pattern: '{.,..,../..,../../..}/{browser,**/browser}{,/**}', group: 'parent', position: 'after' },
+        ],
+        'pathGroupsExcludedImportTypes': ['builtin'],
+        'distinctGroup': false,
+        'newlines-between': 'never',
+      }],
+    },
+  })
+  .append({
     ignores: ['node_modules', '.nuxt', 'dist', '.output', 'web/i18n/generated'],
   })

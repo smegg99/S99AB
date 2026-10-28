@@ -1,8 +1,8 @@
 // web/src/composables/shell/useShellDrawer.ts
 
-import type { NavGroup } from '../../types'
 import { computed, ref, watch } from 'vue'
 import { useDisplay } from 'vuetify'
+import type { NavGroup } from '../../types'
 
 /**
  * Whether the shell has a rail, whether it is pinned, and whether it is open.

@@ -103,17 +103,6 @@ import { useTranslate } from '../../composables/useTranslate'
 import type { KratosFlowKind, KratosNode } from '../../composables/kratos/useKratosFlow'
 import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
-// Every slot the card offers except its body.
-const FORWARDED = [
-  'prepend',
-  'append',
-  'form-prepend',
-  'form-append',
-  'plate',
-  'plate-end',
-  'footer',
-] as const
-
 /**
  * The signed-out screen, with no app frame (give it an empty layout). The mark
  * and card are centred; the way back and the appearance controls are pinned to
@@ -189,6 +178,17 @@ const emit = defineEmits<{
   run: [node: KratosNode]
   unsupported: [node: KratosNode]
 }>()
+
+// Every slot the card offers except its body.
+const FORWARDED = [
+  'prepend',
+  'append',
+  'form-prepend',
+  'form-append',
+  'plate',
+  'plate-end',
+  'footer',
+] as const
 
 // The config decides whether there is a shader; this screen can only veto it.
 const showFlow = computed(() => !noFlow && groundConfig().kind === 'flow')

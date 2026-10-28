@@ -12,7 +12,6 @@ import {
   type MaybeRefOrGetter,
   type Ref,
 } from 'vue'
-
 import { config } from '../internal/eventSource'
 
 /** connecting: reaching for the stream. open: attached. closed: given up. */

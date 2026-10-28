@@ -116,12 +116,12 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, watch } from 'vue'
 import type { VList } from 'vuetify/components'
+import UiDisabledHint from '../primitives/DisabledHint.vue'
 import { focused } from '../../composables/primitives/internal/opener'
-import { pressedByKey } from '../../browser/input'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
 import { type MenuEntry, useContextMenuState } from '../../composables/tabs/internal/contextMenu'
 import { besideMenu } from '../../composables/tabs/internal/hintPlacement'
-import UiDisabledHint from '../primitives/DisabledHint.vue'
+import { pressedByKey } from '../../browser/input'
 
 // The workspace's right-click menu; the clicked target supplies the entries.
 // Hints and disabled reasons share one window-wide tooltip (primitives/internal/tooltip.ts).

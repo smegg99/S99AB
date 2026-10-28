@@ -1,6 +1,5 @@
 // web/src/composables/primitives/useCutText.ts
 import { onScopeDispose, shallowRef } from 'vue'
-
 import { isCut } from './internal/text'
 
 /** Tooltip with the whole text of cut elements matching `selector` in a pane (bound with v-on, drawn from `tip`). */

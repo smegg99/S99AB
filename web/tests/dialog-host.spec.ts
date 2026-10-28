@@ -1,7 +1,7 @@
 // web/tests/dialog-host.spec.ts
 
-import * as components from 'vuetify/components'
 import { defineComponent, h } from 'vue'
+import * as components from 'vuetify/components'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import DialogHost from '../src/components/overlay/DialogHost.vue'

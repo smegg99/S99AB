@@ -24,13 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { trackPointer } from '../../browser/pointer'
 import { onScopeDispose } from 'vue'
+import { trackPointer } from '../../browser/pointer'
 
 defineOptions({ inheritAttrs: false })
-const width = defineModel<number>('width', { required: true })
-const collapsed = defineModel<boolean>('collapsed', { default: false })
-const dragging = defineModel<boolean>('dragging', { default: false })
 const { host, label, min, max, reset, collapsedSize = 44, foldAt = 96, unfoldAt = 128 } = defineProps<{
   /** The unclipped container shared by the pane and its content. */
   host: HTMLElement | null
@@ -42,7 +39,9 @@ const { host, label, min, max, reset, collapsedSize = 44, foldAt = 96, unfoldAt 
   foldAt?: number
   unfoldAt?: number
 }>()
-
+const width = defineModel<number>('width', { required: true })
+const collapsed = defineModel<boolean>('collapsed', { default: false })
+const dragging = defineModel<boolean>('dragging', { default: false })
 function resize(value: number) {
   width.value = Math.round(Math.min(max, Math.max(min, value)))
 }

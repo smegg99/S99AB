@@ -1,9 +1,9 @@
 // web/tests/tab-drag.spec.ts
-import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
-import { mount, type VueWrapper } from '@vue/test-utils'
 import { nextTick, reactive } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
+import { mount, type VueWrapper } from '@vue/test-utils'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import TabStrip from '../src/components/tabs/TabStrip.vue'
 import type { NativeTabDrag } from '../src/composables/tabs/internal/tabDrag'
 import type { WorkspaceTab } from '../src/composables/tabs/useTabs'

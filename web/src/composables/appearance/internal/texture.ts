@@ -1,8 +1,8 @@
 // web/src/composables/appearance/internal/texture.ts
 
 import { reactive } from 'vue'
-import type { TextureSpec, PlaneName, TextureConfig, TextureConfigPatch } from '../useTexture'
 import { inBrowser } from '../../../browser/env'
+import type { TextureSpec, PlaneName, TextureConfig, TextureConfigPatch } from '../useTexture'
 
 /**
  * Every texture with a file. `none` has no file and is added by `options`.

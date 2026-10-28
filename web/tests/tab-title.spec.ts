@@ -1,7 +1,7 @@
 // web/tests/tab-title.spec.ts
+import { defineComponent, h, nextTick, reactive } from 'vue'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
-import { defineComponent, h, nextTick, reactive } from 'vue'
 import TabStrip from '../src/components/tabs/TabStrip.vue'
 import Explorer from '../src/components/explorer/Explorer.vue'
 import UiDisabledHint from '../src/components/primitives/DisabledHint.vue'

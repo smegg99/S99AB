@@ -2,8 +2,8 @@
 
 import { reactive, ref } from 'vue'
 import { applyMotionLevel, motionLevel } from '../../motion/internal/motion'
-import type { EffectsConfig, EffectsConfigPatch } from '../useEffects'
 import { inBrowser } from '../../../browser/env'
+import type { EffectsConfig, EffectsConfigPatch } from '../useEffects'
 
 // Set by the layer plugin from `s99ab.performance`.
 export const config = reactive<EffectsConfig>({

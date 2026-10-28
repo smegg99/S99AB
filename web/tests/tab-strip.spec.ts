@@ -1,7 +1,7 @@
 // web/tests/tab-strip.spec.ts
+import { reactive } from 'vue'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
-import { reactive } from 'vue'
 import TabStrip from '../src/components/tabs/TabStrip.vue'
 import type { WorkspaceTab } from '../src/composables/tabs/useTabs'
 import { vuetifyWith } from './mount'

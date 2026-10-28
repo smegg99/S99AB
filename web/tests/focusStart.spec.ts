@@ -1,6 +1,6 @@
 // web/tests/focusStart.spec.ts
-import { describe, expect, it } from 'vitest'
 import { effectScope, ref } from 'vue'
+import { describe, expect, it } from 'vitest'
 import { useFocusGroup } from '../src/composables/primitives/useFocusGroup'
 import { focusStart } from '../src/browser/focus'
 

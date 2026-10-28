@@ -19,8 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import type { ToolItem } from '../../types'
 import UiToolKey from './ToolKey.vue'
+import type { ToolItem } from '../../types'
 
 // A segmented control with one choice always set, for a few options that should
 // stay visible. Keys share borders, which v-btn-toggle cannot do.
@@ -31,11 +31,11 @@ const { items, label, disabled } = defineProps<{
   disabled?: boolean
 }>()
 
-const model = defineModel<string | number | boolean>({ required: true })
-
 // `select` carries the press event alongside the model update, for a reveal
 // that opens at the cursor.
 const emit = defineEmits<{ select: [value: string | number | boolean, event: MouseEvent] }>()
+
+const model = defineModel<string | number | boolean>({ required: true })
 
 function onKey(value: string | number | boolean, event: MouseEvent) {
   model.value = value

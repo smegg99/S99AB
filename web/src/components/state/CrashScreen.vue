@@ -94,8 +94,6 @@ import UiPanel from '../primitives/Panel.vue'
 import { useTranslate } from '../../composables/useTranslate'
 import { crashTexts, type CrashScreenActions, type CrashScreenReport } from './crashScreen'
 
-const COPIED_MS = 1600
-
 const { report, actions = {}, message } = defineProps<{
   report: CrashScreenReport
   actions?: CrashScreenActions
@@ -105,6 +103,8 @@ const { report, actions = {}, message } = defineProps<{
 
 // title is the window-title phrase, such as "not responding", for the app to put after its name.
 const emit = defineEmits<{ title: [phrase: string] }>()
+
+const COPIED_MS = 1600
 
 interface Action {
   name: string

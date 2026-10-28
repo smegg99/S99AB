@@ -1,7 +1,7 @@
 // web/tests/session.spec.ts
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSession, type SessionIdentity } from '../src/composables/kratos/useSession'
 import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
 

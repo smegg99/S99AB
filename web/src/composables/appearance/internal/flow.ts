@@ -1,8 +1,8 @@
 // web/src/composables/appearance/internal/flow.ts
 
 import { reactive } from 'vue'
-import { inBrowser } from '../../../browser/env'
 import { mergeConfig } from '../../../internal/config'
+import { inBrowser } from '../../../browser/env'
 
 export const config = reactive<GroundConfig>({
   kind: 'flow',

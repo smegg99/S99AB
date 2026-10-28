@@ -4,7 +4,6 @@
 // drag to reorder or file, breadcrumbs back out.
 
 import { computed, inject, provide, ref, shallowRef } from 'vue'
-import type { ExplorerBehaviour, ExplorerIcons, ExplorerTileStyle } from './useExplorerConfig'
 import { explorerDefaults } from './internal/config'
 import { createExplorerDrag } from './internal/drag'
 import { createExplorerEvents } from './internal/events'
@@ -16,13 +15,13 @@ import {
   pathOf,
   byFoldersFirst,
 } from './internal/tree'
+import { explorerKey } from './internal/context'
 import type {
   ExplorerFolderInput,
   ExplorerOptions,
   ExplorerSource,
 } from './internal/types'
-
-import { explorerKey } from './internal/context'
+import type { ExplorerBehaviour, ExplorerIcons, ExplorerTileStyle } from './useExplorerConfig'
 
 export type { ExplorerFolderInput, ExplorerMove, ExplorerOptions, ExplorerSource } from './internal/types'
 

@@ -4,6 +4,8 @@ import { computed, reactive, ref } from 'vue'
 import { config } from './internal/types'
 import { isKratosHidden, isKratosInput, isKratosSubmit } from './internal/nodes'
 import { AlreadySignedIn, NotSignedIn, flowIdFromLocation, nextStop, onThisOrigin } from './internal/api'
+import { kratosFetch, returnToQuery } from './internal/transport'
+import { inBrowser } from '../../browser/env'
 import type { KratosFlow, KratosFlowKind } from './internal/types'
 import type {
   KratosFlowApi,
@@ -11,8 +13,6 @@ import type {
   KratosNotice,
   KratosSuccess,
 } from './internal/api'
-import { kratosFetch, returnToQuery } from './internal/transport'
-import { inBrowser } from '../../browser/env'
 
 export type {
   KratosConfig,

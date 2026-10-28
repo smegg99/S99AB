@@ -1,9 +1,9 @@
 // web/src/composables/motion/internal/motion.ts
 
 import { reactive } from 'vue'
+import { mergeConfig } from '../../../internal/config'
 import { mediaMatches } from '../../../browser/media'
 import { inBrowser } from '../../../browser/env'
-import { mergeConfig } from '../../../internal/config'
 
 /** `reduced` keeps fades and drops movement; `off` removes both. */
 export type MotionLevel = 'system' | 'full' | 'reduced' | 'off'

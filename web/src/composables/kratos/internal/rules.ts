@@ -3,8 +3,8 @@
 // Client-side validation for a Kratos-driven field, and short text for the
 // messages Kratos answers with.
 
-import type { KratosMessage, KratosNode } from './types'
 import { kratosInputType, kratosNodeKind } from './nodes'
+import type { KratosMessage, KratosNode } from './types'
 import type { Translate } from '../../useTranslate'
 
 /** A Vuetify field rule: true when the value passes, else the message. */

@@ -2,9 +2,9 @@
 
 import { reactive } from 'vue'
 import { motionLevel, resolveLevel } from '../../motion/internal/motion'
+import { mergeConfig } from '../../../internal/config'
 import { readStored } from '../../../browser/storage'
 import { inBrowser } from '../../../browser/env'
-import { mergeConfig } from '../../../internal/config'
 
 /**
  * How the screen changes appearance. `cover`, `cover-in`, `veil` and the `wipe`

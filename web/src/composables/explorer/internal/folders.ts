@@ -4,10 +4,10 @@
 // Kept out of useExplorer so that composable imports no components.
 
 import ExplorerFolderDialog from '../../../components/explorer/ExplorerFolderDialog.vue'
-import type { ExplorerApi } from '../useExplorer'
-import type { ExplorerNode } from './tree'
 import { useDialog } from '../../useDialog'
 import { useTranslate } from '../../useTranslate'
+import type { ExplorerApi } from '../useExplorer'
+import type { ExplorerNode } from './tree'
 
 export interface ExplorerFolderDraft {
   name: string

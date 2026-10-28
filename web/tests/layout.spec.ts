@@ -2,8 +2,8 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { createRouter, createWebHistory } from 'vue-router'
 import { defineComponent, h, nextTick } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import AppShell from '../src/components/shell/AppShell.vue'

@@ -1,13 +1,13 @@
 // web/tests/dialog-focus.spec.ts
 import { defineComponent, h, nextTick } from 'vue'
-import { flushPromises, mount } from '@vue/test-utils'
-import { describe, expect, it, vi } from 'vitest'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { VDialog } from 'vuetify/components'
-import { focusStart } from '../src/browser/focus'
+import { describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
 import { DEFAULTS } from '../src/theme'
+import { focusStart } from '../src/browser/focus'
 
 describe('transition-free modal focus on WebKitGTK', () => {
   it('keeps Unidentified Shift+Tab and forward Tab inside the dialog', async () => {

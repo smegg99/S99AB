@@ -1,10 +1,10 @@
 // web/src/composables/explorer/internal/selection.ts
 
 import { computed, type InjectionKey, provide, type Ref, shallowRef, watch } from 'vue'
+import type { PickMods } from '../../../browser/keys'
 import type { ExplorerApi } from '../useExplorer'
 import type { ExplorerNode } from './tree'
 import type { ExplorerSelection } from '../useExplorerSelection'
-import type { PickMods } from '../../../browser/keys'
 
 export function useExplorerSelection<T = unknown>(
   explorer: ExplorerApi<T>,

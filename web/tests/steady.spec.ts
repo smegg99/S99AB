@@ -1,8 +1,8 @@
 // web/tests/steady.spec.ts
 
+import { defineComponent, h, nextTick } from 'vue'
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
-import { defineComponent, h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import AutoHeight from '../src/components/motion/AutoHeight.vue'

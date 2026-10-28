@@ -1,7 +1,6 @@
 // web/src/composables/usePlatform.ts
 
 import { onMounted, readonly, ref } from 'vue'
-
 import { detectOS } from '../internal/platform'
 
 export type OS = 'linux' | 'windows' | 'macos' | 'other'

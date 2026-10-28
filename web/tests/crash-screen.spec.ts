@@ -3,9 +3,9 @@
 import { mount, flushPromises } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import CrashScreen from '../src/components/state/CrashScreen.vue'
-import type { CrashScreenActions, CrashScreenReport } from '../src/components/state/crashScreen'
 import { fakeI18n } from './fake-i18n'
 import { vuetify } from './mount'
+import type { CrashScreenActions, CrashScreenReport } from '../src/components/state/crashScreen'
 
 // Without a message the screen falls back to its English text, so the tests read real sentences.
 function mountScreen(report: CrashScreenReport, actions?: CrashScreenActions, message?: string) {

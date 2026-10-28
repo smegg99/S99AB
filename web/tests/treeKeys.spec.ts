@@ -1,6 +1,6 @@
 // web/tests/treeKeys.spec.ts
-import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { useTreeKeys } from '../src/composables/primitives/useTreeKeys'
 
 /** A tree's rows as the keys read them: their ids, nothing folding. */

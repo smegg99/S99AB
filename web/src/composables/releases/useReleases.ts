@@ -3,10 +3,9 @@
 // Client for the layer's releases endpoints (see apireleases.Register). Called
 // directly, since both ends ship in this layer.
 
-import { useQuery } from '@pinia/colada'
 import { computed, type DeepReadonly, readonly } from 'vue'
+import { useQuery } from '@pinia/colada'
 import { useLocale } from '../useTranslate'
-
 import { config, fetchFromApi } from './internal/api'
 
 export interface ReleaseAsset {

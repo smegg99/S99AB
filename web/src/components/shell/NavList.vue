@@ -55,9 +55,9 @@
 </template>
 
 <script setup lang="ts">
-import type { NavGroup } from '../../types'
 import { computed } from 'vue'
 import { flattenNav } from '../../composables/shell/internal/trail'
+import type { NavGroup } from '../../types'
 
 // The plain rail: grouped links down the side.
 const { groups } = defineProps<{ groups: NavGroup[] }>()

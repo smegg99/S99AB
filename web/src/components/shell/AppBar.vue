@@ -46,11 +46,11 @@
 </template>
 
 <script setup lang="ts">
-import type { NavGroup } from '../../types'
 import { computed } from 'vue'
+import UiBreadcrumbs from './Breadcrumbs.vue'
 import { useTranslate } from '../../composables/useTranslate'
 import { useCssNumber } from '../../composables/useCssNumber'
-import UiBreadcrumbs from './Breadcrumbs.vue'
+import type { NavGroup } from '../../types'
 
 // The app's fixed top strip, frosted so the backdrop shows through.
 defineProps<{

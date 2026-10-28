@@ -1,7 +1,7 @@
 // web/tests/disabled-hint.spec.ts
+import { defineComponent, nextTick, ref } from 'vue'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
-import { defineComponent, nextTick, ref } from 'vue'
 import DisabledHint from '../src/components/primitives/DisabledHint.vue'
 import { vuetifyWith } from './mount'
 

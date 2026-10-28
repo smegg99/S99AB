@@ -6,7 +6,6 @@
 import { readonly } from 'vue'
 import { useDelayConfig } from '../useDelay'
 import { closableOf, config, iconOf, progressOf } from './internal/config'
-import type { ToastConfig } from './internal/config'
 import {
   clear,
   dismiss,
@@ -18,6 +17,7 @@ import {
   update,
   visibleAt,
 } from './internal/queue'
+import type { ToastConfig } from './internal/config'
 import type { ToastKind, ToastOptions } from './internal/types'
 
 export type {

@@ -1,7 +1,7 @@
 // web/tests/translate.spec.ts
 
-import { createI18n } from 'vue-i18n'
 import { defineComponent, h } from 'vue'
+import { createI18n } from 'vue-i18n'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { useTranslate } from '../src/composables/useTranslate'

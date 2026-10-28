@@ -28,9 +28,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
-import { TILE_ATTR } from '../../browser/tiles'
 import { dragHasFiles, useExplorerActions } from '../../composables/explorer/internal/actions'
 import { useTranslate } from '../../composables/useTranslate'
+import { TILE_ATTR } from '../../browser/tiles'
 
 const KEY = 'up'
 

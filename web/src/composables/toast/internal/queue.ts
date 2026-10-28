@@ -4,8 +4,8 @@
 
 import { reactive } from 'vue'
 import { POSITIONS, config } from './config'
-import type { Toast, ToastKind, ToastOptions, ToastPosition, ToastUpdate } from './types'
 import { inBrowser } from '../../../browser/env'
+import type { Toast, ToastKind, ToastOptions, ToastPosition, ToastUpdate } from './types'
 
 function emptyQueues(): Record<ToastPosition, Toast[]> {
   const out = {} as Record<ToastPosition, Toast[]>

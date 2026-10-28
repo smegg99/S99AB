@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import type { NavGroup } from '../../types'
 import { computed } from 'vue'
 import { useBreadcrumbs } from '../../composables/shell/useBreadcrumbs'
 import { useTranslate } from '../../composables/useTranslate'
+import type { NavGroup } from '../../types'
 
 // The group and page the route is on, built from the same nav groups as the rail.
 const { groups = [] } = defineProps<{ groups?: NavGroup[] }>()

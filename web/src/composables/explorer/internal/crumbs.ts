@@ -10,9 +10,9 @@ import {
   ref,
   watch,
 } from 'vue'
-import type { ExplorerApi } from '../useExplorer'
 import { useTranslate } from '../../useTranslate'
 import { inBrowser } from '../../../browser/env'
+import type { ExplorerApi } from '../useExplorer'
 
 export interface ExplorerCrumb {
   key: string

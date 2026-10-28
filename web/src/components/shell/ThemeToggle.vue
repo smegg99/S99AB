@@ -20,13 +20,13 @@ import { appearanceConfig } from '../../composables/appearance/internal/appearan
 import { useThemePreference } from '../../composables/appearance/useThemePreference'
 import { useTranslate } from '../../composables/useTranslate'
 
-const locked = computed(() => appearanceConfig().lock !== '')
-
 // Light or dark, remembered through useThemePreference.
 const { storageKey = '' } = defineProps<{
   /** Overrides `s99ab.appearance.storageKey` for this button. */
   storageKey?: string
 }>()
+
+const locked = computed(() => appearanceConfig().lock !== '')
 
 const { dark, toggle } = useThemePreference(() => storageKey)
 const t = useTranslate()

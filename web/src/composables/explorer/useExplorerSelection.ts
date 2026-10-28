@@ -4,8 +4,8 @@
 // shift selects a run from the anchor, ctrl+shift adds the run. Held as ids to survive reloads.
 
 import { inject } from 'vue'
-import type { useExplorerSelection } from './internal/selection'
 import { explorerSelectionKey } from './internal/selection'
+import type { useExplorerSelection } from './internal/selection'
 
 export type ExplorerSelection<T = unknown> = ReturnType<typeof useExplorerSelection<T>>
 

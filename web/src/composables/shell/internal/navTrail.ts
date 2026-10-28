@@ -1,14 +1,13 @@
 // web/src/composables/shell/internal/navTrail.ts
 
 import type { Ref } from 'vue'
-import type { NavGroup } from '../../../types'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCssNumber } from '../../useCssNumber'
 import { useScrollSpy } from '../useScrollSpy'
 import { anchorsIn } from './anchors'
-
 import { flattenNav, type TrailMetrics, type TrailPoint, trailHeight, trailNodes, trailPath, activeRow } from './trail'
+import type { NavGroup } from '../../../types'
 
 export type { TrailMetrics, TrailNode, TrailPoint, TrailRow } from './trail'
 

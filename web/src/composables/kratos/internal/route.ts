@@ -4,8 +4,8 @@
 
 import { computed, type ComputedRef } from 'vue'
 import { useAuthPaths } from '../useAuthPaths'
-import type { KratosFlowKind } from './types'
 import { inBrowser } from '../../../browser/env'
+import type { KratosFlowKind } from './types'
 
 export interface AuthRoute {
   fullPath: string

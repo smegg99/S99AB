@@ -5,6 +5,7 @@
 import AuthDialog from '../src/components/auth/AuthDialog.vue'
 import ConfirmDialog from '../src/components/overlay/ConfirmDialog.vue'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
+import ShortcutHelp from '../src/components/shortcut/ShortcutHelp.vue'
 import type { AppearanceConfig } from '../src/composables/appearance/useAppearance'
 import { appearanceConfig, configureAppearance } from '../src/composables/appearance/internal/appearance'
 import { applyLite, configureEffects, effectsConfig } from '../src/composables/appearance/internal/effects'
@@ -30,7 +31,6 @@ import { configureReleases } from '../src/composables/releases/internal/api'
 import type { TableConfig } from '../src/composables/table/useServerTable'
 import { configureTable, registerTableRouter } from '../src/composables/table/internal/config'
 import { configureThemeTransition, type ThemeTransitionConfig } from '../src/composables/appearance/internal/themeTransition'
-import ShortcutHelp from '../src/components/shortcut/ShortcutHelp.vue'
 import {
   registerShortcutHelp,
   registerShortcuts,

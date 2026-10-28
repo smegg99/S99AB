@@ -6,14 +6,13 @@
 import { computed, type MaybeRefOrGetter, onScopeDispose, toValue } from 'vue'
 import { useExplorerContext } from './useExplorer'
 import { useExplorerFace } from './useExplorerFace'
-import { TILE_ATTR } from '../../browser/tiles'
 import { useExplorerSelectionContext } from './useExplorerSelection'
-import type { ExplorerNode } from './internal/tree'
 import { useTranslate } from '../useTranslate'
-
 import { noActions, useExplorerActions, dragHasFiles } from './internal/actions'
+import { TILE_ATTR } from '../../browser/tiles'
 import { pickMods } from '../../browser/keys'
 import { inBrowser } from '../../browser/env'
+import type { ExplorerNode } from './internal/tree'
 
 /** Tile actions the screen owns: opening a leaf and the context menu. */
 export interface ExplorerActions<T = unknown> {

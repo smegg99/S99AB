@@ -35,9 +35,9 @@
 </template>
 
 <script setup lang="ts">
-import type { LocaleOption } from '../../types'
 import { computed } from 'vue'
 import { useTranslate } from '../../composables/useTranslate'
+import type { LocaleOption } from '../../types'
 
 // A two-letter button opening a menu. Each name is written in its own language,
 // supplied by the app.

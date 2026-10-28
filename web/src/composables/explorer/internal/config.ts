@@ -2,8 +2,8 @@
 
 import { reactive } from 'vue'
 import { applyExplorerAccents } from './accents'
-import type { ExplorerConfig, ExplorerConfigPatch } from '../useExplorerConfig'
 import { mergeConfig } from '../../../internal/config'
+import type { ExplorerConfig, ExplorerConfigPatch } from '../useExplorerConfig'
 
 export const config = reactive<ExplorerConfig>({
   maxDepth: 8,

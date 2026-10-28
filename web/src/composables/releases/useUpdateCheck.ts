@@ -6,7 +6,6 @@
 import { computed, type MaybeRefOrGetter, toValue } from 'vue'
 import { useBuildVersion } from './useBuildVersion'
 import { useLatestRelease } from './useReleases'
-
 import { compareVersions } from './internal/version'
 
 export interface UpdateCheckOptions {

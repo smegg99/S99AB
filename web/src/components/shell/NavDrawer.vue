@@ -34,12 +34,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { NavGroup, NavLit, NavVariant } from '../../types'
-import { useCssNumber } from '../../composables/useCssNumber'
 import UiNavList from './NavList.vue'
 import UiNavTrail from './NavTrail.vue'
-
-const model = defineModel<boolean>({ default: false })
+import { useCssNumber } from '../../composables/useCssNumber'
+import type { NavGroup, NavLit, NavVariant } from '../../types'
 
 // The drawer and its breakpoint; `variant` picks the body. `width` is a number
 // because Vuetify reserves the page offset from it.
@@ -60,6 +58,8 @@ const {
   /** 0 follows --s99ab-rail-w. */
   width?: number
 }>()
+
+const model = defineModel<boolean>({ default: false })
 
 // Read live, so retuning --s99ab-rail-w also moves the layout offset.
 const rail = useCssNumber('--s99ab-rail-w', 236)

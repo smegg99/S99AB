@@ -2,9 +2,9 @@
 
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
+import { createVuetify } from 'vuetify'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createVuetify } from 'vuetify'
 import AppShell from '../src/components/shell/AppShell.vue'
 import Flow from '../src/components/shell/Flow.vue'
 import { acquireSlot, applyGround, configureGround, groundConfig, groundShape, flowStops, liveInstances, loadNeat, releaseSlot } from '../src/composables/appearance/internal/flow'

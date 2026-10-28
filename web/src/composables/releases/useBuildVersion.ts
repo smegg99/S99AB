@@ -3,8 +3,8 @@
 // The running build, as apihealth's /version reports it. Shared by the update
 // check and the sign-in card's plate; UiAuthCard takes the build as props.
 
-import { useQuery } from '@pinia/colada'
 import { computed, type MaybeRefOrGetter } from 'vue'
+import { useQuery } from '@pinia/colada'
 import { useReleasesConfig } from './useReleases'
 import { fetchFromApi } from './internal/api'
 

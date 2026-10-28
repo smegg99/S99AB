@@ -61,15 +61,15 @@
 </template>
 
 <script setup lang="ts">
-import type { NavGroup, NavLit, NavVariant } from '../../types'
 import { computed } from 'vue'
-import { useAppearance } from '../../composables/appearance/useAppearance'
-import { useShellDrawer } from '../../composables/shell/useShellDrawer'
 import UiAppBar from './AppBar.vue'
-import { groundConfig } from '../../composables/appearance/internal/flow'
 import UiBackdrop from './Backdrop.vue'
 import UiFlow from './Flow.vue'
 import UiNavDrawer from './NavDrawer.vue'
+import { groundConfig } from '../../composables/appearance/internal/flow'
+import { useShellDrawer } from '../../composables/shell/useShellDrawer'
+import { useAppearance } from '../../composables/appearance/useAppearance'
+import type { NavGroup, NavLit, NavVariant } from '../../types'
 
 // The whole application frame: ground, bar, rail, container width and panel gap.
 // Components are imported explicitly so the layer typechecks on its own.

@@ -1,8 +1,8 @@
 // web/src/composables/appearance/internal/appearance.ts
 
 import { reactive, ref, shallowRef } from 'vue'
-import type { AppearanceConfig, AppearanceConfigPatch, AppearanceSource, ThemeMode, ContrastMode } from '../useAppearance'
 import { mediaMatches, onMediaChange } from '../../../browser/media'
+import type { AppearanceConfig, AppearanceConfigPatch, AppearanceSource, ThemeMode, ContrastMode } from '../useAppearance'
 
 // Set once per app, so every toggle writes the same keys.
 export const config = reactive<AppearanceConfig>({

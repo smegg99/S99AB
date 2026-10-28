@@ -1,13 +1,13 @@
 // web/tests/navTrail.spec.ts
 
-import type { NavGroup } from '../src/types'
-import { afterEach, describe, expect, it } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
+import { afterEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { useNavTrail } from '../src/composables/shell/internal/navTrail'
 import { activeRow, flattenNav, trailHeight, trailNodes, trailPath } from '../src/composables/shell/internal/trail'
 import { configureMotion, resetMotion } from '../src/composables/motion/internal/motion'
+import type { NavGroup } from '../src/types'
 
 const NESTED: NavGroup[] = [
   {

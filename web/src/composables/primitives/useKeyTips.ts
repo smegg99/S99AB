@@ -1,6 +1,6 @@
 // web/src/composables/primitives/useKeyTips.ts
-import { hasFocusRing } from '../../browser/focus'
 import { inject, type InjectionKey, provide, shallowRef } from 'vue'
+import { hasFocusRing } from '../../browser/focus'
 
 /**
  * A bar's key tooltips, one open at a time: hover opens, leave, press or click closes, keyboard focus opens.

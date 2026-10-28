@@ -2,12 +2,12 @@
 //
 // Types and defaults live in ./internal and are re-exported here.
 
-import { useQuery } from '@pinia/colada'
 import { computed, type Ref, ref, toValue, watch, onScopeDispose } from 'vue'
+import { useQuery } from '@pinia/colada'
 import { useDelayed } from '../useDelay'
 import { decodeSort, encodeSort, routerFor, tableConfig } from './internal/config'
-import type { Page, ServerTableOptions, SortItem, TableParams } from './internal/types'
 import { debounced } from '../../browser/time'
+import type { Page, ServerTableOptions, SortItem, TableParams } from './internal/types'
 
 export type {
   DataTableHeader,

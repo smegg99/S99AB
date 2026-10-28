@@ -1,7 +1,7 @@
 // web/src/composables/shell/internal/trail.ts
 
-import type { NavGroup, NavLink } from '../../../types'
 import { linkMatches } from './nav'
+import type { NavGroup, NavLink } from '../../../types'
 
 /**
  * One row of the trail, in render order. A heading is a row because it takes

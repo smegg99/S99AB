@@ -6,9 +6,9 @@ import type { ComputedRef, Ref } from 'vue'
 import { config } from './types'
 import { resolveReturnTo } from './route'
 import { useAuthPaths } from '../useAuthPaths'
-import type { KratosFlow, KratosMessage, KratosNode } from './types'
 import { kratosFetch, returnToQuery } from './transport'
 import { inBrowser } from '../../../browser/env'
+import type { KratosFlow, KratosMessage, KratosNode } from './types'
 
 /** One `continue_with` entry; list order is not priority (see nextStop). */
 export interface KratosContinueWith {

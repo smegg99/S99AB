@@ -3,10 +3,10 @@
 // State and labels for the <UiExplorer> tile context menu; tiles reach it through injected actions.
 
 import { computed, shallowRef, watch } from 'vue'
-import { tileById } from '../../../browser/tiles'
 import { provideExplorerActions } from './actions'
-import type { ExplorerNode } from './tree'
 import { useTranslate } from '../../useTranslate'
+import { tileById } from '../../../browser/tiles'
+import type { ExplorerNode } from './tree'
 
 export interface ExplorerMenuHost<T> {
   open: (node: ExplorerNode<T>) => void
