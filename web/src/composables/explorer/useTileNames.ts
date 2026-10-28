@@ -1,6 +1,7 @@
 // web/src/composables/explorer/useTileNames.ts
 import { onScopeDispose, shallowRef } from 'vue'
 import { tileOf, TILE_ATTR } from '../../browser/tiles'
+import { inside } from '../../browser/rect'
 
 /**
  * Tooltip with a tile's full name when truncated, and with `badge` its corner number; bind with v-on on an Explorer grid.
@@ -34,9 +35,7 @@ export function useTileNames(badge?: (id: string) => string | null, delay = 0) {
   function countAt(tile: HTMLElement, event: MouseEvent): HTMLElement | null {
     const count = badge ? tile.querySelector<HTMLElement>('.s99ab-tile__count') : null
     if (!count) return null
-    const box = count.getBoundingClientRect()
-    const inside = event.clientX >= box.left && event.clientX <= box.right && event.clientY >= box.top && event.clientY <= box.bottom
-    return inside ? count : null
+    return inside(count.getBoundingClientRect(), event.clientX, event.clientY) ? count : null
   }
 
   function consider(event: MouseEvent) {

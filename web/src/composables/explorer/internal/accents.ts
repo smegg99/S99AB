@@ -1,5 +1,6 @@
 // web/src/composables/explorer/internal/accents.ts
 
+import { hexChannels } from '../../../theme/color'
 // Runtime folder tints, emitted as the same two rules the _explorer.scss `@each`
 // writes per accent, so every data-accent consumer picks them up.
 
@@ -15,13 +16,8 @@ const NAME = /^[a-z][a-z0-9-]*$/i
 export function accentTriplet(value: string): string | null {
   const raw = value.trim()
 
-  const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(raw)
-  if (hex) {
-    const digits = hex[1]!
-    const full = digits.length === 3 ? digits.replace(/./g, d => d + d) : digits
-    const parts = [0, 2, 4].map(i => Number.parseInt(full.slice(i, i + 2), 16))
-    return parts.join(', ')
-  }
+  const channels = hexChannels(raw)
+  if (channels) return channels.join(', ')
 
   const numbers = raw.split(/[\s,]+/).filter(Boolean).map(Number)
   const usable = numbers.length === 3

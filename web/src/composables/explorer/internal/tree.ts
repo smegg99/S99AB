@@ -70,14 +70,15 @@ export function groupByParent<T>(
   // Stable sorts in reverse precedence: app order, folders first, then pinned first.
   for (const group of groups.values()) {
     group.sort(compare)
-    if (foldersFirst) {
-      group.sort(
-        (a, b) => Number(a.kind === 'item') - Number(b.kind === 'item'),
-      )
-    }
+    if (foldersFirst) group.sort(byFoldersFirst)
     group.sort((a, b) => Number(!a.pinned) - Number(!b.pinned))
   }
   return groups
+}
+
+/** Folders before items; a stable sort keeps the order within each. */
+export function byFoldersFirst(a: { kind: ExplorerKind }, b: { kind: ExplorerKind }): number {
+  return Number(a.kind === 'item') - Number(b.kind === 'item')
 }
 
 export function childrenOf<T>(

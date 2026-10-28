@@ -6,6 +6,7 @@
 import { onScopeDispose, shallowRef } from 'vue'
 import { TILE_ATTR } from '../../../browser/tiles'
 import { pickMods } from '../../../browser/keys'
+import { overlaps } from '../../../browser/rect'
 
 /** Band rectangle relative to the region it is drawn in. */
 export interface ExplorerBand {
@@ -102,12 +103,7 @@ export function covered(
     const id = tile.getAttribute(TILE_ATTR)
     if (!id) continue
 
-    const box = tile.getBoundingClientRect()
-    const misses = box.right < band.left
-      || box.left > band.right
-      || box.bottom < band.top
-      || box.top > band.bottom
-    if (!misses) ids.push(id)
+    if (overlaps(tile.getBoundingClientRect(), band)) ids.push(id)
   }
 
   return ids

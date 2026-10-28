@@ -8,6 +8,7 @@
 
 import { argbFromHex, Hct, hexFromArgb } from '@material/material-color-utilities'
 import type { TextureConfigPatch } from '../composables/appearance/useTexture'
+import { hexChannels } from './color'
 
 export type Palette = Record<string, string>
 
@@ -253,11 +254,8 @@ function toward(hue: number, accent: number, t: number): number {
  * 0.55. Only used for an app-supplied accent.
  */
 function inkOn(hex: string): string {
-  const h = hex.replace('#', '')
-  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h
-  const n = Number.parseInt(full, 16)
-  const luma
-    = (0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255)) / 255
+  const [r, g, b] = hexChannels(hex) ?? [0, 0, 0]
+  const luma = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255
 
   return luma > 0.55 ? '#0d1017' : '#ffffff'
 }

@@ -14,6 +14,7 @@ import {
   type ExplorerOrder,
   groupByParent,
   pathOf,
+  byFoldersFirst,
 } from './internal/tree'
 import type {
   ExplorerFolderInput,
@@ -195,9 +196,7 @@ function createExplorer<T = unknown>(
     // Stable sort, so this partitions without reordering within groups.
     regroup: list =>
       ordering.value.foldersFirst
-        ? [...list].sort(
-            (a, b) => Number(a.kind === 'item') - Number(b.kind === 'item'),
-          )
+        ? [...list].sort(byFoldersFirst)
         : list,
     canMoveInto: canMoveNode,
     persist: persistMove,
