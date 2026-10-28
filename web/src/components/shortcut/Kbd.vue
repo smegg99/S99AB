@@ -5,7 +5,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { isMac } from '../../composables/useShortcut'
+import { isMac } from '../../internal/shortcut'
 import { useTranslate } from '../../composables/useTranslate'
 
 // A key cap. Resolves `mod` to Cmd on macOS and Ctrl elsewhere.

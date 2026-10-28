@@ -10,9 +10,8 @@ import {
   resolveKeys,
   setDesktop,
   setShortcutOverrides,
-  useShortcut,
-  useShortcutRegistry,
-} from '../src/composables/useShortcut'
+} from '../src/internal/shortcut'
+import { useShortcut, useShortcutRegistry } from '../src/composables/useShortcut'
 
 const SHORTCUTS = {
   'app.save': { keys: 'mod+s', label: 'shortcut.save' },

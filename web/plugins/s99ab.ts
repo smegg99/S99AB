@@ -67,7 +67,7 @@ import {
   registerShortcutHelp,
   registerShortcuts,
   type ShortcutMap,
-} from '../src/composables/useShortcut'
+} from '../src/internal/shortcut'
 import {
   applyTexture,
   configureTexture,
