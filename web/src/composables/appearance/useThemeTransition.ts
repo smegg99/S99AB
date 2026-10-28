@@ -1,7 +1,7 @@
 // web/src/composables/appearance/useThemeTransition.ts
 
 import { computed, reactive, readonly } from 'vue'
-import { motionLevel, resolveLevel } from '../motion/useMotion'
+import { motionLevel, resolveLevel } from '../motion/internal/motion'
 
 /**
  * How the screen changes appearance. `cover`, `cover-in`, `veil` and the `wipe`

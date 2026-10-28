@@ -13,7 +13,7 @@ import {
   trailPath,
   useNavTrail,
 } from '../src/composables/shell/useNavTrail'
-import { configureMotion, resetMotion } from '../src/composables/motion/useMotion'
+import { configureMotion, resetMotion } from '../src/composables/motion/internal/motion'
 
 const NESTED: NavGroup[] = [
   {

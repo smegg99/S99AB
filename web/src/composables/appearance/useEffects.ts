@@ -1,7 +1,7 @@
 // web/src/composables/appearance/useEffects.ts
 
 import { computed, onMounted, reactive, ref } from 'vue'
-import { applyMotionLevel, motionLevel } from '../motion/useMotion'
+import { applyMotionLevel, motionLevel } from '../motion/internal/motion'
 
 // Lite mode as a runtime preference; the default is `s99ab.performance.lite`.
 

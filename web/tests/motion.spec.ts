@@ -4,14 +4,8 @@ import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Motion from '../src/components/motion/Motion.vue'
-import {
-  applyMotionLevel,
-  configureMotion,
-  prefersReducedMotion,
-  resetMotion,
-  resolveLevel,
-  useMotion,
-} from '../src/composables/motion/useMotion'
+import { useMotion } from '../src/composables/motion/useMotion'
+import { applyMotionLevel, configureMotion, prefersReducedMotion, resetMotion, resolveLevel } from '../src/composables/motion/internal/motion'
 
 /** Stubs the OS preference, which happy-dom does not implement. */
 function stubPrefersReduced(reduce: boolean) {

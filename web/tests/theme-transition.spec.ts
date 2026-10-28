@@ -2,7 +2,7 @@
 
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { configureMotion, resetMotion } from '../src/composables/motion/useMotion'
+import { configureMotion, resetMotion } from '../src/composables/motion/internal/motion'
 import {
   configureThemeTransition,
   coverRadius,

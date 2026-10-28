@@ -45,10 +45,7 @@ import {
   configureKratos,
   type KratosConfig,
 } from '../src/composables/kratos/useKratosFlow'
-import {
-  configureMotion,
-  type MotionConfigPatch,
-} from '../src/composables/motion/useMotion'
+import { configureMotion, type MotionConfigPatch } from '../src/composables/motion/internal/motion'
 import {
   configureReleases,
   type ReleasesConfig,

@@ -26,7 +26,8 @@ import {
   releaseSlot,
   supportsWebgl,
 } from '../../composables/appearance/useFlow'
-import { motionLevel, resolveLevel, useMotion } from '../../composables/motion/useMotion'
+import { useMotion } from '../../composables/motion/useMotion'
+import { motionLevel, resolveLevel } from '../../composables/motion/internal/motion'
 
 /**
  * A moving WebGL gradient on one canvas, drawn over UiBackdrop, which stays as
