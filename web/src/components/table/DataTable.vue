@@ -80,6 +80,7 @@ import UiTableStrip from './TableStrip.vue'
 import { type DataTableHeader, useTableConfig } from '../../composables/table/useServerTable'
 import { type TableLike, useTableFrame } from '../../composables/table/internal/frame'
 import { useTranslate } from '../../composables/useTranslate'
+import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
 // Presentation and states. The composable owns the state, so an outside filter
 // can drive the table.
@@ -125,9 +126,7 @@ const steadyStyle = computed(() =>
 )
 
 // `actions` belongs to the strip; `default` would replace the table body.
-const forwardedSlots = computed(() =>
-  Object.keys(slots).filter(name => name !== 'actions' && name !== 'default'),
-)
+const forwardedSlots = useForwardedSlots({ except: ['actions', 'default'] })
 
 // Named apart from the prop, or the computed would shadow it.
 const emptyHeading = computed(() => emptyTitle ?? t('common.noResults', 'Nothing found'))

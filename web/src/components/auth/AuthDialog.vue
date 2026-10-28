@@ -24,9 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useSlots } from 'vue'
+import { ref } from 'vue'
 import UiAuthCard from './AuthCard.vue'
 import type { KratosFlowKind } from '../../composables/kratos/useKratosFlow'
+import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
 // The plate slots are not forwarded; see the template.
 const FORWARDED = ['brand', 'prepend', 'append', 'form-prepend', 'form-append'] as const
@@ -40,8 +41,7 @@ const { kind: initial = 'login', returnTo = '' } = defineProps<{
   returnTo?: string
 }>()
 
-const slots = useSlots()
-const forwarded = computed(() => FORWARDED.filter(name => slots[name]))
+const forwarded = useForwardedSlots({ only: FORWARDED })
 
 // Local, because the switch stays inside the dialog.
 const kind = ref<KratosFlowKind>(initial)

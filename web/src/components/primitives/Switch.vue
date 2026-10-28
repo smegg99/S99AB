@@ -19,12 +19,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
+import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
 // The layer's switch; size and accent come from the theme DEFAULTS for VSwitch.
 // The whole v-switch API falls through as attributes.
 const model = defineModel<boolean>()
 
-const slots = useSlots()
-const forwarded = computed(() => Object.keys(slots))
+const forwarded = useForwardedSlots()
 </script>

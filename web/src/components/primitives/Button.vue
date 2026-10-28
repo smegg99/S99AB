@@ -26,16 +26,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue'
 import UiGoo from '../state/Goo.vue'
+import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
 /**
  * v-btn with the layer's goo loader. Every v-btn attribute falls through,
  * including `aria-busy`, which v-btn sets from `loading`.
  */
 
-const slots = useSlots()
-
 // `loader` is in the template, so a caller's own loader lands inside the wrapper.
-const forwarded = computed(() => Object.keys(slots).filter(name => name !== 'loader'))
+const forwarded = useForwardedSlots({ except: ['loader'] })
 </script>

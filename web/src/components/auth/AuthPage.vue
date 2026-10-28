@@ -101,6 +101,7 @@ import { useAuthFlowKind, useReturnTo } from '../../composables/kratos/internal/
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
 import { useTranslate } from '../../composables/useTranslate'
 import type { KratosFlowKind, KratosNode } from '../../composables/kratos/useKratosFlow'
+import { useForwardedSlots } from '../../composables/primitives/internal/slots'
 
 // Every slot the card offers except its body.
 const FORWARDED = [
@@ -206,7 +207,7 @@ const routeReturnTo = useReturnTo()
 const flowKind = computed(() => kind ?? routeKind.value)
 const target = computed(() => returnTo || routeReturnTo.value)
 
-const forwarded = computed(() => FORWARDED.filter(name => slots[name]))
+const forwarded = useForwardedSlots({ only: FORWARDED })
 
 const hasBrand = computed(() => brand || Boolean(slots.brand))
 
