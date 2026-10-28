@@ -6,6 +6,7 @@ package applife
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -37,7 +38,8 @@ func (c *ctxCloser) closeContext(ctx context.Context) error { return c.fn(ctx) }
 func WithContext(fn func(context.Context) error) Closer { return &ctxCloser{fn: fn} }
 
 type Options struct {
-	// Timeout bounds the whole shutdown, not each closer. Zero means 15s.
+	// Timeout bounds the whole shutdown, not each closer: a closer still running at the deadline is
+	// left behind and the rest are skipped. Zero means 15s.
 	Timeout time.Duration
 	// Closers in construction order. Shutdown reverses them.
 	Closers []Closer
@@ -87,6 +89,10 @@ func (l *Lifecycle) shutdown() error {
 
 	var errs []error
 	for i := len(l.opts.Closers) - 1; i >= 0; i-- {
+		if err := ctx.Err(); err != nil {
+			errs = append(errs, fmt.Errorf("applife: %d closers skipped: %w", i+1, err))
+			break
+		}
 		errs = append(errs, closeOne(ctx, l.opts.Closers[i]))
 	}
 	return errors.Join(errs...)
@@ -96,5 +102,12 @@ func closeOne(ctx context.Context, c Closer) error {
 	if cc, ok := c.(contextCloser); ok {
 		return cc.closeContext(ctx)
 	}
-	return c.Close()
+	done := make(chan error, 1)
+	go func() { done <- c.Close() }()
+	select {
+	case err := <-done:
+		return err
+	case <-ctx.Done():
+		return fmt.Errorf("applife: close did not finish: %w", ctx.Err())
+	}
 }

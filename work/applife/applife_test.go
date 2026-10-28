@@ -113,3 +113,24 @@ func TestSecondShutdownReportsTheFirstError(t *testing.T) {
 		t.Fatalf("second = %v, want the same failure reported again", second)
 	}
 }
+
+// A closer that hangs must not hold the process past Timeout.
+func TestTimeoutBoundsAPlainCloserThatHangs(t *testing.T) {
+	hang := make(chan struct{})
+	defer close(hang)
+	l := applife.New(applife.Options{
+		Timeout: 100 * time.Millisecond,
+		Closers: []applife.Closer{applife.CloserFunc(func() error { <-hang; return nil })},
+	})
+
+	done := make(chan error, 1)
+	go func() { done <- l.Shutdown() }()
+	select {
+	case err := <-done:
+		if !errors.Is(err, context.DeadlineExceeded) {
+			t.Fatalf("Shutdown = %v, want the deadline", err)
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("Shutdown waited on a hung closer past its timeout")
+	}
+}
