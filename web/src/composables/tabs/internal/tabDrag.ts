@@ -75,6 +75,7 @@ export function useTabDrag<T extends WorkspaceTab>(list: Readonly<Ref<HTMLElemen
     // The cross closes; a press on it is not a grab.
     if (event.button !== 0 || tab.pinned || tab.moving || (native()?.closing || native()?.allowed(tab) === false) || (event.target as Element).closest('.tab__close')) return
     press = { id: tab.id, x: event.clientX, y: event.clientY }
+    // Not trackPointer: a native cross-window drag goes on through a blur and buttonless moves.
     window.addEventListener('pointermove', onPointermove)
     window.addEventListener('pointerup', onPointerup)
     window.addEventListener('pointercancel', cancel)

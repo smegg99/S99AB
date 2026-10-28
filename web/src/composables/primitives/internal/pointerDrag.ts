@@ -1,5 +1,6 @@
 // web/src/composables/primitives/internal/pointerDrag.ts
 import { computed, onScopeDispose, shallowReactive } from 'vue'
+import { trackPointer } from '../../../browser/pointer'
 
 export interface DropPlace<At, Carried> {
   find: (el: Element) => At | null
@@ -46,7 +47,7 @@ export function createPointerDrag<Carried extends object>(threshold = 5) {
   /** A drag just ended on a thing, whose click must not pick it. */
   let swallow = false
   /** The window's listeners are on, from a press until the drag ends. */
-  let listening = false
+  let untrack: (() => void) | null = null
 
   /** Registers a drop place under a name until the calling scope ends. */
   function place<At>(name: string, spec: DropPlace<At, Carried>) {
@@ -73,22 +74,12 @@ export function createPointerDrag<Carried extends object>(threshold = 5) {
     if (event.button !== 0) return
     stop()
     pressed = { carried, refuse, x: event.clientX, y: event.clientY }
-    listening = true
     document.documentElement.classList.add(PRESSING)
-    window.addEventListener('pointermove', move)
-    window.addEventListener('pointerup', drop)
-    window.addEventListener('pointercancel', stop)
-    window.addEventListener('blur', stop)
-    window.addEventListener('keydown', key, true)
+    untrack = trackPointer(event, { move, end: released => (released ? drop() : stop()), key })
   }
 
   function move(event: PointerEvent) {
     if (!pressed) return
-    // No button held: the release fell outside the window and never came here.
-    if (event.buttons === 0) {
-      stop()
-      return
-    }
     if (!state.carried) {
       if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) < threshold) return
       if (!pressed.carried) {
@@ -135,11 +126,11 @@ export function createPointerDrag<Carried extends object>(threshold = 5) {
     }
   }
 
-  function key(event: KeyboardEvent) {
-    if (event.key !== 'Escape' || !pressed) return
+  function key(event: KeyboardEvent): boolean {
+    if (event.key !== 'Escape' || !pressed) return false
     event.preventDefault()
     event.stopPropagation()
-    stop()
+    return true
   }
 
   function stop() {
@@ -148,14 +139,11 @@ export function createPointerDrag<Carried extends object>(threshold = 5) {
     state.carried = null
     state.over = null
     state.held = false
-    if (listening) {
-      listening = false
+    if (untrack) {
+      const end = untrack
+      untrack = null
       document.documentElement.classList.remove(PRESSING)
-      window.removeEventListener('pointermove', move)
-      window.removeEventListener('pointerup', drop)
-      window.removeEventListener('pointercancel', stop)
-      window.removeEventListener('blur', stop)
-      window.removeEventListener('keydown', key, true)
+      end()
     }
     if (was) for (const spec of places.values()) spec.end?.()
   }

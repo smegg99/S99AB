@@ -1,7 +1,8 @@
 // web/tests/explorer-marquee.spec.ts
 
+import { effectScope } from 'vue'
 import { describe, expect, it } from 'vitest'
-import { covered } from '../src/composables/explorer/internal/marquee'
+import { covered, useExplorerMarquee } from '../src/composables/explorer/internal/marquee'
 import { TILE_ATTR } from '../src/browser/tiles'
 
 /** A grid of tiles at given boxes; happy-dom has no layout, so the geometry is fed directly. */
@@ -63,5 +64,39 @@ describe('what a rubber band covers', () => {
     el.prepend(up)
 
     expect(covered(el, { left: 0, top: 0, right: 300, bottom: 300 })).toEqual(['a'])
+  })
+})
+
+describe('the band', () => {
+  function pressGrid() {
+    const grid = document.createElement('div')
+    document.body.append(grid)
+    const scope = effectScope()
+    const covers: string[][] = []
+    const marquee = scope.run(() => useExplorerMarquee({ enabled: () => true, clear: () => {}, cover: ids => covers.push(ids) }))!
+    grid.addEventListener('pointerdown', marquee.onPointerdown)
+    grid.dispatchEvent(new PointerEvent('pointerdown', { button: 0, clientX: 5, clientY: 5, bubbles: true }))
+    const done = () => {
+      scope.stop()
+      grid.remove()
+    }
+    return { marquee, covers, done }
+  }
+
+  it('follows the pointer and ends on Escape', () => {
+    const { marquee, done } = pressGrid()
+    window.dispatchEvent(new PointerEvent('pointermove', { buttons: 1, clientX: 40, clientY: 30 }))
+    expect(marquee.band.value).toMatchObject({ width: 35, height: 25 })
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    expect(marquee.band.value).toBeNull()
+    done()
+  })
+
+  it('ends when the release happened outside the window', () => {
+    const { marquee, done } = pressGrid()
+    window.dispatchEvent(new PointerEvent('pointermove', { buttons: 1, clientX: 40, clientY: 30 }))
+    window.dispatchEvent(new PointerEvent('pointermove', { buttons: 0, clientX: 60, clientY: 60 }))
+    expect(marquee.band.value).toBeNull()
+    done()
   })
 })

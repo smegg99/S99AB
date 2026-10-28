@@ -7,6 +7,7 @@ import { onScopeDispose, shallowRef } from 'vue'
 import { TILE_ATTR } from '../../../browser/tiles'
 import { pickMods } from '../../../browser/keys'
 import { overlaps } from '../../../browser/rect'
+import { trackPointer } from '../../../browser/pointer'
 
 /** Band rectangle relative to the region it is drawn in. */
 export interface ExplorerBand {
@@ -35,7 +36,9 @@ export function useExplorerMarquee(host: ExplorerMarqueeHost) {
   let grid: HTMLElement | null = null
   let origin: Corner = { x: 0, y: 0 }
 
-  function onMousedown(event: MouseEvent) {
+  let untrack: (() => void) | null = null
+
+  function onPointerdown(event: PointerEvent) {
     // Main button only: right opens the menu, middle is autoscroll.
     if (!host.enabled() || event.button !== 0) return
 
@@ -48,12 +51,10 @@ export function useExplorerMarquee(host: ExplorerMarqueeHost) {
     origin = { x: event.clientX, y: event.clientY }
     if (!pickMods(event).ctrl) host.clear()
 
-    window.addEventListener('mousemove', onMousemove)
-    window.addEventListener('mouseup', stop)
-    window.addEventListener('keydown', onKeydown)
+    untrack = trackPointer(event, { move, end: stop, key: event => event.key === 'Escape' })
   }
 
-  function onMousemove(event: MouseEvent) {
+  function move(event: PointerEvent) {
     if (!grid) return
     event.preventDefault()
 
@@ -74,22 +75,18 @@ export function useExplorerMarquee(host: ExplorerMarqueeHost) {
     host.cover(covered(grid, { left, top, right, bottom }))
   }
 
-  /** Escape ends the band; the covered tiles stay selected. */
-  function onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape') stop()
-  }
-
+  // A release, Escape or a lost pointer all end the band; the covered tiles stay selected.
   function stop() {
     grid = null
     band.value = null
-    window.removeEventListener('mousemove', onMousemove)
-    window.removeEventListener('mouseup', stop)
-    window.removeEventListener('keydown', onKeydown)
+    const end = untrack
+    untrack = null
+    end?.()
   }
 
   onScopeDispose(stop)
 
-  return { band, onMousedown }
+  return { band, onPointerdown }
 }
 
 /** Ids of tiles the band intersects. */

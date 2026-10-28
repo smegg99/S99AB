@@ -384,7 +384,7 @@ describe('picking tiles', () => {
     const wrapper = mountExplorer(movable(), { selected: ['docs'] })
     await flushPromises()
 
-    await wrapper.find('.s99ab-explorer__grid').trigger('mousedown')
+    await wrapper.find('.s99ab-explorer__grid').trigger('pointerdown')
 
     expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([[]])
   })
@@ -394,7 +394,7 @@ describe('picking tiles', () => {
     const wrapper = mountExplorer(movable(), { selected: ['docs'] })
     await flushPromises()
 
-    await wrapper.find('.s99ab-explorer__grid').trigger('mousedown', { ctrlKey: true })
+    await wrapper.find('.s99ab-explorer__grid').trigger('pointerdown', { ctrlKey: true })
 
     expect(wrapper.emitted('update:selected')).toBeUndefined()
   })

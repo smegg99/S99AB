@@ -30,7 +30,7 @@
          including the empty space below the grid. -->
     <div
       class="s99ab-explorer__scroll"
-      @mousedown="onMousedown"
+      @pointerdown="onPointerdown"
     >
       <!-- Skeleton tiles in the real grid, so nothing moves when the tiles arrive. -->
       <slot
@@ -255,7 +255,7 @@ bindExplorerEvents<T>(explorer.events, {
 // What was picked before the band started: kept on ctrl-drag, empty otherwise.
 let base: string[] = []
 
-const { band, onMousedown: startBand } = useExplorerMarquee({
+const { band, onPointerdown: startBand } = useExplorerMarquee({
   enabled: () => selection.mode.value === 'multi',
   cover: (ids) => {
     const covered = new Set([...base, ...ids])
@@ -273,8 +273,8 @@ const bandStyle = computed(() => ({
   height: `${band.value?.height ?? 0}px`,
 }))
 
-/** Deselects on mousedown, so deselect and a following rubber band are one gesture. */
-function onMousedown(event: MouseEvent) {
+/** Deselects on press, so deselect and a following rubber band are one gesture. */
+function onPointerdown(event: PointerEvent) {
   const onTile = (event.target as HTMLElement | null)?.closest('.s99ab-tile')
   if (!onTile && !pickMods(event).ctrl) selection.clear()
   base = onTile ? [] : [...selection.ids.value]
