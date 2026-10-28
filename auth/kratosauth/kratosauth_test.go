@@ -130,3 +130,33 @@ func TestIdentityRoundTripsThroughAContext(t *testing.T) {
 		t.Fatalf("got %+v ok=%v", got, ok)
 	}
 }
+
+// Kratos sets a csrf cookie on every anonymous visitor who opens a flow; that is not a session.
+func TestWhoamiWithOnlyUnrelatedCookiesMakesNoCall(t *testing.T) {
+	calls := 0
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		calls++
+		w.WriteHeader(http.StatusServiceUnavailable)
+	}))
+	t.Cleanup(server.Close)
+	client, err := kratosauth.New(kratosauth.Options{PublicURL: server.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r.Header.Set("Cookie", "csrf_token_806060ca=abc; theme=dark")
+
+	if _, err := client.Whoami(context.Background(), r); !errors.Is(err, kratosauth.ErrNoSession) || calls != 0 {
+		t.Fatalf("err = %v after %d calls, want ErrNoSession and no call", err, calls)
+	}
+}
+
+func TestWhoamiSeesAnOryNetworkSessionCookie(t *testing.T) {
+	client := whoami(t, http.StatusOK, `{"id":"s","active":true,"identity":{"id":"id-1"}}`)
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	r.Header.Set("Cookie", "ory_session_coolproject=abc")
+
+	if _, err := client.Whoami(context.Background(), r); err != nil {
+		t.Fatalf("err = %v, want the session resolved", err)
+	}
+}

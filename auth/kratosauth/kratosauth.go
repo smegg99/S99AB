@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -86,11 +87,17 @@ type Options struct {
 	Client    *http.Client
 	// Timeout bounds the whoami call.
 	Timeout time.Duration
+	// SessionCookie is the session cookie's name. Empty means ory_kratos_session; Ory Network's
+	// ory_session_* cookies are always recognised.
+	SessionCookie string
 }
 
 func (o *Options) defaults() {
 	if o.Timeout <= 0 {
 		o.Timeout = 5 * time.Second
+	}
+	if o.SessionCookie == "" {
+		o.SessionCookie = "ory_kratos_session"
 	}
 	if o.Client == nil {
 		o.Client = &http.Client{Timeout: o.Timeout}
@@ -110,10 +117,23 @@ func New(opts Options) (*Client, error) {
 	return &Client{opts: opts}, nil
 }
 
-// Whoami validates the request's cookie or session token with Kratos. A request with neither is
-// ErrNoSession without a call.
+// credentialed reports whether r carries a session cookie, a session token or an Authorization header.
+func (c *Client) credentialed(r *http.Request) bool {
+	if r.Header.Get("X-Session-Token") != "" || r.Header.Get("Authorization") != "" {
+		return true
+	}
+	for _, cookie := range r.Cookies() {
+		if cookie.Name == c.opts.SessionCookie || strings.HasPrefix(cookie.Name, "ory_session_") {
+			return true
+		}
+	}
+	return false
+}
+
+// Whoami validates the request's session cookie or session token with Kratos. A request with
+// neither is ErrNoSession without a call.
 func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error) {
-	if r.Header.Get("Cookie") == "" && r.Header.Get("X-Session-Token") == "" && r.Header.Get("Authorization") == "" {
+	if !c.credentialed(r) {
 		return nil, ErrNoSession
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,

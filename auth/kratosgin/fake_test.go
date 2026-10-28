@@ -24,7 +24,7 @@ func TestFakeTellsAccountsApart(t *testing.T) {
 		"alice-token": "alice@example.com",
 		"bob-token":   "bob@example.com",
 	} {
-		w := do(r, "/public", credential)
+		w := do(r, "/public", "ory_kratos_session="+credential)
 
 		var body map[string]any
 		_ = json.Unmarshal(w.Body.Bytes(), &body)
@@ -37,7 +37,7 @@ func TestFakeTellsAccountsApart(t *testing.T) {
 func TestFakeRejectsAnUnknownCredential(t *testing.T) {
 	r := engine(kratosauthtest.Fake(t, fakeAccounts))
 
-	if code := do(r, "/private", "nobody-token").Code; code != http.StatusUnauthorized {
+	if code := do(r, "/private", "ory_kratos_session=nobody-token").Code; code != http.StatusUnauthorized {
 		t.Fatalf("code = %d, want 401", code)
 	}
 
@@ -66,7 +66,7 @@ func TestFakeAcceptsASessionToken(t *testing.T) {
 func TestFakeAccountWithoutTraitsIsUsable(t *testing.T) {
 	r := engine(kratosauthtest.Fake(t, map[string]kratosauth.Identity{"t": {ID: "id-plain"}}))
 
-	w := do(r, "/private", "t")
+	w := do(r, "/private", "ory_kratos_session=t")
 	if w.Code != http.StatusOK {
 		t.Fatalf("code = %d: %s", w.Code, w.Body.String())
 	}

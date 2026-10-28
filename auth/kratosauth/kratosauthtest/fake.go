@@ -13,8 +13,8 @@ import (
 	"github.com/smegg99/s99ab/auth/kratosauth"
 )
 
-// Fake is a Client backed by a whoami endpoint that maps a credential (the whole
-// Cookie, X-Session-Token or Authorization header) to an account.
+// Fake is a Client backed by a whoami endpoint that maps a credential (the
+// ory_kratos_session cookie's value, X-Session-Token or Authorization) to an account.
 func Fake(t *testing.T, accounts map[string]kratosauth.Identity) *kratosauth.Client {
 	t.Helper()
 
@@ -48,8 +48,12 @@ func Fake(t *testing.T, accounts map[string]kratosauth.Identity) *kratosauth.Cli
 
 // credential returns the first credential header set, in Whoami's order.
 func credential(r *http.Request) string {
+	session := ""
+	if cookie, err := r.Cookie("ory_kratos_session"); err == nil {
+		session = cookie.Value
+	}
 	for _, value := range []string{
-		r.Header.Get("Cookie"),
+		session,
 		r.Header.Get("X-Session-Token"),
 		r.Header.Get("Authorization"),
 	} {
