@@ -77,11 +77,11 @@ const {
   groups = [],
   navVariant = 'list',
   navLit = 'both',
-  defer = false,
+  defer,
   backdrop = true,
-  noFlow = false,
+  noFlow,
   stack = true,
-  wide = false,
+  wide,
 } = defineProps<{
   title?: string
   subtitle?: string

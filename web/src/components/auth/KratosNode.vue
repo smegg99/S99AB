@@ -165,7 +165,7 @@ import { useTranslate } from '../../composables/useTranslate'
 import type { KratosNode } from '../../composables/kratos/internal/types'
 
 /** One node of a Kratos flow; every node type is rendered or reported. */
-const { node, value = '', errors = [], hints = [], submitting = false } = defineProps<{
+const { node, value = '', errors = [], hints = [], submitting } = defineProps<{
   node: KratosNode
   /** From the flow's value map. */
   value?: string

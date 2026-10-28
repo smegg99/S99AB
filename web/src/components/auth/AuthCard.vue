@@ -130,7 +130,7 @@ const {
   commit = '',
   builtAt = '',
   routed = true,
-  repo = false,
+  repo,
 } = defineProps<{
   kind?: KratosFlowKind
   returnTo?: string

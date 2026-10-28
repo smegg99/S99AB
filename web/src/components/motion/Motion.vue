@@ -57,7 +57,7 @@ defineOptions({ inheritAttrs: false })
 // Callers name an intent; tokens and CSS decide timing and classes.
 const {
   name: preset = 'fade',
-  group = false,
+  group,
   box = true,
   tag = 'div',
   mode = 'out-in',

@@ -59,7 +59,7 @@ import { useTips } from '../../composables/primitives/useTips'
 import { type FooterStat, statOrder } from '../../composables/primitives/internal/paneFoot'
 import { factsShown, factStub, foldOf, isProblem } from '../../composables/primitives/internal/paneFoot'
 
-const { stats = [], keep = false } = defineProps<{
+const { stats = [], keep } = defineProps<{
   /** What the line says. */
   stats?: readonly FooterStat[]
   /** The line's room kept while it says nothing. */

@@ -61,7 +61,7 @@ import { computed } from 'vue'
 import { useTranslate } from '../../composables/useTranslate'
 
 // The strip itself is the search field, with no box of its own.
-const { searchable = true, busy = false } = defineProps<{
+const { searchable = true, busy } = defineProps<{
   /** Shown in the strip, in the label style. */
   title?: string
   /** Defaults to the field's own name. */

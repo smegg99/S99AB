@@ -67,7 +67,7 @@ import { computed, useSlots } from 'vue'
 
 // The layer's content surface: a chrome head strip over a well. The title also
 // names the <section>, so it is exposed as a landmark.
-const { title, flush = false } = defineProps<{
+const { title, flush } = defineProps<{
   title?: string
   /** A sentence at the top of the body, held to a measure. */
   subtitle?: string

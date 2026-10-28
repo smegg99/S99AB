@@ -49,7 +49,7 @@ import { useTranslate } from '../../composables/useTranslate'
 
 // A skeleton for lists, matching row height, padding and count; otherwise the
 // state shell in the accent with the goo loader.
-const { variant = 'spinner', rows = 3, lines = 'two', inline = false, text } = defineProps<{
+const { variant = 'spinner', rows = 3, lines = 'two', inline, text } = defineProps<{
   variant?: 'spinner' | 'skeleton'
   /** A small loader in a row, for non-list content; a full-size one would make the page jump. */
   inline?: boolean

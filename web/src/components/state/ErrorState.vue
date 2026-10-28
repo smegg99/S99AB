@@ -88,7 +88,7 @@ import { useTranslate } from '../../composables/useTranslate'
 import { inBrowser } from '../../browser/env'
 
 // Shows a translated message, never the raw error (URLs, stacks, proxy HTML).
-const { error, title, retryable = true, retrying = false } = defineProps<{
+const { error, title, retryable = true, retrying } = defineProps<{
   error: unknown
   title?: string
   retryable?: boolean

@@ -164,7 +164,7 @@ const {
   emptyTitle,
   emptyText,
   autoLoad = true,
-  acceptFiles = false,
+  acceptFiles,
 } = defineProps<{
   /** Read once at setup; key the component to show a different tree. */
   explorer: ExplorerApi<T>

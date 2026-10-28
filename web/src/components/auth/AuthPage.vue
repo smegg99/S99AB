@@ -114,7 +114,7 @@ const {
   title = '',
   subtitle,
   icon = '',
-  build = false,
+  build,
   version = '',
   commit = '',
   builtAt = '',
@@ -125,9 +125,9 @@ const {
   theme = true,
   contrast = true,
   storageKey = '',
-  repo = false,
+  repo,
   backdrop = true,
-  noFlow = false,
+  noFlow,
 } = defineProps<{
   /** Overrides the `[flow]` route segment, for a page at a fixed path. */
   kind?: KratosFlowKind

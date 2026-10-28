@@ -10,7 +10,7 @@
 <script setup lang="ts">
 // The app's ground: four slow-drifting washes of the theme's accent and warning
 // hues over the background token. CSS gradients, to stay cheap in a Wails webview.
-const { still = false } = defineProps<{
+const { still } = defineProps<{
   /** Stops the drift. The motion level applies without it. */
   still?: boolean
 }>()

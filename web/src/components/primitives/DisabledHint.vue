@@ -36,7 +36,7 @@ import { computed, onBeforeUnmount, watch } from 'vue'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
 
 /** Keep the child natively disabled; this focusable host explains why. */
-const { reason, label = '', block = false, location = 'bottom' } = defineProps<{
+const { reason, label = '', block, location = 'bottom' } = defineProps<{
   reason: string
   label?: string
   /** Fields, list rows and other controls which fill their layout cell. */

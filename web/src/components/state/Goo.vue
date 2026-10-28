@@ -49,7 +49,7 @@ import { computed, useId } from 'vue'
 
 // Two balls that meet, merge and part. The merge is an SVG blur plus alpha
 // ramp; CSS contrast() would grey out a transparent ground. One `size` scales all.
-const { size, dense = false } = defineProps<{
+const { size, dense } = defineProps<{
   /** Width in px, as a one-off override of $goo-size in styles/_config.scss. */
   size?: number | string
   /** The smaller size, $goo-size-dense, for a row of ordinary height. */

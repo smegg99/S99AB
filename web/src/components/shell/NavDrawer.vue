@@ -43,7 +43,7 @@ import type { NavGroup, NavLit, NavVariant } from '../../types'
 // because Vuetify reserves the page offset from it.
 const {
   groups,
-  permanent = false,
+  permanent,
   variant = 'list',
   lit = 'both',
   width = 0,

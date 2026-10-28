@@ -5,7 +5,7 @@ import { computed } from 'vue'
 // Section edges. `crest` is one long swell, `ripple` two shorter ones.
 type Variant = 'crest' | 'ripple'
 
-const { variant = 'crest', flip = false, height = 72, stack = false } = defineProps<{
+const { variant = 'crest', flip, height = 72, stack } = defineProps<{
   variant?: Variant
   // Points the swell upward, for a band's bottom edge.
   flip?: boolean

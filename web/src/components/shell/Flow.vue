@@ -26,7 +26,7 @@ import { motionLevel, resolveLevel } from '../../composables/motion/internal/mot
  * the fallback. As the ground it shows through every .s99ab-glass surface; a
  * bounded instance is capped (see useFlow).
  */
-const { ground = false } = defineProps<{
+const { ground } = defineProps<{
   /** Fixed and full-viewport instead of filling its container. */
   ground?: boolean
 }>()

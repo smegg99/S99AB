@@ -68,7 +68,7 @@ import type { ReleaseAsset } from '../../composables/releases/useReleases'
 import { formatBytes, kindKey } from '../../composables/releases/internal/api'
 import { useTranslate } from '../../composables/useTranslate'
 
-const { asset, primary = false, version = '' } = defineProps<{
+const { asset, primary, version = '' } = defineProps<{
   asset: ReleaseAsset
   /** The platform's default format, offered first. */
   primary?: boolean

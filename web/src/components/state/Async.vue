@@ -73,8 +73,8 @@ const {
   loading = 'skeleton',
   rows = 3,
   lines = 'two',
-  retrying = false,
-  flush = false,
+  retrying,
+  flush,
 } = defineProps<{
   query: QueryLike
   /**
