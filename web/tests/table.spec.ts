@@ -2,12 +2,8 @@
 
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  decodeSort,
-  encodeSort,
-  registerTableRouter,
-  useTableState,
-} from '../src/composables/table/useServerTable'
+import { useTableState } from '../src/composables/table/useServerTable'
+import { decodeSort, encodeSort, registerTableRouter } from '../src/composables/table/internal/config'
 
 beforeEach(() => {
   registerTableRouter(() => undefined)

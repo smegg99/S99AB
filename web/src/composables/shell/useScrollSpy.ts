@@ -2,7 +2,7 @@
 
 import { getCurrentInstance, onMounted, onScopeDispose, ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { quietScroll, regionInset, scrollSettling } from './useShellScroll'
+import { quietScroll, regionInset, scrollSettling } from './internal/scroll'
 
 // Mirrors the on-screen section of a long page into the URL hash with `replace`.
 // A scroll listener: IntersectionObserver cannot answer "last section whose top has passed".
@@ -180,20 +180,4 @@ export function useScrollSpy(ids: () => string[]): ScrollSpy {
   })
 
   return { current }
-}
-
-/** Same-page anchor ids among `tos`, in drawn order (`/theme#type` counts, `/textures` does not). */
-export function anchorsIn(tos: string[], path: string): string[] {
-  const ids: string[] = []
-
-  for (const to of tos) {
-    const cut = to.indexOf('#')
-    if (cut < 0) continue
-    if (to.slice(0, cut) !== path) continue
-
-    const id = to.slice(cut + 1)
-    if (id && !ids.includes(id)) ids.push(id)
-  }
-
-  return ids
 }

@@ -46,11 +46,8 @@ import {
 import { configureMotion, type MotionConfigPatch } from '../src/composables/motion/internal/motion'
 import type { ReleasesConfig } from '../src/composables/releases/useReleases'
 import { configureReleases } from '../src/composables/releases/internal/api'
-import {
-  configureTable,
-  registerTableRouter,
-  type TableConfig,
-} from '../src/composables/table/useServerTable'
+import type { TableConfig } from '../src/composables/table/useServerTable'
+import { configureTable, registerTableRouter } from '../src/composables/table/internal/config'
 import {
   configureThemeTransition,
   type ThemeTransitionConfig,

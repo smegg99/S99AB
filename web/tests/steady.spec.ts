@@ -10,7 +10,8 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import AutoHeight from '../src/components/motion/AutoHeight.vue'
 import DataTable from '../src/components/table/DataTable.vue'
-import { configureTable, useServerTable } from '../src/composables/table/useServerTable'
+import { useServerTable } from '../src/composables/table/useServerTable'
+import { configureTable } from '../src/composables/table/internal/config'
 
 const vuetify = createVuetify({ components, directives })
 

@@ -1,7 +1,7 @@
 // web/tests/shell-scroll.spec.ts
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { quietScroll, scrollSettling, shellScrollBehavior } from '../src/composables/shell/useShellScroll'
+import { quietScroll, scrollSettling, shellScrollBehavior } from '../src/composables/shell/internal/scroll'
 
 // Covers the scroll rules in shellScrollBehavior.
 

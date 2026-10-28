@@ -3,7 +3,8 @@
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { anchorsIn, useScrollSpy } from '../src/composables/shell/useScrollSpy'
+import { useScrollSpy } from '../src/composables/shell/useScrollSpy'
+import { anchorsIn } from '../src/composables/shell/internal/anchors'
 
 // Lights the section being read on an anchor-only nav, where the URL only knows the clicked row.
 

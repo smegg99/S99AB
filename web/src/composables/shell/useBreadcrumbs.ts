@@ -1,22 +1,15 @@
 // web/src/composables/shell/useBreadcrumbs.ts
 import type { MaybeRefOrGetter } from 'vue'
-import { computed, ref, toValue } from 'vue'
+import { computed, toValue } from 'vue'
 import { useRoute } from 'vue-router'
 import type { NavGroup, NavLink } from '../../types'
+
+import { tail } from './internal/breadcrumbs'
 
 // One step of the trail. `to` is kept for linking, though the bar renders plain text.
 export interface Crumb {
   label: string
   to?: string
-}
-
-// The trailing crumb for a place the router does not name (a tab, a selected
-// row's title). Shared, since only one page is active; set and clear it per page.
-const tail = ref<string>()
-
-/** Append (or clear, with undefined) the trailing crumb. Clear on unmount. */
-export function setBreadcrumbTail(label: string | undefined) {
-  tail.value = label
 }
 
 // The nav trail for the active route, "Group > Item". The deepest matching `to`

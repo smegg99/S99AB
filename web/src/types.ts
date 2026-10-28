@@ -29,7 +29,7 @@ export type {
   GroundShape,
 } from './composables/appearance/useFlow'
 
-export type { ScrollRoute, ScrollSaved } from './composables/shell/useShellScroll'
+export type { ScrollRoute, ScrollSaved } from './composables/shell/internal/scroll'
 export type { ScrollSpy } from './composables/shell/useScrollSpy'
 
 export type { Highlightable, Token, TokenKind } from './composables/markdown/internal/highlight'

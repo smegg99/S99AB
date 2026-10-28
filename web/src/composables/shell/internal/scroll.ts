@@ -1,4 +1,4 @@
-// web/src/composables/shell/useShellScroll.ts
+// web/src/composables/shell/internal/scroll.ts
 
 /**
  * Scroll handling for UiAppShell, which scrolls `.shell__main` instead of the

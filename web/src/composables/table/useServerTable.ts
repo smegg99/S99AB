@@ -8,14 +8,18 @@ import { useDelayed } from '../useDelay'
 import { decodeSort, encodeSort, routerFor, tableConfig } from './internal/config'
 import type { Page, ServerTableOptions, SortItem, TableParams } from './internal/types'
 
-export * from './internal/types'
-export {
-  configureTable,
-  decodeSort,
-  encodeSort,
-  registerTableRouter,
-  useTableConfig,
-} from './internal/config'
+export type {
+  DataTableHeader,
+  Fetcher,
+  Page,
+  ServerTableOptions,
+  SortItem,
+  TableConfig,
+  TableKey,
+  TableParams,
+  TableRouter,
+} from './internal/types'
+export { useTableConfig } from './internal/config'
 
 export interface TableState {
   page: Ref<number>

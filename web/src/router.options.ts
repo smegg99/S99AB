@@ -4,7 +4,7 @@
 // the window. Registered by the pages:routerOptions hook in nuxt.config.
 
 import type { RouterScrollBehavior } from 'vue-router'
-import { shellScrollBehavior } from './composables/shell/useShellScroll'
+import { shellScrollBehavior } from './composables/shell/internal/scroll'
 
 const scrollBehavior: RouterScrollBehavior = (to, from, saved) =>
   shellScrollBehavior(to, from, saved)
