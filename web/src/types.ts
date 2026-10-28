@@ -32,7 +32,7 @@ export type {
 export type { ScrollRoute, ScrollSaved } from './composables/shell/useShellScroll'
 export type { ScrollSpy } from './composables/shell/useScrollSpy'
 
-export type { Highlightable, Token, TokenKind } from './composables/markdown/useHighlight'
+export type { Highlightable, Token, TokenKind } from './composables/markdown/internal/highlight'
 
 export type {
   PlaneName,

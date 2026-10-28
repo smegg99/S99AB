@@ -2,12 +2,8 @@
 
 import { computed, type MaybeRefOrGetter, ref, toValue, watch } from 'vue'
 import { usePlatform } from '../usePlatform'
-import {
-  type Downloads,
-  PLATFORM_NAMES,
-  type ReleaseAsset,
-  useReleasesConfig,
-} from './useReleases'
+import { type Downloads, type ReleaseAsset, useReleasesConfig } from './useReleases'
+import { PLATFORM_NAMES } from './internal/api'
 import { useTranslate } from '../useTranslate'
 
 /** One tab of the download card, and everything it offers. */

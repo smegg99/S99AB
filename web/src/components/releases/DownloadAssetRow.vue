@@ -64,7 +64,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCopy } from '../../composables/useCopy'
-import { formatBytes, kindKey, type ReleaseAsset } from '../../composables/releases/useReleases'
+import type { ReleaseAsset } from '../../composables/releases/useReleases'
+import { formatBytes, kindKey } from '../../composables/releases/internal/api'
 import { useTranslate } from '../../composables/useTranslate'
 
 const { asset, primary = false, version = '' } = defineProps<{

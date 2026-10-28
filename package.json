@@ -22,7 +22,9 @@
     "./i18n": "./web/i18n/index.ts",
     "./kratos": "./web/src/composables/kratos/useKratosFlow.ts",
     "./browser": "./web/src/browser.ts",
-    "./state": "./web/src/state.ts"
+    "./state": "./web/src/state.ts",
+    "./markdown": "./web/src/markdown.ts",
+    "./releases": "./web/src/releases.ts"
   },
   "peerDependencies": {
     "@firecms/neat": "^0.8.0 || ^1.0.0",

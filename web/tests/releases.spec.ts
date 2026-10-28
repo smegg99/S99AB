@@ -1,9 +1,9 @@
 // web/tests/releases.spec.ts
 
 import { describe, expect, it } from 'vitest'
-import { formatBytes, kindKey } from '../src/composables/releases/useReleases'
+import { formatBytes, kindKey } from '../src/composables/releases/internal/api'
 import { detectOS } from '../src/internal/platform'
-import { compareVersions } from '../src/composables/releases/useUpdateCheck'
+import { compareVersions } from '../src/composables/releases/internal/version'
 
 describe('compareVersions', () => {
   it('orders by number, not by text', () => {

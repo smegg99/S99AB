@@ -4,7 +4,9 @@
 // rungs (title, section label) so it never outranks the host page.
 
 import { computed, type ComputedRef } from 'vue'
-import { type Block, type Inline, parseMarkdown } from './useMarkdown'
+import { type Block, type Inline, parseMarkdown } from './internal/markdown'
+
+export type { Block, Inline } from './internal/markdown'
 
 export type MarkdownBlock
   = | { type: 'heading', tag: string, label: boolean, inline: Inline[] }

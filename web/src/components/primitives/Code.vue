@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { tokenise, type Highlightable } from '../../composables/markdown/useHighlight'
+import { tokenise, type Highlightable } from '../../composables/markdown/internal/highlight'
 import { useCopy } from '../../composables/useCopy'
 import { useTranslate } from '../../composables/useTranslate'
 

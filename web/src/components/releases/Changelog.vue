@@ -70,7 +70,7 @@ import UiErrorState from '../state/ErrorState.vue'
 import UiLoadingState from '../state/LoadingState.vue'
 import UiReleaseNotes from './ReleaseNotes.vue'
 import { useDelayed } from '../../composables/useDelay'
-import { formatReleaseDate } from '../../composables/releases/useReleaseDate'
+import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useChangelog } from '../../composables/releases/useReleases'
 import { useTranslate } from '../../composables/useTranslate'
 

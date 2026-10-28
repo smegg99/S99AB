@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Inline } from '../../composables/markdown/useMarkdown'
+import type { Inline } from '../../composables/markdown/internal/markdown'
 import { useTranslate } from '../../composables/useTranslate'
 
 // Every value is a text node, so Vue escapes it; no HTML is rendered. A token

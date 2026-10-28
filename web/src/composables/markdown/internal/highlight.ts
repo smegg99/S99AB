@@ -1,4 +1,4 @@
-// web/src/composables/markdown/useHighlight.ts
+// web/src/composables/markdown/internal/highlight.ts
 
 // A small tokenising highlighter for TS and CSS, kept free of a grammar
 // dependency. Output is built from input slices, so a miss only miscolours.

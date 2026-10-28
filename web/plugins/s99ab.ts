@@ -44,10 +44,8 @@ import {
   type KratosConfig,
 } from '../src/composables/kratos/useKratosFlow'
 import { configureMotion, type MotionConfigPatch } from '../src/composables/motion/internal/motion'
-import {
-  configureReleases,
-  type ReleasesConfig,
-} from '../src/composables/releases/useReleases'
+import type { ReleasesConfig } from '../src/composables/releases/useReleases'
+import { configureReleases } from '../src/composables/releases/internal/api'
 import {
   configureTable,
   registerTableRouter,

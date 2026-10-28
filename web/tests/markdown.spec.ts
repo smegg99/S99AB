@@ -1,7 +1,7 @@
 // web/tests/markdown.spec.ts
 
 import { describe, expect, it } from 'vitest'
-import { type Block, parseInline, parseMarkdown } from '../src/composables/markdown/useMarkdown'
+import { type Block, parseInline, parseMarkdown } from '../src/composables/markdown/internal/markdown'
 
 function textOf(block: Block): string {
   if (block.type === 'code') return block.value

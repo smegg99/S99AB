@@ -1,4 +1,4 @@
-// web/src/composables/markdown/useMarkdown.ts
+// web/src/composables/markdown/internal/markdown.ts
 
 // A markdown subset parsed to a tree the renderer walks: headings, paragraphs,
 // lists, links, emphasis, code, quotes and rules. Unknown syntax stays as text.

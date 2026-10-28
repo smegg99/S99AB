@@ -5,7 +5,8 @@
 
 import { useQuery } from '@pinia/colada'
 import { computed, type MaybeRefOrGetter } from 'vue'
-import { fetchFromApi, useReleasesConfig } from './useReleases'
+import { useReleasesConfig } from './useReleases'
+import { fetchFromApi } from './internal/api'
 
 export interface BuildVersion {
   version: string

@@ -6,7 +6,7 @@ import * as directives from 'vuetify/directives'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import Code from '../src/components/primitives/Code.vue'
-import { tokenise } from '../src/composables/markdown/useHighlight'
+import { tokenise } from '../src/composables/markdown/internal/highlight'
 import { fakeI18n } from './fake-i18n'
 
 const vuetify = createVuetify({ components, directives })

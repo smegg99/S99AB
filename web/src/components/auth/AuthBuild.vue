@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { formatReleaseDate } from '../../composables/releases/useReleaseDate'
+import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useBuildVersion } from '../../composables/releases/useBuildVersion'
 import { useTranslate } from '../../composables/useTranslate'
 
