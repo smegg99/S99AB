@@ -114,12 +114,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import UiMotion from '../motion/Motion.vue'
-import {
-  POSITIONS,
-  type Toast,
-  type ToastPosition,
-  useToast,
-} from '../../composables/toast/useToast'
+import { POSITIONS } from '../../composables/toast/internal/config'
+import { type Toast, type ToastPosition, useToast } from '../../composables/toast/useToast'
 import { useToastHold } from '../../composables/toast/useToastHold'
 import { useToastStack } from '../../composables/toast/useToastStack'
 import { useTranslate } from '../../composables/useTranslate'

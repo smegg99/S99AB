@@ -1,13 +1,9 @@
 // web/tests/toast.spec.ts
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  configureToast,
-  queueDepth,
-  resetToasts,
-  useToast,
-  visibleAt,
-} from '../src/composables/toast/useToast'
+import { configureToast } from '../src/composables/toast/internal/config'
+import { queueDepth, resetToasts, visibleAt } from '../src/composables/toast/internal/queue'
+import { useToast } from '../src/composables/toast/useToast'
 
 // Module-level state lets anything raise a toast; each test resets it.
 beforeEach(() => {

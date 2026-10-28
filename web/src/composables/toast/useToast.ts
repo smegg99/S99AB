@@ -20,27 +20,17 @@ import {
 } from './internal/queue'
 import type { ToastKind, ToastOptions } from './internal/types'
 
-export * from './internal/types'
-export {
-  POSITIONS,
-  closableOf,
-  configureToast,
-  iconOf,
-  progressOf,
-  type ToastConfig,
-  type ToastConfigPatch,
-} from './internal/config'
-export {
-  clear,
-  dismiss,
-  pause,
-  queueDepth,
-  resetToasts,
-  resume,
-  show,
-  update,
-  visibleAt,
-} from './internal/queue'
+export type {
+  Toast,
+  ToastAction,
+  ToastIcons,
+  ToastKind,
+  ToastOptions,
+  ToastPosition,
+  ToastProgress,
+  ToastUpdate,
+} from './internal/types'
+export type { ToastConfig, ToastConfigPatch } from './internal/config'
 
 /** A string, or a function of what the work returned or threw. */
 type Said<T> = string | ((subject: T) => string)
@@ -62,7 +52,7 @@ export interface ToastPromise<T> {
  * One toast for a piece of work: pending, then its outcome in place, paced by s99ab.delay.
  * Rethrows, so the caller still handles the error.
  */
-export async function promise<T>(
+async function promise<T>(
   work: Promise<T>,
   said: ToastPromise<T>,
   opts: ToastOptions = {},

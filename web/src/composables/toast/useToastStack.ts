@@ -2,23 +2,10 @@
 
 import { onBeforeUnmount, reactive } from 'vue'
 import { useMotion } from '../motion/useMotion'
-import {
-  type Toast,
-  type ToastPosition,
-  iconOf,
-  progressOf,
-  visibleAt,
-} from './useToast'
-
-/**
- * Distance of a toast from its stack's edge, from the heights of the toasts nearer that edge.
- * The oldest toast is furthest out, so its expiry moves no other toast.
- */
-export function stackLift(heights: number[], index: number): string {
-  let px = 0
-  for (let i = 0; i < index; i++) px += heights[i] ?? 0
-  return `calc(${px}px + ${index} * var(--s99ab-toast-gap))`
-}
+import type { Toast, ToastPosition } from './useToast'
+import { iconOf, progressOf } from './internal/config'
+import { visibleAt } from './internal/queue'
+import { stackLift } from './internal/stack'
 
 /** One toast with its render values resolved. */
 export interface ToastRow {

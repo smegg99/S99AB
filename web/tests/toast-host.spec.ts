@@ -11,8 +11,10 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ToastHost from '../src/components/overlay/ToastHost.vue'
 import { configureMotion } from '../src/composables/motion/useMotion'
-import { configureToast, resetToasts, useToast, visibleAt } from '../src/composables/toast/useToast'
-import { stackLift } from '../src/composables/toast/useToastStack'
+import { configureToast } from '../src/composables/toast/internal/config'
+import { resetToasts, visibleAt } from '../src/composables/toast/internal/queue'
+import { stackLift } from '../src/composables/toast/internal/stack'
+import { useToast } from '../src/composables/toast/useToast'
 
 const vuetify = createVuetify({ components, directives })
 

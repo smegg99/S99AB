@@ -74,10 +74,7 @@ import {
   type TextureConfigPatch,
   useTexture,
 } from '../src/composables/appearance/useTexture'
-import {
-  configureToast,
-  type ToastConfigPatch,
-} from '../src/composables/toast/useToast'
+import { configureToast, type ToastConfigPatch } from '../src/composables/toast/internal/config'
 import { type PaletteName, paletteTexture } from '../src/theme/palette'
 
 export default defineNuxtPlugin(() => {
