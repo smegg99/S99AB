@@ -5,6 +5,7 @@ package jobs_test
 import (
 	"context"
 	"errors"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -286,5 +287,32 @@ func TestStartAndCloseAreIdempotent(t *testing.T) {
 	}
 	if err := s.Close(); err != nil {
 		t.Fatalf("second Close: %v", err)
+	}
+}
+
+// One buggy job must not take the process, and the rest of the schedule, with it.
+func TestAPanickingJobIsReportedAsItsError(t *testing.T) {
+	var seen []jobs.Run
+	s := jobs.New(jobs.Options{Observe: func(r jobs.Run) { seen = append(seen, r) }})
+	if err := s.Add("bad", "@every 1h", func(context.Context) error { panic("nil map") }); err != nil {
+		t.Fatal(err)
+	}
+
+	err := s.RunNow(context.Background(), "bad")
+	if err == nil || !strings.Contains(err.Error(), "nil map") {
+		t.Fatalf("RunNow = %v, want the panic as an error", err)
+	}
+	if len(seen) != 1 || seen[0].Err == nil {
+		t.Fatalf("observed %+v, want one run with the error", seen)
+	}
+}
+
+func TestStartAfterCloseIsRefused(t *testing.T) {
+	s := jobs.New(jobs.Options{})
+	if err := s.Close(); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Start(context.Background()); !errors.Is(err, jobs.ErrClosed) {
+		t.Fatalf("Start after Close = %v, want ErrClosed", err)
 	}
 }

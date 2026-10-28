@@ -20,6 +20,7 @@ var (
 	ErrDuplicate = errors.New("jobs: name is already registered")
 	ErrNoJob     = errors.New("jobs: no such job")
 	ErrRunning   = errors.New("jobs: scheduler already started")
+	ErrClosed    = errors.New("jobs: scheduler is closed")
 )
 
 // Func is one job's work.
@@ -55,6 +56,7 @@ type Scheduler struct {
 	mu      sync.Mutex
 	entries map[string]*entry
 	started bool
+	closed  bool
 	ctx     context.Context
 	cancel  context.CancelFunc
 }
@@ -113,18 +115,21 @@ func (s *Scheduler) Jobs() []Registered {
 	return out
 }
 
-// Start begins ticking. ctx cancellation stops every running job.
-func (s *Scheduler) Start(ctx context.Context) {
+// Start begins ticking; a second call does nothing and a call after Close is ErrClosed. ctx
+// cancellation stops every running job.
+func (s *Scheduler) Start(ctx context.Context) error {
 	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.closed {
+		return ErrClosed
+	}
 	if s.started {
-		s.mu.Unlock()
-		return
+		return nil
 	}
 	s.started = true
 	s.ctx, s.cancel = context.WithCancel(ctx)
-	s.mu.Unlock()
-
 	s.cron.Start()
+	return nil
 }
 
 // Close stops the schedule, cancels the context running jobs were given,
@@ -132,6 +137,7 @@ func (s *Scheduler) Start(ctx context.Context) {
 func (s *Scheduler) Close() error {
 	s.mu.Lock()
 	cancel := s.cancel
+	s.closed = true
 	s.mu.Unlock()
 
 	stopped := s.cron.Stop()
@@ -179,10 +185,17 @@ func (s *Scheduler) call(ctx context.Context, e *entry) error {
 	return s.exec(ctx, e)
 }
 
-func (s *Scheduler) exec(ctx context.Context, e *entry) error {
+func (s *Scheduler) exec(ctx context.Context, e *entry) (err error) {
 	started := time.Now()
 
-	err := e.fn(ctx)
+	func() {
+		defer func() {
+			if r := recover(); r != nil {
+				err = fmt.Errorf("jobs: %q panicked: %v", e.name, r)
+			}
+		}()
+		err = e.fn(ctx)
+	}()
 
 	s.observe(Run{Name: e.name, Started: started, Took: time.Since(started), Err: err})
 	return err
