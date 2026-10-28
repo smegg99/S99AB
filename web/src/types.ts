@@ -137,7 +137,6 @@ export type {
 } from './composables/explorer/internal/events'
 export type { ExplorerKeyHost } from './composables/explorer/internal/keys'
 export type {
-  ExplorerPickMods,
   ExplorerSelection,
 } from './composables/explorer/useExplorerSelection'
 
@@ -237,3 +236,5 @@ export type {
   CrashScreenKind,
   CrashScreenReport,
 } from './components/state/crashScreen'
+
+export type { PickMods } from './browser/keys'

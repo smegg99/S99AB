@@ -7,11 +7,6 @@ import { inject } from 'vue'
 import type { useExplorerSelection } from './internal/selection'
 import { explorerSelectionKey } from './internal/selection'
 
-export interface ExplorerPickMods {
-  ctrl?: boolean
-  shift?: boolean
-}
-
 export type ExplorerSelection<T = unknown> = ReturnType<typeof useExplorerSelection<T>>
 
 /** The enclosing selection, or null so a tile knows not to draw the picked state. */

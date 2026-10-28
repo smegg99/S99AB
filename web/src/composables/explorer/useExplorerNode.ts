@@ -12,6 +12,7 @@ import type { ExplorerNode } from './internal/tree'
 import { useTranslate } from '../useTranslate'
 
 import { noActions, useExplorerActions, dragHasFiles } from './internal/actions'
+import { pickMods } from '../../browser/keys'
 
 /** Tile actions the screen owns: opening a leaf and the context menu. */
 export interface ExplorerActions<T = unknown> {
@@ -228,7 +229,7 @@ export function useExplorerNode<T = unknown>(
   function onClick(event: MouseEvent) {
     if (disabled.value) return
 
-    const mods = { ctrl: event.ctrlKey || event.metaKey, shift: event.shiftKey }
+    const mods = pickMods(event)
     const modified = mods.ctrl || mods.shift
     const twoClicks = explorer.behaviour.value.activate === 'double'
 

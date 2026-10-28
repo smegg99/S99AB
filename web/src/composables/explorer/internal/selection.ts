@@ -3,7 +3,8 @@
 import { computed, type InjectionKey, provide, type Ref, shallowRef, watch } from 'vue'
 import type { ExplorerApi } from '../useExplorer'
 import type { ExplorerNode } from './tree'
-import type { ExplorerPickMods, ExplorerSelection } from '../useExplorerSelection'
+import type { ExplorerSelection } from '../useExplorerSelection'
+import type { PickMods } from '../../../browser/keys'
 
 export function useExplorerSelection<T = unknown>(
   explorer: ExplorerApi<T>,
@@ -63,7 +64,7 @@ export function useExplorerSelection<T = unknown>(
     return list.slice(start, end + 1).filter(n => !n.disabled).map(n => n.id)
   }
 
-  function pick(node: ExplorerNode<T>, mods: ExplorerPickMods = {}) {
+  function pick(node: ExplorerNode<T>, mods: Partial<PickMods> = {}) {
     if (!active.value || node.disabled) return
 
     if (mode.value === 'single') {

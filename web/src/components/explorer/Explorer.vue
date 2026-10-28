@@ -154,6 +154,7 @@ import type { ExplorerFolderInput, ExplorerMove } from '../../composables/explor
 import type { ExplorerNode } from '../../composables/explorer/internal/tree'
 import { useToast } from '../../composables/toast/useToast'
 import { useTranslate } from '../../composables/useTranslate'
+import { pickMods } from '../../browser/keys'
 
 // The whole explorer in one tag; the screen supplies the source, leaf opening and menu entries.
 const {
@@ -275,7 +276,7 @@ const bandStyle = computed(() => ({
 /** Deselects on mousedown, so deselect and a following rubber band are one gesture. */
 function onMousedown(event: MouseEvent) {
   const onTile = (event.target as HTMLElement | null)?.closest('.s99ab-tile')
-  if (!onTile && !(event.ctrlKey || event.metaKey)) selection.clear()
+  if (!onTile && !pickMods(event).ctrl) selection.clear()
   base = onTile ? [] : [...selection.ids.value]
   startBand(event)
 }

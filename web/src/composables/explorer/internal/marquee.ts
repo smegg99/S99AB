@@ -5,6 +5,7 @@
 
 import { onScopeDispose, shallowRef } from 'vue'
 import { TILE_ATTR } from '../../../browser/tiles'
+import { pickMods } from '../../../browser/keys'
 
 /** Band rectangle relative to the region it is drawn in. */
 export interface ExplorerBand {
@@ -44,7 +45,7 @@ export function useExplorerMarquee(host: ExplorerMarqueeHost) {
 
     grid = el
     origin = { x: event.clientX, y: event.clientY }
-    if (!(event.ctrlKey || event.metaKey)) host.clear()
+    if (!pickMods(event).ctrl) host.clear()
 
     window.addEventListener('mousemove', onMousemove)
     window.addEventListener('mouseup', stop)

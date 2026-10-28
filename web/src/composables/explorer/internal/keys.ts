@@ -1,22 +1,18 @@
 // web/src/composables/explorer/internal/keys.ts
 
 import { TILE_ATTR } from '../../../browser/tiles'
+import { type PickMods, pickMods } from '../../../browser/keys'
 // Grid keyboard: arrows move focus and selection, ctrl moves focus only, shift
 // extends, space picks. Enter is handled by the tile.
 // Columns and tiles are read from the DOM; a custom tile must spread useExplorerNode's bindings.
-
-export interface ExplorerKeyMods {
-  ctrl: boolean
-  shift: boolean
-}
 
 export interface ExplorerKeyHost {
   /** Whether the arrow keys move focus. */
   enabled: () => boolean
   /** Focus landed on a tile; the host updates the selection. */
-  moved?: (id: string, mods: ExplorerKeyMods) => void
+  moved?: (id: string, mods: PickMods) => void
   /** Space picks the focused tile; ctrl+space toggles it. */
-  choose?: (id: string, mods: ExplorerKeyMods) => void
+  choose?: (id: string, mods: PickMods) => void
   /** ctrl+a; false leaves the browser's select-all. */
   selectAll?: () => boolean
   /** Escape; false leaves the key alone. */
@@ -36,7 +32,7 @@ export function useExplorerKeys(host: ExplorerKeyHost) {
     const grid = event.currentTarget as HTMLElement | null
     if (!grid) return
 
-    const mods = { ctrl: event.ctrlKey || event.metaKey, shift: event.shiftKey }
+    const mods = pickMods(event)
 
     if (host.selectAll && event.key === 'a' && mods.ctrl) {
       if (host.selectAll()) event.preventDefault()
