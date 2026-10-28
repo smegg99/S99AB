@@ -109,7 +109,8 @@ import {
   type KratosNode,
 } from '../../composables/kratos/useKratosFlow'
 import { useAuthPaths } from '../../composables/kratos/useAuthPaths'
-import { resolveReturnTo, useReturnTo } from '../../composables/kratos/useAuthRoute'
+import { useReturnTo } from '../../composables/kratos/useAuthRoute'
+import { resolveReturnTo } from '../../composables/kratos/internal/route'
 import { useTranslate } from '../../composables/useTranslate'
 
 // A login or registration screen in one tag. Kratos decides the fields.

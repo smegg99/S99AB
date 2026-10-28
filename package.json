@@ -20,7 +20,7 @@
     "./theme": "./web/src/theme/index.ts",
     "./appearance": "./web/src/appearance.ts",
     "./i18n": "./web/i18n/index.ts",
-    "./kratos": "./web/src/composables/kratos/useKratosFlow.ts",
+    "./kratos": "./web/src/kratos.ts",
     "./browser": "./web/src/browser.ts",
     "./state": "./web/src/state.ts",
     "./markdown": "./web/src/markdown.ts",

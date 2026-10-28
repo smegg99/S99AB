@@ -78,7 +78,7 @@ import UiErrorState from '../state/ErrorState.vue'
 import UiLoadingState from '../state/LoadingState.vue'
 import UiTableStrip from './TableStrip.vue'
 import { type DataTableHeader, useTableConfig } from '../../composables/table/useServerTable'
-import { type TableLike, useTableFrame } from '../../composables/table/useTableFrame'
+import { type TableLike, useTableFrame } from '../../composables/table/internal/frame'
 import { useTranslate } from '../../composables/useTranslate'
 
 // Presentation and states. The composable owns the state, so an outside filter

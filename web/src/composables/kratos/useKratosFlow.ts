@@ -12,10 +12,17 @@ import type {
   KratosSuccess,
 } from './internal/api'
 
-export * from './internal/types'
-export * from './internal/nodes'
-export { isKratosEmail, kratosMessageText, kratosRules, type Rule } from './internal/rules'
-export { kratosRefreshSession, kratosSignOut, type KratosFlowApi, type KratosFlowOptions, type KratosSuccess } from './internal/api'
+export type {
+  KratosConfig,
+  KratosFlow,
+  KratosFlowKind,
+  KratosMessage,
+  KratosMessageType,
+  KratosNode,
+  KratosNodeAttributes,
+} from './internal/types'
+export type { KratosNodeKind } from './internal/nodes'
+export type { KratosFlowApi, KratosFlowOptions, KratosNotice, KratosSuccess } from './internal/api'
 
 /** `kind` may be a getter, so a destructured prop stays reactive. */
 export function useKratosFlow(

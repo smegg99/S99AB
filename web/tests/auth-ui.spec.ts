@@ -8,7 +8,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import AuthCard from '../src/components/auth/AuthCard.vue'
 import AuthPage from '../src/components/auth/AuthPage.vue'
-import { configureAuthPaths } from '../src/composables/kratos/useAuthPaths'
+import { configureAuthPaths } from '../src/composables/kratos/internal/paths'
 import { fakeI18n } from './fake-i18n'
 
 const vuetify = createVuetify({ components, directives })

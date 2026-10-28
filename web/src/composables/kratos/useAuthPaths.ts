@@ -1,6 +1,7 @@
 // web/src/composables/kratos/useAuthPaths.ts
 
-import { reactive, readonly } from 'vue'
+import { readonly } from 'vue'
+import { paths } from './internal/paths'
 
 /** App paths for the auth screens; a 401 links to signInPath. */
 export interface AuthPaths {
@@ -11,18 +12,6 @@ export interface AuthPaths {
   homePath: string
   /** The settings flow's path. Empty for an app with nothing to change. */
   settingsPath: string
-}
-
-const paths = reactive<AuthPaths>({
-  signInPath: '',
-  signUpPath: '',
-  homePath: '',
-  settingsPath: '',
-})
-
-/** Called by the layer's Nuxt plugin with s99ab.auth. */
-export function configureAuthPaths(patch: Partial<AuthPaths>) {
-  Object.assign(paths, patch)
 }
 
 export function useAuthPaths(): Readonly<AuthPaths> {

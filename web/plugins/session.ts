@@ -4,11 +4,8 @@
 // request cookie for the framework-free useSession.
 
 import { config } from '../src/composables/kratos/internal/types'
-import {
-  configureSession,
-  loadSession,
-  type SessionIdentity,
-} from '../src/composables/kratos/useSession'
+import type { SessionIdentity } from '../src/composables/kratos/useSession'
+import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
 
 /**
  * Absolute Kratos address for server-side reads. The browser's proxy path

@@ -1,6 +1,6 @@
-// web/src/composables/tabs/useTabDrag.ts
+// web/src/composables/tabs/internal/tabDrag.ts
 import { computed, nextTick, onScopeDispose, ref, shallowRef, watch, type Ref } from 'vue'
-import type { WorkspaceTab } from './useTabs'
+import type { WorkspaceTab } from '../useTabs'
 
 export interface TabStripGeometry {
   bounds: { x: number, y: number, width: number, height: number }

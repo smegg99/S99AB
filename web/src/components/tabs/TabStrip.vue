@@ -113,7 +113,7 @@
 import { computed, nextTick, onMounted, onScopeDispose, ref, watch, type ComponentPublicInstance } from 'vue'
 import type { MenuEntry } from '../../composables/tabs/internal/contextMenu'
 import { openContextMenu, useContextMenuState } from '../../composables/tabs/internal/contextMenu'
-import { useTabDrag, type TabWorkspace, type NativeTabDrag } from '../../composables/tabs/useTabDrag'
+import { useTabDrag, type TabWorkspace, type NativeTabDrag } from '../../composables/tabs/internal/tabDrag'
 import type { WorkspaceTab } from '../../composables/tabs/useTabs'
 import UiDisabledHint from '../primitives/DisabledHint.vue'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'

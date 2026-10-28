@@ -116,8 +116,8 @@ import { computed } from 'vue'
 import UiMotion from '../motion/Motion.vue'
 import { POSITIONS } from '../../composables/toast/internal/config'
 import { type Toast, type ToastPosition, useToast } from '../../composables/toast/useToast'
-import { useToastHold } from '../../composables/toast/useToastHold'
-import { useToastStack } from '../../composables/toast/useToastStack'
+import { useToastHold } from '../../composables/toast/internal/hold'
+import { useToastStack } from '../../composables/toast/internal/rows'
 import { useTranslate } from '../../composables/useTranslate'
 
 // Mount once in app.vue, above every layout, or toasts appear twice.

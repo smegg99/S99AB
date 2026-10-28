@@ -8,16 +8,14 @@ import PromptDialog from '../src/components/overlay/PromptDialog.vue'
 import type { AppearanceConfig } from '../src/composables/appearance/useAppearance'
 import { appearanceConfig, configureAppearance } from '../src/composables/appearance/internal/appearance'
 import { applyLite, configureEffects, effectsConfig } from '../src/composables/appearance/internal/effects'
-import {
-  type AuthPaths,
-  configureAuthPaths,
-} from '../src/composables/kratos/useAuthPaths'
+import type { AuthPaths } from '../src/composables/kratos/useAuthPaths'
+import { configureAuthPaths } from '../src/composables/kratos/internal/paths'
 import {
   configureAuthFlowRoutes,
   registerAuthRouting,
 } from '../src/composables/kratos/internal/route'
-import type { KratosFlowKind } from '../src/composables/kratos/internal/types'
-import { registerAuthDialog } from '../src/composables/kratos/useAuthDialog'
+import type { KratosFlowKind, configureKratos, type KratosConfig } from '../src/composables/kratos/internal/types'
+import { registerAuthDialog } from '../src/composables/kratos/internal/dialog'
 import { registerDialogPresets } from '../src/internal/dialog'
 import { configureDelay, type DelayConfig } from '../src/internal/delay'
 import type { EventSourceConfig } from '../src/composables/useEventSource'
@@ -26,10 +24,6 @@ import type { ExplorerConfigPatch } from '../src/composables/explorer/useExplore
 import { applyExplorerTints, configureExplorer } from '../src/composables/explorer/internal/config'
 import type { GroundConfig } from '../src/composables/appearance/internal/flow'
 import { applyGround, configureGround } from '../src/composables/appearance/internal/flow'
-import {
-  configureKratos,
-  type KratosConfig,
-} from '../src/composables/kratos/useKratosFlow'
 import { configureMotion, type MotionConfigPatch } from '../src/composables/motion/internal/motion'
 import type { ReleasesConfig } from '../src/composables/releases/useReleases'
 import { configureReleases } from '../src/composables/releases/internal/api'

@@ -106,7 +106,7 @@
 <script setup lang="ts">
 import type { NavGroup, NavLit } from '../../types'
 import { computed, useTemplateRef, watchEffect } from 'vue'
-import { useNavTrail } from '../../composables/shell/useNavTrail'
+import { useNavTrail } from '../../composables/shell/internal/navTrail'
 
 // A rail beside the nav with a disc that moves to the current page. The rows
 // are ordinary v-list-items, so focus, routing and keyboard nav still apply.

@@ -5,7 +5,7 @@ import { nextTick, reactive } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import TabStrip from '../src/components/tabs/TabStrip.vue'
-import type { NativeTabDrag } from '../src/composables/tabs/useTabDrag'
+import type { NativeTabDrag } from '../src/composables/tabs/internal/tabDrag'
 import type { WorkspaceTab } from '../src/composables/tabs/useTabs'
 
 const vuetify = createVuetify({ components })

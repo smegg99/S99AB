@@ -1,9 +1,9 @@
-// web/src/composables/toast/useToastHold.ts
+// web/src/composables/toast/internal/hold.ts
 
 import { onBeforeUnmount, ref } from 'vue'
-import { POSITIONS } from './internal/config'
-import { pause, resume, visibleAt } from './internal/queue'
-import { useToast } from './useToast'
+import { POSITIONS } from './config'
+import { pause, resume, visibleAt } from './queue'
+import { useToast } from '../useToast'
 
 /** Pauses a toast's countdown on hover or hidden tab; the host binds its paused class to isPaused. */
 export function useToastHold() {

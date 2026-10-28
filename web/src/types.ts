@@ -100,6 +100,9 @@ export type {
   KratosNode,
   KratosNodeAttributes,
   KratosNodeKind,
+  KratosFlowOptions,
+  KratosNotice,
+  KratosSuccess,
 } from './composables/kratos/useKratosFlow'
 
 export type {
@@ -158,7 +161,7 @@ export type {
 export type { QueryLike } from './composables/state/useAsyncState'
 export type { AccountIdentity } from './composables/kratos/useAccountIdentity'
 export type { AppearanceSource } from './composables/appearance/useAppearance'
-export type { TableLike } from './composables/table/useTableFrame'
+export type { TableLike } from './composables/table/internal/frame'
 export type {
   BuildVersion,
   BuildVersionOptions,
@@ -171,7 +174,7 @@ export type {
   TrailNode,
   TrailPoint,
   TrailRow,
-} from './composables/shell/useNavTrail'
+} from './composables/shell/internal/navTrail'
 
 export type {
   Palette,
@@ -225,7 +228,7 @@ export type ToolValue = string | number | boolean
 
 export type { WorkspaceTab, TabsOptions } from './composables/tabs/useTabs'
 export type { MenuEntry } from './composables/tabs/internal/contextMenu'
-export type { TabWorkspace, NativeTabDrag, NativeTabFace, NativeTabTrack, TabStripGeometry } from './composables/tabs/useTabDrag'
+export type { TabWorkspace, NativeTabDrag, NativeTabFace, NativeTabTrack, TabStripGeometry } from './composables/tabs/internal/tabDrag'
 
 export type { FooterStat } from './composables/primitives/internal/paneFoot'
 

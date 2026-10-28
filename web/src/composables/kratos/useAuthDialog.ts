@@ -1,14 +1,8 @@
 // web/src/composables/kratos/useAuthDialog.ts
 
 import { useDialog } from '../useDialog'
+import { authDialog } from './internal/dialog'
 import type { KratosFlowKind } from './useKratosFlow'
-
-// Set by the layer's Nuxt plugin to avoid an import cycle with the component.
-let component: unknown
-
-export function registerAuthDialog(dialog: unknown) {
-  component = dialog
-}
 
 export interface AuthDialogOptions {
   kind?: KratosFlowKind
@@ -24,6 +18,7 @@ export function useAuthDialog() {
   const { openDialog } = useDialog()
 
   return function askToSignIn(options: AuthDialogOptions = {}) {
+    const component = authDialog()
     if (!component) {
       throw new Error('s99ab: the auth dialog is not registered; is the layer plugin loaded?')
     }

@@ -8,25 +8,10 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import KratosForm from '../src/components/auth/KratosForm.vue'
 import ErrorState from '../src/components/state/ErrorState.vue'
-import {
-  configureKratos,
-  isKratosHidden,
-  isKratosInput,
-  isKratosPrimary,
-  isKratosSubmit,
-  kratosInputType,
-  kratosLabel,
-  kratosSeverity,
-  useKratosFlow,
-  type KratosFlow,
-  type KratosNode,
-} from '../src/composables/kratos/useKratosFlow'
-import {
-  AUTH_FLOW_ROUTES,
-  configureAuthFlowRoutes,
-  registerAuthRouting,
-  resolveReturnTo,
-} from '../src/composables/kratos/useAuthRoute'
+import { useKratosFlow, type KratosFlow, type KratosNode } from '../src/composables/kratos/useKratosFlow'
+import { configureKratos } from '../src/composables/kratos/internal/types'
+import { isKratosHidden, isKratosInput, isKratosPrimary, isKratosSubmit, kratosInputType, kratosLabel, kratosSeverity } from '../src/composables/kratos/internal/nodes'
+import { AUTH_FLOW_ROUTES, configureAuthFlowRoutes, registerAuthRouting, resolveReturnTo } from '../src/composables/kratos/internal/route'
 import { kratosRefreshSession, kratosSignOut } from '../src/composables/kratos/internal/api'
 import { fakeI18n } from './fake-i18n'
 

@@ -1,16 +1,16 @@
-// web/src/composables/shell/useNavTrail.ts
+// web/src/composables/shell/internal/navTrail.ts
 
 import type { Ref } from 'vue'
-import type { NavGroup } from '../../types'
+import type { NavGroup } from '../../../types'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { useCssNumber } from '../useCssNumber'
-import { useScrollSpy } from './useScrollSpy'
-import { anchorsIn } from './internal/anchors'
+import { useCssNumber } from '../../useCssNumber'
+import { useScrollSpy } from '../useScrollSpy'
+import { anchorsIn } from './anchors'
 
-import { flattenNav, type TrailMetrics, type TrailPoint, trailHeight, trailNodes, trailPath, activeRow } from './internal/trail'
+import { flattenNav, type TrailMetrics, type TrailPoint, trailHeight, trailNodes, trailPath, activeRow } from './trail'
 
-export type { TrailMetrics, TrailNode, TrailPoint, TrailRow } from './internal/trail'
+export type { TrailMetrics, TrailNode, TrailPoint, TrailRow } from './trail'
 
 /** The rail's geometry and the disc's position. Dimensions come from useCssNumber, so themer changes redraw it. */
 export function useNavTrail(groups: () => NavGroup[], active: Ref<number | undefined>) {

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { createMemoryHistory, createRouter } from 'vue-router'
-import { useNavTrail } from '../src/composables/shell/useNavTrail'
+import { useNavTrail } from '../src/composables/shell/internal/navTrail'
 import { activeRow, flattenNav, trailHeight, trailNodes, trailPath } from '../src/composables/shell/internal/trail'
 import { configureMotion, resetMotion } from '../src/composables/motion/internal/motion'
 

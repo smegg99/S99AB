@@ -2,12 +2,8 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
-import {
-  configureSession,
-  loadSession,
-  useSession,
-  type SessionIdentity,
-} from '../src/composables/kratos/useSession'
+import { useSession, type SessionIdentity } from '../src/composables/kratos/useSession'
+import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
 
 // The composable caches across calls, so each test starts from a clean module.
 async function fresh() {
