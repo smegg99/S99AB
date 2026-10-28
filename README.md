@@ -80,6 +80,40 @@ export default defineNuxtConfig({
 })
 ```
 
+## Subpaths
+
+Inside a Nuxt app the layer auto-imports its `use*`, `provide*` and `dispose*`
+composables and their types, nothing else. Plain functions, and code outside
+Nuxt such as a desktop bridge, import from a subpath:
+
+| Subpath | Holds |
+|---|---|
+| `@smegg99/s99ab/browser` | focus, pointer tracking and drag, tiles, edit undo, text fitting, `takeRow`, `createPendingSaves`, `prefersReducedMotion` |
+| `@smegg99/s99ab/explorer` | tree helpers (`pathOf`, `groupByParent`, `childrenOf`, ...), `bindExplorerEvents`, explorer types |
+| `@smegg99/s99ab/kratos` | node helpers, `kratosRules`, `kratosMessageText`, sign-out and refresh, sign-in routes, Kratos types |
+| `@smegg99/s99ab/appearance` | `useAppearance`, the appearance source, textures, `supportsWebgl`, `originOf` |
+| `@smegg99/s99ab/releases` | `formatBytes`, `kindKey`, `PLATFORM_NAMES`, `compareVersions`, `formatReleaseDate` |
+| `@smegg99/s99ab/markdown` | `parseMarkdown`, `parseInline`, `tokenise` |
+| `@smegg99/s99ab/state` | `settle`, `toApiError` |
+| `@smegg99/s99ab/tabs` | `useTabs`, the tab context menu, native tab drag types |
+| `@smegg99/s99ab/theme` | palettes and Vuetify theme helpers |
+| `@smegg99/s99ab/types` | every type in a public signature |
+| `@smegg99/s99ab/i18n` | the layer's catalogs |
+| `@smegg99/s99ab/styles` | the shared stylesheet |
+
+## Upgrading the Nuxt layer after 1.7.0
+
+The auto-import surface shrank from about 250 names to the composables. A
+consumer that used one of these as a global imports it from the subpath above:
+`pathOf`, `groupByParent`, `childrenOf`, `depthOf`, `bindExplorerEvents`,
+`createPointerDrag`, `inZone`, `fitWordRun`, `isCut`, `wordBoxes`, `wordsRoom`,
+`takeRow`, `originOf`, `registerAppearanceSource`, `resetAppearanceSource`,
+`TEXTURES`, `applyTexture`, `textureConfig`, `supportsWebgl`, `formatBytes`,
+`kindKey`, `parseMarkdown`, `prefersReducedMotion`, `settle`. Renamed:
+`injectKeyTips` is `useKeyTipsContext`, `pendingSaves` is `createPendingSaves`.
+`/browser` no longer re-exports composables; they are auto-imported. Toast
+functions (`show`, `dismiss`, `promise`, ...) are only on `useToast()`.
+
 ## Upgrading to 1.7.0
 
 1.7.0 breaks these Go APIs:
