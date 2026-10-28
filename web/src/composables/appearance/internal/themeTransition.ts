@@ -4,6 +4,7 @@ import { reactive } from 'vue'
 import { motionLevel, resolveLevel } from '../../motion/internal/motion'
 import { readStored } from '../../../browser/storage'
 import { inBrowser } from '../../../browser/env'
+import { mergeConfig } from '../../../internal/config'
 
 /**
  * How the screen changes appearance. `cover`, `cover-in`, `veil` and the `wipe`
@@ -124,11 +125,7 @@ export const config = reactive<ThemeTransitionConfig>({
 
 /** Called by the layer's Nuxt plugin. The per-shape maps are merged, not replaced. */
 export function configureThemeTransition(patch: Partial<ThemeTransitionConfig>) {
-  const { durations, easings, ...rest } = patch
-
-  Object.assign(config, rest)
-  if (durations) Object.assign(config.durations, durations)
-  if (easings) Object.assign(config.easings, easings)
+  mergeConfig(config, patch, ['durations', 'easings'])
 }
 
 /** ms for one shape: its own, or the shared default. */

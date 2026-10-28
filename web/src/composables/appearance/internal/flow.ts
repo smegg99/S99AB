@@ -2,6 +2,7 @@
 
 import { reactive } from 'vue'
 import { inBrowser } from '../../../browser/env'
+import { mergeConfig } from '../../../internal/config'
 
 export const config = reactive<GroundConfig>({
   kind: 'flow',
@@ -30,11 +31,7 @@ export const config = reactive<GroundConfig>({
 
 /** Called by the layer's Nuxt plugin with the app's s99ab.ground config. */
 export function configureGround(patch: Partial<GroundConfig>) {
-  // Merge `dark` separately; spreading would replace the whole map.
-  const { dark, ...rest } = patch
-
-  Object.assign(config, rest)
-  if (dark) Object.assign(config.dark, dark)
+  mergeConfig(config, patch, ['dark'])
 }
 
 /** The shader shape for one variant, with dark overrides applied over the base. */

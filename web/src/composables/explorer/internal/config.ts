@@ -3,6 +3,7 @@
 import { reactive } from 'vue'
 import { applyExplorerAccents } from './accents'
 import type { ExplorerConfig, ExplorerConfigPatch } from '../useExplorerConfig'
+import { mergeConfig } from '../../../internal/config'
 
 export const config = reactive<ExplorerConfig>({
   maxDepth: 8,
@@ -73,14 +74,7 @@ export const config = reactive<ExplorerConfig>({
 
 /** Called by the layer's Nuxt plugin with the app's s99ab.explorer config. */
 export function configureExplorer(patch: ExplorerConfigPatch) {
-  // Merge nested maps per entry.
-  const { icons, tile, behaviour, pin, folderFields, ...rest } = patch
-  Object.assign(config, rest)
-  if (icons) Object.assign(config.icons, icons)
-  if (tile) Object.assign(config.tile, tile)
-  if (behaviour) Object.assign(config.behaviour, behaviour)
-  if (pin) Object.assign(config.pin, pin)
-  if (folderFields) Object.assign(config.folderFields, folderFields)
+  mergeConfig(config, patch, ['icons', 'tile', 'behaviour', 'pin', 'folderFields'])
 }
 
 export function applyExplorerTints() {

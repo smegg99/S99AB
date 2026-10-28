@@ -3,6 +3,7 @@
 import { reactive } from 'vue'
 import { mediaMatches } from '../../../browser/media'
 import { inBrowser } from '../../../browser/env'
+import { mergeConfig } from '../../../internal/config'
 
 /** `reduced` keeps fades and drops movement; `off` removes both. */
 export type MotionLevel = 'system' | 'full' | 'reduced' | 'off'
@@ -36,11 +37,7 @@ export const config = reactive<MotionConfig>({
 
 /** Called by the layer's Nuxt plugin with the app's s99ab.motion config. */
 export function configureMotion(patch: MotionConfigPatch) {
-  // Merge the nested maps so a patch setting one duration keeps the rest.
-  const { duration, easing, ...rest } = patch
-  Object.assign(config, rest)
-  if (duration) Object.assign(config.duration, duration)
-  if (easing) Object.assign(config.easing, easing)
+  mergeConfig(config, patch, ['duration', 'easing'])
 }
 
 /** The configured level, read once without a computed. */
