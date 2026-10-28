@@ -6,6 +6,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"net"
+	"time"
 
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
@@ -17,16 +19,24 @@ type imapSource struct {
 	c *imapclient.Client
 }
 
-func dialIMAP(cfg Config) (*imapSource, error) {
+// dial connects with cfg.DialTimeout, over TLS when cfg asks for it.
+func dial(cfg Config) (*imapclient.Client, string, error) {
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-
-	var c *imapclient.Client
-	var err error
-	if cfg.UseTLS {
-		c, err = imapclient.DialTLS(addr, nil)
-	} else {
-		c, err = imapclient.DialInsecure(addr, nil)
+	timeout := cfg.DialTimeout
+	if timeout <= 0 {
+		timeout = 10 * time.Second
 	}
+	opts := &imapclient.Options{Dialer: &net.Dialer{Timeout: timeout}}
+	if cfg.UseTLS {
+		c, err := imapclient.DialTLS(addr, opts)
+		return c, addr, err
+	}
+	c, err := imapclient.DialInsecure(addr, opts)
+	return c, addr, err
+}
+
+func dialIMAP(cfg Config) (*imapSource, error) {
+	c, addr, err := dial(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("dial %s: %w", addr, err)
 	}

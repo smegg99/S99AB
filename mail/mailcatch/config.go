@@ -22,6 +22,8 @@ type Config struct {
 	CodeRegex *regexp.Regexp
 	// PollInterval zero means 5s.
 	PollInterval time.Duration
+	// DialTimeout bounds connecting to the server. Zero means 10s.
+	DialTimeout time.Duration
 }
 
 func (c Config) pollInterval() time.Duration {

@@ -3,11 +3,10 @@
 package mailcatch
 
 import (
-	"fmt"
+	"errors"
 	"io"
-	"strings"
-
-	"github.com/emersion/go-imap/v2/imapclient"
+	"net"
+	"syscall"
 )
 
 // ValidationError carries only a code for the frontend to localize.
@@ -21,15 +20,7 @@ func (e *ValidationError) Error() string {
 
 // ValidateCredentials returns a *ValidationError naming the step that failed.
 func ValidateCredentials(cfg Config) error {
-	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
-
-	var c *imapclient.Client
-	var err error
-	if cfg.UseTLS {
-		c, err = imapclient.DialTLS(addr, nil)
-	} else {
-		c, err = imapclient.DialInsecure(addr, nil)
-	}
+	c, _, err := dial(cfg)
 	if err != nil {
 		if !cfg.UseTLS {
 			return &ValidationError{Code: "connection_failed_try_tls"}
@@ -54,9 +45,10 @@ func ValidateCredentials(cfg Config) error {
 }
 
 func isConnectionLost(err error) bool {
-	if err == io.EOF || err == io.ErrUnexpectedEOF {
-		return true
+	for _, lost := range []error{io.EOF, io.ErrUnexpectedEOF, io.ErrClosedPipe, net.ErrClosed, syscall.ECONNRESET, syscall.EPIPE} {
+		if errors.Is(err, lost) {
+			return true
+		}
 	}
-	s := err.Error()
-	return strings.Contains(s, "EOF") || strings.Contains(s, "connection reset") || strings.Contains(s, "broken pipe")
+	return false
 }
