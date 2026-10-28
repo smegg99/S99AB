@@ -2,7 +2,8 @@
 
 import { effectScope, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { configureDelay, settle, useDelayed } from '../src/composables/useDelay'
+import { configureDelay, settle } from '../src/internal/delay'
+import { useDelayed } from '../src/composables/useDelay'
 
 // The composable registers an onScopeDispose, which warns outside one.
 function inScope<T>(fn: () => T): T {

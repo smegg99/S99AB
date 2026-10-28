@@ -21,7 +21,8 @@
     "./appearance": "./web/src/appearance.ts",
     "./i18n": "./web/i18n/index.ts",
     "./kratos": "./web/src/composables/kratos/useKratosFlow.ts",
-    "./browser": "./web/src/browser.ts"
+    "./browser": "./web/src/browser.ts",
+    "./state": "./web/src/state.ts"
   },
   "peerDependencies": {
     "@firecms/neat": "^0.8.0 || ^1.0.0",

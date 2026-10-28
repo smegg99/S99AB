@@ -9,7 +9,7 @@ import * as directives from 'vuetify/directives'
 import Async from '../src/components/state/Async.vue'
 import Row from '../src/components/primitives/Row.vue'
 import Stack from '../src/components/primitives/Stack.vue'
-import { configureDelay } from '../src/composables/useDelay'
+import { configureDelay } from '../src/internal/delay'
 import { fakeI18n } from './fake-i18n'
 
 const vuetify = createVuetify({ components, directives })

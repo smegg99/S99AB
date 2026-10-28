@@ -26,7 +26,7 @@ import {
 import type { KratosFlowKind } from '../src/composables/kratos/internal/types'
 import { registerAuthDialog } from '../src/composables/kratos/useAuthDialog'
 import { registerDialogPresets } from '../src/composables/useDialog'
-import { configureDelay, type DelayConfig } from '../src/composables/useDelay'
+import { configureDelay, type DelayConfig } from '../src/internal/delay'
 import {
   configureEventSource,
   type EventSourceConfig,
