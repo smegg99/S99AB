@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -80,19 +81,40 @@ func TestListenRefusesLiveSocket(t *testing.T) {
 // a stale socket file left by a crash is cleared, not treated as a live owner
 func TestListenClearsStaleSocket(t *testing.T) {
 	sock := tempSocket(t)
-	// A plain file stands in for a crash's leftover socket.
 	if err := os.MkdirAll(filepath.Dir(sock), 0o700); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(sock, nil, 0o600); err != nil {
+	// A crash leaves the socket file behind with nothing accepting on it.
+	dead, err := net.ListenUnix("unix", &net.UnixAddr{Name: sock, Net: "unix"})
+	if err != nil {
 		t.Fatal(err)
 	}
+	dead.SetUnlinkOnClose(false)
+	_ = dead.Close()
 
 	ln, err := Listen(sock)
 	if err != nil {
 		t.Fatalf("Listen over stale socket: %v", err)
 	}
 	_ = ln.Close()
+}
+
+// A mistyped path must never cost the user a file.
+func TestListenLeavesARegularFileAlone(t *testing.T) {
+	sock := tempSocket(t)
+	if err := os.MkdirAll(filepath.Dir(sock), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(sock, []byte("notes"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := Listen(sock); !errors.Is(err, ErrNotSocket) {
+		t.Fatalf("Listen = %v, want ErrNotSocket", err)
+	}
+	if data, err := os.ReadFile(sock); err != nil || string(data) != "notes" {
+		t.Fatalf("the file was touched: %q, %v", data, err)
+	}
 }
 
 // EnsureRunning does not start anything when the daemon is already up

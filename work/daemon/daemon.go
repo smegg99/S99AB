@@ -6,6 +6,7 @@ package daemon
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -13,8 +14,12 @@ import (
 	"time"
 )
 
-// ErrRunning is returned by Listen when a live process already answers on the socket.
-var ErrRunning = errors.New("daemon: already running on this socket")
+var (
+	// ErrRunning is returned by Listen when a live process already answers on the socket.
+	ErrRunning = errors.New("daemon: already running on this socket")
+	// ErrNotSocket is returned by Listen when the path holds something else, which it never removes.
+	ErrNotSocket = errors.New("daemon: path exists and is not a socket")
+)
 
 // dialTimeout bounds the liveness probe against a socket whose owner has died.
 const dialTimeout = 500 * time.Millisecond
@@ -36,14 +41,18 @@ func Dial(path string) *http.Client {
 }
 
 // Listen listens on the unix socket at path, returning ErrRunning if a live
-// process owns it and removing a stale one. The directory is 0700, the socket 0600.
+// process owns it and removing a stale one. A new directory is 0700 and the socket is 0600; the
+// socket is chmodded after it is bound, so keep a directory you pass in private.
 func Listen(path string) (net.Listener, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err
 	}
 
 	// A socket that exists but does not answer is left over from a crash.
-	if _, err := os.Stat(path); err == nil {
+	if info, err := os.Lstat(path); err == nil {
+		if info.Mode()&os.ModeSocket == 0 {
+			return nil, fmt.Errorf("%w: %s", ErrNotSocket, path)
+		}
 		if live(path) {
 			return nil, ErrRunning
 		}

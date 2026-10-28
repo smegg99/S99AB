@@ -35,7 +35,11 @@ func EnsureRunning(ctx context.Context, cfg Config) error {
 		return errors.New("daemon: EnsureRunning needs a Socket")
 	}
 
-	if check(ctx, cfg) == nil {
+	// One client for every poll: a new transport per check would leak its idle connections.
+	client := Dial(cfg.Socket)
+	defer client.CloseIdleConnections()
+
+	if check(ctx, cfg, client) == nil {
 		return nil
 	}
 	if len(cfg.Command) == 0 {
@@ -63,7 +67,7 @@ func EnsureRunning(ctx context.Context, cfg Config) error {
 		case <-deadline.C:
 			return fmt.Errorf("daemon: %s did not come up within %s: %w", cfg.Socket, timeout, last)
 		case <-ticker.C:
-			if last = check(ctx, cfg); last == nil {
+			if last = check(ctx, cfg, client); last == nil {
 				return nil
 			}
 		}
@@ -71,14 +75,14 @@ func EnsureRunning(ctx context.Context, cfg Config) error {
 }
 
 // check reports whether the daemon is up and, when Ready is set, ready.
-func check(ctx context.Context, cfg Config) error {
+func check(ctx context.Context, cfg Config, client *http.Client) error {
 	if !live(cfg.Socket) {
 		return errNotUp
 	}
 	if cfg.Ready == nil {
 		return nil
 	}
-	return cfg.Ready(ctx, Dial(cfg.Socket))
+	return cfg.Ready(ctx, client)
 }
 
 var errNotUp = errors.New("daemon: not up")
