@@ -80,6 +80,24 @@ export default defineNuxtConfig({
 })
 ```
 
+## Upgrading to 1.7.0
+
+1.7.0 breaks these Go APIs:
+
+- `auth/kratosauth` keeps the Kratos client. The Gin middleware moved to
+  `auth/kratosgin`: `Session`, `Require`, `RequireFunc`, `RequireMeta`, `From`
+  and `MustFrom`.
+- `kratosauth.Client.Whoami` answers `ErrNoSession` without calling Kratos when
+  the request has no cookie, session token or Authorization header.
+- `db.Open(ctx, cfg)`, `db.Migrate(ctx, ...)` and `db.MigrateDown(ctx, ...)`
+  take a context. `db.Detect(conn)` takes no context and returns an error for an
+  unknown driver.
+- `outbox.Worker.Start` and `jobs.Scheduler.Start` return an error, `ErrClosed`
+  after `Close`. Outbox timestamps use a fixed-width UTC layout.
+- `storage.Key` returns an error unless it gets a SHA-256 hex digest.
+- `apipage.Order` always ends with the fallback's columns.
+- `daemon.Listen` refuses a path that holds anything but a socket.
+
 ## Development
 
 ```sh
