@@ -1,7 +1,8 @@
 // web/tests/cutText.spec.ts
 import { effectScope } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cutWords, isCut, useCutText, wordsRoom } from '../src/composables/primitives/useCutText'
+import { useCutText } from '../src/composables/primitives/useCutText'
+import { cutWords, isCut, wordsRoom } from '../src/composables/primitives/internal/text'
 
 /** An element as far as the tooltip asks: what selectors it matches, its widths, its words, what holds it. */
 interface Stub {

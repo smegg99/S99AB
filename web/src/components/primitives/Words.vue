@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { wordBoxes } from '../../composables/primitives/useCutText'
+import { wordBoxes } from '../../composables/primitives/internal/text'
 
 const { text } = defineProps<{
   text: string

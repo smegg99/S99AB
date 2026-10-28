@@ -59,6 +59,6 @@ export function provideKeyTips(): KeyTips {
 }
 
 /** The bar's key tooltips when inside one, else this component's own. */
-export function injectKeyTips(): KeyTips {
+export function useKeyTipsContext(): KeyTips {
   return inject(KEY, null) ?? useKeyTips()
 }

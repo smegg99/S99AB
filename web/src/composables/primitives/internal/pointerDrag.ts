@@ -1,4 +1,4 @@
-// web/src/composables/primitives/usePointerDrag.ts
+// web/src/composables/primitives/internal/pointerDrag.ts
 import { computed, onScopeDispose, shallowReactive } from 'vue'
 
 export interface DropPlace<At, Carried> {

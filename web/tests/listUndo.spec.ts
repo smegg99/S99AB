@@ -1,7 +1,8 @@
 // web/tests/listUndo.spec.ts
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { effectScope, nextTick, ref } from 'vue'
-import { pendingSaves, useListUndo } from '../src/composables/primitives/useListUndo'
+import { useListUndo } from '../src/composables/primitives/useListUndo'
+import { createPendingSaves } from '../src/composables/primitives/internal/listUndo'
 
 // Vuetify keeps a focused list's text, so after Ctrl+Z the list is blurred and focused again once the change is drawn.
 
@@ -87,7 +88,7 @@ it('leaves a list alone that lost the focus meanwhile', async () => {
 
 // Panes with lists other than a lesson's hand Ctrl+Z on once the pane's saves have landed.
 it('waits for every save a pane started, refused ones included, and no longer', async () => {
-  const saves = pendingSaves()
+  const saves = createPendingSaves()
   let done = false
   void saves.settled().then(() => (done = true))
   await settle()

@@ -1,18 +1,15 @@
 // web/src/browser.ts
+//
+// DOM and input helpers for code outside setup: `@smegg99/s99ab/browser`.
+
 export { focusStart, hasFocusRing } from './browser/focus'
-export { cutWords, wordBoxes, wordsRoom, isCut, useCutText } from './composables/primitives/useCutText'
-export { createPointerDrag, inZone, type DropPlace, type Over } from './composables/primitives/usePointerDrag'
 export { trackPointer, type PointerTrack } from './browser/pointer'
-export { useTreeKeys, takeRow } from './composables/primitives/useTreeKeys'
-export { useKeyTips, provideKeyTips, injectKeyTips } from './composables/primitives/useKeyTips'
-export { useTileNames } from './composables/explorer/useTileNames'
 export { tileOf, whenTile, middleClick, shiftPick } from './browser/tiles'
 export { undoStep, passUndo, listUndo } from './browser/edit'
 export { scrollsDown } from './browser/scroll'
-export { useTips } from './composables/primitives/useTips'
+export { cutWords, fitWordRun, isCut, wordBoxes, wordsRoom } from './composables/primitives/internal/text'
+export { createPointerDrag, inZone, type DropPlace, type Over } from './composables/primitives/internal/pointerDrag'
+export { takeRow } from './composables/primitives/internal/treeKeys'
+export { createPendingSaves } from './composables/primitives/internal/listUndo'
 export { statOrder } from './composables/primitives/internal/paneFoot'
-export { useFocusGroup } from './composables/primitives/useFocusGroup'
-export { useTextWidth, fitWordRun } from './composables/primitives/useTextWidth'
-export { useListUndo, pendingSaves } from './composables/primitives/useListUndo'
-export { useNow } from './composables/primitives/useNow'
 export { prefersReducedMotion } from './composables/motion/internal/motion'

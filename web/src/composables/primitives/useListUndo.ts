@@ -30,15 +30,3 @@ export function useListUndo(after: () => Promise<unknown>, changed: WatchSource)
     })
   }
 }
-
-/** A pane's pending saves for useListUndo's `after`: `track` each, `settled` once all earlier ones landed. */
-export function pendingSaves() {
-  let saving: Promise<unknown> = Promise.resolve()
-  return {
-    track<T>(run: Promise<T>): Promise<T> {
-      saving = Promise.allSettled([saving, run])
-      return run
-    },
-    settled: (): Promise<unknown> => saving,
-  }
-}

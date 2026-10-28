@@ -1,7 +1,7 @@
 // web/tests/pointer-drag.spec.ts
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope } from 'vue'
-import { createPointerDrag, type DropPlace } from '../src/composables/primitives/usePointerDrag'
+import { createPointerDrag, type DropPlace } from '../src/composables/primitives/internal/pointerDrag'
 
 interface Carried { kind: string, id: number, title: string, line: string }
 const DRAG_START = 5
