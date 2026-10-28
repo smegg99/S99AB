@@ -23,7 +23,7 @@ import {
   closeAllDialogs,
   closeDialog,
   dialogEntries as entries,
-} from '../../composables/useDialog'
+} from '../../internal/dialog'
 import { DIALOG_WIDTHS } from '../../theme'
 
 // Mount once in app.vue, above every layout, or dialogs open twice. Reads the

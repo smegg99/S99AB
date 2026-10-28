@@ -9,8 +9,8 @@ import {
   dialogEntries,
   registerDialogPresets,
   resetDialogs,
-  useDialog,
-} from '../src/composables/useDialog'
+} from '../src/internal/dialog'
+import { useDialog } from '../src/composables/useDialog'
 
 const Stub = defineComponent({ name: 'Stub', setup: () => () => h('div') })
 

@@ -7,7 +7,8 @@ import { defineComponent, h } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import DialogHost from '../src/components/overlay/DialogHost.vue'
-import { dialogEntries, resetDialogs, useDialog } from '../src/composables/useDialog'
+import { dialogEntries, resetDialogs } from '../src/internal/dialog'
+import { useDialog } from '../src/composables/useDialog'
 
 const vuetify = createVuetify({ components, directives })
 

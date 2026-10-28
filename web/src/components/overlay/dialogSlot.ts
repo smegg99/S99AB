@@ -6,7 +6,7 @@ import {
   DIALOG_HOLD,
   type DialogEntry,
   closeDialog,
-} from '../../composables/useDialog'
+} from '../../internal/dialog'
 
 /**
  * Provides one entry's resolver to what it renders; provide() is per instance,

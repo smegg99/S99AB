@@ -6,7 +6,8 @@ import * as directives from 'vuetify/directives'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
-import { DIALOG_CLOSE, DIALOG_HOLD, type PromptOptions } from '../src/composables/useDialog'
+import { DIALOG_CLOSE, DIALOG_HOLD } from '../src/internal/dialog'
+import type { PromptOptions } from '../src/composables/useDialog'
 
 const vuetify = createVuetify({ components, directives })
 
