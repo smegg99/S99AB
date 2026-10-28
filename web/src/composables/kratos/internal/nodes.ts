@@ -3,9 +3,9 @@
 // Pure classifiers for one flow node.
 
 import type { KratosMessage, KratosMessageType, KratosNode } from './types'
+import type { Translate } from '../../useTranslate'
 
 // Local type, so node helpers do not depend on how translation is wired.
-type Translate = (key: string, fallback?: string) => string
 
 /** Node kinds the renderer knows; `unknown` is reported instead of dropped. */
 export type KratosNodeKind

@@ -5,11 +5,10 @@
 
 import type { KratosMessage, KratosNode } from './types'
 import { kratosInputType, kratosNodeKind } from './nodes'
+import type { Translate } from '../../useTranslate'
 
 /** A Vuetify field rule: true when the value passes, else the message. */
 export type Rule = (value: string) => boolean | string
-
-type Translate = (key: string, fallback?: string) => string
 
 // Only constraints the node states: required and email shape. Kratos does not
 // send its password policy, so no length rule.

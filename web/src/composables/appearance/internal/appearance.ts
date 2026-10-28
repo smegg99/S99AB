@@ -2,6 +2,7 @@
 
 import { reactive, ref, shallowRef } from 'vue'
 import type { AppearanceConfig, AppearanceConfigPatch, AppearanceSource, ThemeMode, ContrastMode } from '../useAppearance'
+import { mediaMatches, onMediaChange } from '../../../browser/media'
 
 // Set once per app, so every toggle writes the same keys.
 export const config = reactive<AppearanceConfig>({
@@ -21,18 +22,12 @@ export function appearanceConfig(): AppearanceConfig {
 
 /** Whether the OS is asking for more contrast. False where it cannot be asked. */
 export function prefersMoreContrast(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false
-  }
-  return window.matchMedia('(prefers-contrast: more)').matches
+  return mediaMatches('(prefers-contrast: more)')
 }
 
 /** Whether the OS is asking for a dark palette. False where it cannot be asked. */
 export function prefersDark(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false
-  }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
+  return mediaMatches('(prefers-color-scheme: dark)')
 }
 
 // One per process; a shallowRef so a late registration reaches mounted toggles.
@@ -57,19 +52,7 @@ export const systemTick = ref(0)
 
 /** Attaches to the current matchMedia and returns the teardown. */
 export function listenForSystem(): () => void {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return () => {}
-  }
-
-  const bump = () => systemTick.value++
-  const lists = ['(prefers-color-scheme: dark)', '(prefers-contrast: more)']
-    .map(query => window.matchMedia(query))
-
-  for (const list of lists) list.addEventListener('change', bump)
-
-  return () => {
-    for (const list of lists) list.removeEventListener('change', bump)
-  }
+  return onMediaChange(['(prefers-color-scheme: dark)', '(prefers-contrast: more)'], () => systemTick.value++)
 }
 
 // The user's pick per axis, as opposed to what it resolves to. Seeded from storage on mount.

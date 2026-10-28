@@ -1,5 +1,7 @@
 // web/src/components/state/crashScreen.ts
 
+import type { Translate } from '../../composables/useTranslate'
+
 /** Why UiCrashScreen opened. */
 export type CrashScreenKind = 'config' | 'startup' | 'crash' | 'hang' | 'killed'
 
@@ -38,8 +40,6 @@ export interface CrashScreenActions {
   /** Closes a hung app; its report follows. */
   kill?: () => Promise<void>
 }
-
-type Translate = (key: string, fallback?: string, params?: Record<string, string | number>) => string
 
 /** The screen's heading, message and window-title phrase for report; message replaces the kind's. */
 export function crashTexts(t: Translate, report: CrashScreenReport, message?: string) {

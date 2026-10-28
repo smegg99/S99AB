@@ -26,7 +26,10 @@ function fill(message: string, params: TranslateParams): string {
  * returns the key. Reads Vue's app context, so the layer has no Nuxt import and
  * works without i18n. `$t`, not `$i18n.t`, which is not an own property.
  */
-export function useTranslate() {
+/** A translator as useTranslate returns it: key, English fallback, named params. */
+export type Translate = (key: string, fallback?: string, params?: TranslateParams) => string
+
+export function useTranslate(): Translate {
   const globals = getCurrentInstance()?.appContext.config.globalProperties as
     | I18nGlobals
     | undefined

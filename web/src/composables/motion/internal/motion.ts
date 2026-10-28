@@ -1,6 +1,7 @@
 // web/src/composables/motion/internal/motion.ts
 
 import { reactive } from 'vue'
+import { mediaMatches } from '../../../browser/media'
 
 /** `reduced` keeps fades and drops movement; `off` removes both. */
 export type MotionLevel = 'system' | 'full' | 'reduced' | 'off'
@@ -48,9 +49,7 @@ export function motionLevel(): MotionLevel {
 
 /** Whether the OS asks for reduced motion. False where matchMedia is absent. */
 export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function')
-    return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return mediaMatches('(prefers-reduced-motion: reduce)')
 }
 
 export function resolveLevel(level: MotionLevel): ResolvedMotionLevel {
