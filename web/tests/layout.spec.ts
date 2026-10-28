@@ -3,9 +3,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { createRouter, createWebHistory } from 'vue-router'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -14,6 +11,7 @@ import Page from '../src/components/shell/Page.vue'
 import Panel from '../src/components/primitives/Panel.vue'
 import Stat from '../src/components/primitives/Stat.vue'
 import ToolGroup from '../src/components/primitives/ToolGroup.vue'
+import { vuetify, vuetifyWith } from './mount'
 
 // Vuetify's display service samples window.innerWidth when the plugin is
 // created, so the width is set first; a later resize flips `permanent` and force-opens the drawer.
@@ -25,10 +23,9 @@ function setViewport(width: number) {
 }
 
 setViewport(1600)
-const vuetify = createVuetify({ components, directives })
 
 setViewport(700)
-const narrowVuetify = createVuetify({ components, directives })
+const narrowVuetify = vuetifyWith({})
 
 // AppShell's drawer renders v-list-item with `to`, which resolves a route.
 const router = createRouter({

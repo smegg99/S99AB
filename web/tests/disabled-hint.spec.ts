@@ -2,11 +2,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
 import DisabledHint from '../src/components/primitives/DisabledHint.vue'
+import { vuetifyWith } from './mount'
 
-const vuetify = createVuetify({ components, defaults: { VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
+const vuetify = vuetifyWith({ defaults: { VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
 // Happy DOM has no visual viewport; Vuetify supports the browser's null case.
 beforeAll(() => {
   vi.stubGlobal('visualViewport', null)

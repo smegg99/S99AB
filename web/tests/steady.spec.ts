@@ -2,9 +2,6 @@
 
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { defineComponent, h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -12,8 +9,7 @@ import AutoHeight from '../src/components/motion/AutoHeight.vue'
 import DataTable from '../src/components/table/DataTable.vue'
 import { useServerTable } from '../src/composables/table/useServerTable'
 import { configureTable } from '../src/composables/table/internal/config'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function mountTable(rows: number, limit: number, steady = true) {
   const items = Array.from({ length: rows }, (_, i) => ({ id: String(i), name: `Item ${i}` }))

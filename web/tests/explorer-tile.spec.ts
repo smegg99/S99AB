@@ -1,8 +1,5 @@
 // web/tests/explorer-tile.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,8 +11,7 @@ import {
 } from '../src/composables/explorer/useExplorer'
 import { configureExplorer } from '../src/composables/explorer/internal/config'
 import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 // docs (folder, with a cover), note (leaf, disabled), photo (leaf)
 function seed(): ExplorerNode[] {

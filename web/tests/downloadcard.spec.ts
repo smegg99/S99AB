@@ -2,17 +2,13 @@
 
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DownloadCard from '../src/components/releases/DownloadCard.vue'
 import DownloadAssetRow from '../src/components/releases/DownloadAssetRow.vue'
 import EmptyState from '../src/components/state/EmptyState.vue'
 import type { Downloads } from '../src/composables/releases/useReleases'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function asset(name: string, platform: string, kind: string, arch = 'x86_64') {
   return {

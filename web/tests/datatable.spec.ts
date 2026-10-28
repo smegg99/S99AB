@@ -2,9 +2,6 @@
 
 import { createPinia } from 'pinia'
 import { PiniaColada } from '@pinia/colada'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { defineComponent, h, ref } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
@@ -12,8 +9,7 @@ import DataTable from '../src/components/table/DataTable.vue'
 import EmptyState from '../src/components/state/EmptyState.vue'
 import ErrorState from '../src/components/state/ErrorState.vue'
 import { useServerTable } from '../src/composables/table/useServerTable'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function mountTable(
   items: { id: string, name: string }[],

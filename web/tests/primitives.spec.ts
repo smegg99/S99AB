@@ -1,8 +1,5 @@
 // web/tests/primitives.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -11,8 +8,7 @@ import SearchField from '../src/components/primitives/SearchField.vue'
 import Tally from '../src/components/primitives/Tally.vue'
 import Thumb from '../src/components/primitives/Thumb.vue'
 import { fakeI18n } from './fake-i18n'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 describe('UiKbd', () => {
   afterEach(() => vi.unstubAllGlobals())

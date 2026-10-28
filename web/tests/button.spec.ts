@@ -1,13 +1,9 @@
 // web/tests/button.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import Button from '../src/components/primitives/Button.vue'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function render(props: Record<string, unknown> = {}, slots: Record<string, string> = {}) {
   return mount(Button, {

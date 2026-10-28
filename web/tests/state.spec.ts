@@ -3,9 +3,6 @@
 import { defineComponent, h, ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import EmptyState from '../src/components/state/EmptyState.vue'
 import ErrorState from '../src/components/state/ErrorState.vue'
 import SignInPrompt from '../src/components/state/SignInPrompt.vue'
@@ -15,8 +12,7 @@ import { useApiError } from '../src/composables/state/useApiError'
 import { useFirstLoad, useIsEmpty } from '../src/composables/state/useAsyncState'
 import { useTranslate } from '../src/composables/useTranslate'
 import { fakeI18n } from './fake-i18n'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function query(data: unknown, error: unknown = undefined, status = 'idle') {
   return { data: ref(data), error: ref(error), asyncStatus: ref(status) }

@@ -3,16 +3,12 @@
 import { h, ref, type Component } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import Async from '../src/components/state/Async.vue'
 import Row from '../src/components/primitives/Row.vue'
 import Stack from '../src/components/primitives/Stack.vue'
 import { configureDelay } from '../src/internal/delay'
 import { fakeI18n } from './fake-i18n'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function query(data: unknown, error: unknown = undefined, status = 'idle') {
   return { data: ref(data), error: ref(error), asyncStatus: ref(status) }

@@ -3,15 +3,11 @@
 import { h } from 'vue'
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import AuthCard from '../src/components/auth/AuthCard.vue'
 import AuthPage from '../src/components/auth/AuthPage.vue'
 import { configureAuthPaths } from '../src/composables/kratos/internal/paths'
 import { fakeI18n } from './fake-i18n'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 // The form is stubbed: it starts a Kratos flow on mount. useTranslate falls back
 // to the layer's English, so these assert words.

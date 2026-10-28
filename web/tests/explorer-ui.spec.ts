@@ -1,8 +1,5 @@
 // web/tests/explorer-ui.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -16,8 +13,7 @@ import {
 } from '../src/composables/explorer/useExplorer'
 import { configureExplorer } from '../src/composables/explorer/internal/config'
 import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 // docs
 // +-- nested   (folder, empty)

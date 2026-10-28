@@ -1,13 +1,9 @@
 // web/tests/explorer-folder-dialog.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import ExplorerFolderDialog from '../src/components/explorer/ExplorerFolderDialog.vue'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 describe('UiExplorerFolderDialog', () => {
   // Enter closes the dialog on keydown; WebKit would otherwise pass the same

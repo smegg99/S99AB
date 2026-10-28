@@ -1,15 +1,11 @@
 // web/tests/highlight.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import Code from '../src/components/primitives/Code.vue'
 import { tokenise } from '../src/composables/markdown/internal/highlight'
 import { fakeI18n } from './fake-i18n'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function mountCode(props: Record<string, unknown>) {
   return mount(Code, {

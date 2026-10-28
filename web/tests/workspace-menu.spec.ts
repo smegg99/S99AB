@@ -2,14 +2,14 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import DisabledHint from '../src/components/primitives/DisabledHint.vue'
 import WorkspaceMenu from '../src/components/tabs/WorkspaceMenu.vue'
 import { closeContextMenu, openContextMenu, useContextMenuState } from '../src/composables/tabs/internal/contextMenu'
 import { installInputMode } from '../src/browser/input'
+import { vuetifyWith } from './mount'
 
-const vuetify = createVuetify({ components, defaults: { VMenu: { transition: false, scrollStrategy: 'none' }, VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
+const vuetify = vuetifyWith({ defaults: { VMenu: { transition: false, scrollStrategy: 'none' }, VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
 beforeAll(() => {
   vi.stubGlobal('visualViewport', null)
 })

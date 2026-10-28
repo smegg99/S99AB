@@ -3,9 +3,6 @@
 import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { resolve } from 'node:path'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -15,8 +12,7 @@ import { configureToast } from '../src/composables/toast/internal/config'
 import { resetToasts, visibleAt } from '../src/composables/toast/internal/queue'
 import { stackLift } from '../src/composables/toast/internal/stack'
 import { useToast } from '../src/composables/toast/useToast'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function mountHost() {
   return mount(ToastHost, { global: { plugins: [vuetify] } })

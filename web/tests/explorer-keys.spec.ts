@@ -1,16 +1,12 @@
 // web/tests/explorer-keys.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import Explorer from '../src/components/explorer/Explorer.vue'
 import { disposeExplorer, useExplorer } from '../src/composables/explorer/useExplorer'
 import { configureExplorer } from '../src/composables/explorer/internal/config'
 import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 // One folder and three leaves at the root, so a run has something to cross.
 function seed(): ExplorerNode[] {

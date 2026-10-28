@@ -1,16 +1,13 @@
 // web/tests/dialog-host.spec.ts
 
-import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { defineComponent, h } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it } from 'vitest'
 import DialogHost from '../src/components/overlay/DialogHost.vue'
 import { dialogEntries, resetDialogs } from '../src/internal/dialog'
 import { useDialog } from '../src/composables/useDialog'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 // happy-dom has no visualViewport, and VOverlay's setup throws without one.
 Object.defineProperty(globalThis, 'visualViewport', {

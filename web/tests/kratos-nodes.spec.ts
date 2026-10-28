@@ -2,14 +2,10 @@
 
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import KratosNode from '../src/components/auth/KratosNode.vue'
 import { kratosInputType, kratosNodeKind } from '../src/composables/kratos/internal/nodes'
 import type { KratosNode as Node } from '../src/composables/kratos/internal/types'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function node(partial: Partial<Node> & { type: string }): Node {
   return { group: 'default', attributes: {}, ...partial } as Node

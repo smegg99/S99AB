@@ -2,9 +2,6 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent, h, nextTick, reactive } from 'vue'
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import TabStrip from '../src/components/tabs/TabStrip.vue'
 import Explorer from '../src/components/explorer/Explorer.vue'
 import UiDisabledHint from '../src/components/primitives/DisabledHint.vue'
@@ -13,11 +10,12 @@ import { configureExplorer } from '../src/composables/explorer/internal/config'
 import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
 import { titleWords } from '../src/composables/tabs/internal/titleWords'
 import type { WorkspaceTab } from '../src/composables/tabs/useTabs'
+import { vuetifyWith } from './mount'
 
 // A tab title too long for its tab ends after a whole word ("Quarterly - Rep...").
 // Its tooltip is one of the window's explaining tooltips, of which one stands open at a time.
 
-const vuetify = createVuetify({ components, directives, defaults: { VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
+const vuetify = vuetifyWith({ defaults: { VTooltip: { openDelay: 0, closeDelay: 0, transition: false } } })
 beforeAll(() => {
   vi.stubGlobal('visualViewport', null)
 })

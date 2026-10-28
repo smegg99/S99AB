@@ -1,8 +1,5 @@
 // web/tests/kratos.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -20,8 +17,7 @@ import login from './fixtures/login.json'
 import step1 from './fixtures/registration-step1.json'
 import step2 from './fixtures/registration-step2.json'
 import settings from './fixtures/settings.json'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function nodes(flow: unknown): KratosNode[] {
   return (flow as KratosFlow).ui.nodes

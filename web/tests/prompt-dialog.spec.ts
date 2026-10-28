@@ -1,15 +1,11 @@
 // web/tests/prompt-dialog.spec.ts
 
-import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
-import * as directives from 'vuetify/directives'
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
 import { DIALOG_CLOSE, DIALOG_HOLD } from '../src/internal/dialog'
 import type { PromptOptions } from '../src/composables/useDialog'
-
-const vuetify = createVuetify({ components, directives })
+import { vuetify } from './mount'
 
 function open(options: PromptOptions) {
   const close = vi.fn()
