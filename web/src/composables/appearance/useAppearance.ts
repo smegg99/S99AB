@@ -5,7 +5,8 @@ import { useTheme } from 'vuetify'
 import { previewColors, rebuildThemes, themeState } from '../../theme'
 import { originOf, runThemeTransition, type ThemeTransition } from './internal/themeTransition'
 
-import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, read, write, erase, themePref, contrastPref } from './internal/appearance'
+import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, themePref, contrastPref } from './internal/appearance'
+import { readStored, writeStored, eraseStored } from '../../browser/storage'
 
 /**
  * Light/dark and contrast. Light and dark are the two registered themes;
@@ -90,8 +91,8 @@ export function useAppearance(keys: () => AppearanceKeys = () => ({})) {
 
   /** Whether the user has stored a choice on either axis. */
   const stored = () => ({
-    theme: read(themeKey()),
-    contrast: read(contrastKey()),
+    theme: readStored(themeKey()),
+    contrast: readStored(contrastKey()),
   })
 
   // Applies both axes. Contrast repaints the registered themes, since Vuetify
@@ -127,7 +128,7 @@ export function useAppearance(keys: () => AppearanceKeys = () => ({})) {
       transition,
       groundFor(next, high.value),
     )
-    write(themeKey(), next ? 'dark' : 'light')
+    writeStored(themeKey(), next ? 'dark' : 'light')
   }
 
   function toggleContrast(event?: Event, transition?: ThemeTransition) {
@@ -138,14 +139,14 @@ export function useAppearance(keys: () => AppearanceKeys = () => ({})) {
       transition,
       groundFor(dark.value, next),
     )
-    write(contrastKey(), next ? 'high' : 'normal')
+    writeStored(contrastKey(), next ? 'high' : 'normal')
   }
 
   // `system` erases the stored pick so the axis follows the OS; an explicit pick is stored.
   function setMode(next: ThemeMode, event?: Event, transition?: ThemeTransition) {
     themePref.value = next
-    if (next === 'system') erase(themeKey())
-    else write(themeKey(), next)
+    if (next === 'system') eraseStored(themeKey())
+    else writeStored(themeKey(), next)
 
     const nextDark = next === 'system' ? system.value.dark : next === 'dark'
     runThemeTransition(
@@ -158,8 +159,8 @@ export function useAppearance(keys: () => AppearanceKeys = () => ({})) {
 
   function setContrast(next: ContrastMode, event?: Event, transition?: ThemeTransition) {
     contrastPref.value = next
-    if (next === 'system') erase(contrastKey())
-    else write(contrastKey(), next === 'high' ? 'high' : 'normal')
+    if (next === 'system') eraseStored(contrastKey())
+    else writeStored(contrastKey(), next === 'high' ? 'high' : 'normal')
 
     const nextHigh = next === 'system' ? system.value.high : next === 'high'
     runThemeTransition(

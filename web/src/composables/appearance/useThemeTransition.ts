@@ -2,6 +2,7 @@
 
 import { computed, readonly } from 'vue'
 import { type ThemeTransition, THEME_TRANSITIONS, type ThemeTransitionConfig, config, resolvedTransition } from './internal/themeTransition'
+import { writeStored } from '../../browser/storage'
 
 export type { ThemeTransition, ThemeTransitionConfig, TransitionOrigin } from './internal/themeTransition'
 
@@ -14,12 +15,7 @@ export function useThemeTransition() {
   const current = computed<ThemeTransition>({
     get: () => resolvedTransition(),
     set: (next) => {
-      try {
-        localStorage.setItem(config.storageKey, next)
-      }
-      catch {
-        // As above.
-      }
+      writeStored(config.storageKey, next)
       // A picker re-reads the reactive config.
       config.transition = next
     },

@@ -2,6 +2,7 @@
 
 import { reactive } from 'vue'
 import { motionLevel, resolveLevel } from '../../motion/internal/motion'
+import { readStored } from '../../../browser/storage'
 
 /**
  * How the screen changes appearance. `cover`, `cover-in`, `veil` and the `wipe`
@@ -140,14 +141,8 @@ export function easingFor(kind: ThemeTransition): string {
 }
 
 export function read(): ThemeTransition | null {
-  try {
-    const stored = localStorage.getItem(config.storageKey)
-    return isTransition(stored) ? stored : null
-  }
-  catch {
-    // Private mode and blocked storage both throw; the app default applies.
-    return null
-  }
+  const stored = readStored(config.storageKey)
+  return isTransition(stored) ? stored : null
 }
 
 export function isTransition(value: unknown): value is ThemeTransition {

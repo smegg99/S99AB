@@ -128,22 +128,3 @@ export function applyTexture(patch: TextureConfigPatch = {}) {
     else root.removeAttribute(`data-tex-${plane}`)
   }
 }
-
-export function read(key: string): string | null {
-  try {
-    return localStorage.getItem(key)
-  }
-  catch {
-    // Private mode and blocked storage both throw.
-    return null
-  }
-}
-
-export function write(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value)
-  }
-  catch {
-    // As above.
-  }
-}

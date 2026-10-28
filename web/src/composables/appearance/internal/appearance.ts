@@ -72,34 +72,6 @@ export function listenForSystem(): () => void {
   }
 }
 
-export function read(key: string): string | null {
-  try {
-    return localStorage.getItem(key)
-  }
-  catch {
-    // Private mode and blocked storage both throw.
-    return null
-  }
-}
-
-export function write(key: string, value: string) {
-  try {
-    localStorage.setItem(key, value)
-  }
-  catch {
-    // As above.
-  }
-}
-
-export function erase(key: string) {
-  try {
-    localStorage.removeItem(key)
-  }
-  catch {
-    // As above.
-  }
-}
-
 // The user's pick per axis, as opposed to what it resolves to. Seeded from storage on mount.
 export const themePref = ref<ThemeMode>('system')
 

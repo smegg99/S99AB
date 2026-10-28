@@ -1,7 +1,8 @@
 // web/src/composables/appearance/useTexture.ts
 
 import { computed } from 'vue'
-import { TEXTURES, PLANES, config, applyTexture, read, write } from './internal/texture'
+import { TEXTURES, PLANES, config, applyTexture } from './internal/texture'
+import { readStored, writeStored } from '../../browser/storage'
 
 // Which texture each surface plane wears, and how strongly. Written as custom
 // properties on the document element, so surfaces the layer does not own get them too.
@@ -68,9 +69,9 @@ export function useTexture() {
   const planeOptions = computed(() => ['', 'none', ...TEXTURES.map(spec => spec.name)])
 
   function remember() {
-    write(`${config.storageKey}.name`, config.name)
+    writeStored(`${config.storageKey}.name`, config.name)
     for (const plane of PLANES) {
-      write(`${config.storageKey}.plane.${plane}`, config.textures[plane])
+      writeStored(`${config.storageKey}.plane.${plane}`, config.textures[plane])
     }
   }
 
@@ -87,11 +88,11 @@ export function useTexture() {
 
   /** Restores the stored pick, called by the plugin after app config so a stored choice wins. */
   function restore() {
-    const name = read(`${config.storageKey}.name`)
+    const name = readStored(`${config.storageKey}.name`)
     const textures: Partial<Record<PlaneName, string>> = {}
 
     for (const plane of PLANES) {
-      const stored = read(`${config.storageKey}.plane.${plane}`)
+      const stored = readStored(`${config.storageKey}.plane.${plane}`)
       if (stored !== null) textures[plane] = stored
     }
 
