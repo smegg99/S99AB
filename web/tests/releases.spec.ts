@@ -1,7 +1,9 @@
 // web/tests/releases.spec.ts
 
-import { describe, expect, it } from 'vitest'
-import { formatBytes, kindKey } from '../src/composables/releases/internal/api'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { fetchFromApi, formatBytes, kindKey } from '../src/composables/releases/internal/api'
+import { formatCount, pluralCount } from '../src/composables/releases/internal/count'
+import { formatReleaseDate } from '../src/composables/releases/internal/date'
 import { detectOS } from '../src/internal/platform'
 import { compareVersions } from '../src/composables/releases/internal/version'
 
@@ -42,10 +44,10 @@ describe('detectOS', () => {
     expect(detectOS('darwin')).toBe('macos')
   })
 
-  // An iPhone matches /mac/ and would be offered a .dmg.
-  it('calls a handheld other rather than guessing a desktop', () => {
-    expect(detectOS('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)')).toBe('other')
-    expect(detectOS('Mozilla/5.0 (Linux; Android 14)')).toBe('other')
+  // An iPhone matches /mac/ and an Android phone /linux/, so handhelds are read first.
+  it('names a handheld rather than guessing a desktop', () => {
+    expect(detectOS('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X)')).toBe('ios')
+    expect(detectOS('Mozilla/5.0 (Linux; Android 14)')).toBe('android')
   })
 })
 
@@ -68,5 +70,45 @@ describe('kindKey', () => {
     expect(kindKey('tar.gz')).toBe('targz')
     expect(kindKey('pkg.tar.zst')).toBe('pkgtarzst')
     expect(kindKey('appimage')).toBe('appimage')
+  })
+})
+
+describe('formatReleaseDate', () => {
+  it('writes a long date in the given locale', () => {
+    expect(formatReleaseDate('2026-07-01T12:00:00Z', 'en')).toBe('July 1, 2026')
+    expect(formatReleaseDate('2026-07-01T12:00:00Z', 'pl')).toBe('1 lipca 2026')
+  })
+
+  it('says nothing for a missing or broken timestamp', () => {
+    expect(formatReleaseDate(undefined, 'en')).toBe('')
+    expect(formatReleaseDate('soon', 'en')).toBe('')
+  })
+})
+
+describe('formatCount', () => {
+  it('compacts thousands in the reader\'s locale', () => {
+    expect(formatCount(950, 'en')).toBe('950')
+    expect(formatCount(1234, 'en')).toBe('1.2K')
+  })
+
+  // "1.2K stars" and "1,2 tys. gwiazdek" take the form of zero, not of 1234.
+  it('selects the plural form of the printed number', () => {
+    expect(pluralCount(3)).toBe(3)
+    expect(pluralCount(1234)).toBe(0)
+  })
+})
+
+describe('fetchFromApi', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('passes the abort signal to fetch', async () => {
+    const fetch = vi.fn(async () => ({ ok: true, status: 200, json: async () => ({}) }))
+    vi.stubGlobal('fetch', fetch)
+    const signal = new AbortController().signal
+
+    await fetchFromApi('/repo', '', signal)
+    expect(fetch).toHaveBeenCalledWith('/api/v1/repo', expect.objectContaining({ signal }))
   })
 })

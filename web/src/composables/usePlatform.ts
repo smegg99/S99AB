@@ -3,7 +3,7 @@
 import { onMounted, readonly, ref } from 'vue'
 import { detectOS } from '../internal/platform'
 
-export type OS = 'linux' | 'windows' | 'macos' | 'other'
+export type OS = 'linux' | 'windows' | 'macos' | 'android' | 'ios' | 'other'
 
 // Module level, so every caller gets the same answer.
 const os = ref<OS>('other')

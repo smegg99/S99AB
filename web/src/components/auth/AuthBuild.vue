@@ -18,7 +18,7 @@
 import { computed } from 'vue'
 import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useBuildVersion } from '../../composables/releases/useBuildVersion'
-import { useTranslate } from '../../composables/useTranslate'
+import { useLocale, useTranslate } from '../../composables/useTranslate'
 
 // The plate's rows from /version. A separate component so `v-if` keeps
 // useQuery (and Pinia) out of a sign-in form that does not ask for `build`.
@@ -28,5 +28,6 @@ const commitLabel = computed(() => t('auth.commit', 'commit'))
 const builtLabel = computed(() => t('auth.built', 'built'))
 const { version, commit, buildTime } = useBuildVersion()
 
-const builtAt = computed(() => formatReleaseDate(buildTime.value))
+const locale = useLocale()
+const builtAt = computed(() => formatReleaseDate(buildTime.value, locale.value))
 </script>

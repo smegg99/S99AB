@@ -5,18 +5,25 @@ import type { ReleasesConfig } from '../useReleases'
 
 export const config = reactive<ReleasesConfig>({
   apiBase: '/api/v1',
-  order: ['linux', 'windows', 'macos'],
+  order: ['linux', 'windows', 'macos', 'android', 'web', 'ios'],
   // AppImage runs anywhere; Windows users expect the NSIS installer.
-  primaryKind: { linux: 'appimage', windows: 'installer' },
+  primaryKind: { linux: 'appimage', windows: 'installer', android: 'apk', web: 'tar.zst' },
   icons: {
     linux: 'mdi-linux',
     windows: 'mdi-microsoft-windows',
     macos: 'mdi-apple',
     android: 'mdi-android',
     ios: 'mdi-apple-ios',
+    web: 'mdi-web',
     source: 'mdi-code-tags',
     extras: 'mdi-file-document-outline',
   },
+  planned: [],
+  experimental: [],
+  fallback: [],
+  releasesUrl: '',
+  changelogPath: '',
+  umami: false,
   staleTime: 5 * 60_000,
 })
 
@@ -28,10 +35,11 @@ export function configureReleases(patch: Partial<ReleasesConfig>) {
   if (icons) Object.assign(config.icons, icons)
 }
 
-export async function fetchFromApi<T>(path: string, locale = ''): Promise<T> {
+export async function fetchFromApi<T>(path: string, locale = '', signal?: AbortSignal): Promise<T> {
   const query = locale ? `?locale=${encodeURIComponent(locale)}` : ''
   const res = await fetch(`${config.apiBase}${path}${query}`, {
     headers: { Accept: 'application/json' },
+    signal,
   })
   if (!res.ok) throw new Error(`s99ab: ${path} answered ${res.status}`)
   return (await res.json()) as T
@@ -44,6 +52,7 @@ export const PLATFORM_NAMES: Record<string, string> = {
   macos: 'macOS',
   android: 'Android',
   ios: 'iOS',
+  web: 'Web',
   source: 'Source',
   extras: 'Other files',
 }

@@ -8,7 +8,8 @@ import type { OS } from '../composables/usePlatform'
  */
 export function detectOS(ua: string): OS {
   const s = ua.toLowerCase()
-  if (/iphone|ipad|ipod|android/.test(s)) return 'other'
+  if (/android/.test(s)) return 'android'
+  if (/iphone|ipad|ipod/.test(s)) return 'ios'
   if (/darwin|macos|mac os|macintosh|mac/.test(s)) return 'macos'
   if (/windows|win/.test(s)) return 'windows'
   if (/linux|x11|cros/.test(s)) return 'linux'

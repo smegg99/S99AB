@@ -36,7 +36,7 @@
             v-if="release.published_at"
             :datetime="release.published_at"
             class="s99ab-eyebrow"
-          >{{ formatReleaseDate(release.published_at) }}</time>
+          >{{ formatReleaseDate(release.published_at, locale) }}</time>
           <v-spacer />
           <!-- Quiet link out to the release. -->
           <v-btn
@@ -72,9 +72,10 @@ import UiReleaseNotes from './ReleaseNotes.vue'
 import { useDelayed } from '../../composables/useDelay'
 import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useChangelog } from '../../composables/releases/useReleases'
-import { useTranslate } from '../../composables/useTranslate'
+import { useLocale, useTranslate } from '../../composables/useTranslate'
 
 const t = useTranslate()
+const locale = useLocale()
 const query = useChangelog()
 
 const releases = query.releases

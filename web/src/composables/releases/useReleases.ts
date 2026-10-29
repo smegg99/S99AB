@@ -12,11 +12,11 @@ export interface ReleaseAsset {
   name: string
   size: number
   download_url: string
-  /** linux | windows | macos | source | other */
+  /** linux | windows | macos | android | web | source | other */
   platform: string
   /** x86_64 | arm64 | universal | "" */
   arch: string
-  /** appimage | deb | rpm | tar.gz | exe | installer | msix | zip | dmg | ... */
+  /** appimage | deb | rpm | tar.gz | tar.zst | exe | installer | msix | zip | dmg | apk | aab | ... */
   kind: string
   /**
    * GitHub's checksum as "algo:hex", empty when GitHub has none. Catches a
@@ -69,13 +69,31 @@ export interface RepoStats {
   html_url: string
 }
 
+/** A platform the card shows when the API is down or has no builds; every row links to releasesUrl. */
+export interface FallbackPlatform {
+  platform: string
+  /** Each row's label is release.kinds.<kind>; subKey names the line under it. */
+  assets: { kind: string, subKey?: string }[]
+}
+
 export interface ReleasesConfig {
   apiBase: string
-  /** Platform tab order. A platform with no build is not shown. */
+  /** Platform tab order. A platform with no build is not shown unless it is planned. */
   order: string[]
   /** The format each platform is offered first. Others stay available. */
   primaryKind: Record<string, string>
   icons: Record<string, string>
+  /** Platforms with no build yet, shown as a disabled tab. */
+  planned: string[]
+  /** Platforms whose builds are marked experimental. */
+  experimental: string[]
+  fallback: FallbackPlatform[]
+  /** The repository's releases page; '' hides every link to it. */
+  releasesUrl: string
+  /** The app's changelog route; '' hides the link. */
+  changelogPath: string
+  /** Adds Umami data-umami-event attributes to tabs, downloads and links. */
+  umami: boolean
   /** How long a fetched list is reused, in ms. The server caches too. */
   staleTime: number
 }
@@ -96,7 +114,7 @@ export function useLatestRelease() {
 
   return useQuery({
     key: () => [...keyed('release', locale.value)],
-    query: () => fetchFromApi<Release>('/releases/latest', locale.value),
+    query: ({ signal }) => fetchFromApi<Release>('/releases/latest', locale.value, signal),
     staleTime: config.staleTime,
   })
 }
@@ -107,7 +125,7 @@ export function useDownloads() {
 
   return useQuery({
     key: () => [...keyed('downloads', locale.value)],
-    query: () => fetchFromApi<Downloads>('/downloads', locale.value),
+    query: ({ signal }) => fetchFromApi<Downloads>('/downloads', locale.value, signal),
     staleTime: config.staleTime,
   })
 }
@@ -118,8 +136,8 @@ export function useChangelog() {
 
   const q = useQuery({
     key: () => [...keyed('changelog', locale.value)],
-    query: () =>
-      fetchFromApi<{ releases: Release[] }>('/releases', locale.value).then(
+    query: ({ signal }) =>
+      fetchFromApi<{ releases: Release[] }>('/releases', locale.value, signal).then(
         r => r.releases ?? [],
       ),
     staleTime: config.staleTime,
@@ -132,7 +150,7 @@ export function useChangelog() {
 export function useRepoStats() {
   return useQuery({
     key: ['s99ab', 'repo'],
-    query: () => fetchFromApi<RepoStats>('/repo'),
+    query: ({ signal }) => fetchFromApi<RepoStats>('/repo', '', signal),
     staleTime: config.staleTime,
   })
 }

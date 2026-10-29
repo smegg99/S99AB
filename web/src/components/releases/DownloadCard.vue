@@ -94,7 +94,7 @@ import { useDelayed } from '../../composables/useDelay'
 import { useDownloadGroups } from '../../composables/releases/useDownloadGroups'
 import { formatReleaseDate } from '../../composables/releases/internal/date'
 import { useDownloads } from '../../composables/releases/useReleases'
-import { useTranslate } from '../../composables/useTranslate'
+import { useLocale, useTranslate } from '../../composables/useTranslate'
 import { useCssNumber } from '../../composables/useCssNumber'
 import { inBrowser } from '../../browser/env'
 
@@ -117,7 +117,8 @@ const firstLoad = useDelayed(() => query.asyncStatus.value === 'loading' && !que
 
 const { groups, detected, tab, current } = useDownloadGroups(downloads)
 
-const published = computed(() => formatReleaseDate(downloads.value?.published_at))
+const locale = useLocale()
+const published = computed(() => formatReleaseDate(downloads.value?.published_at, locale.value))
 const latestLabel = computed(() => t('release.latest', 'Latest'))
 const yoursLabel = computed(() => t('release.yourSystem', 'Your system'))
 const allReleasesLabel = computed(() => t('release.allReleases', 'All releases'))
