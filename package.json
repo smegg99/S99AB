@@ -70,7 +70,7 @@
     "test": "cd web && vitest run",
     "test:watch": "cd web && vitest",
     "lint": "eslint .",
-    "locales": "loc build -c web/i18n/config.cue"
+    "locales": "go run github.com/smegg99/s99locale/cmd/loc@v1.1.0 build -c web/i18n/config.cue"
   },
   "peerDependenciesMeta": {
     "@firecms/neat": {

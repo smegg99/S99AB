@@ -48,12 +48,12 @@ fonts:
 
 # Regenerate the runtime locales from their canonical source with S99Locale.
 locales:
-    loc build -c web/i18n/config.cue
+    go run github.com/smegg99/s99locale/cmd/loc@v1.1.0 build -c web/i18n/config.cue
 
 # Fail when generated locales differ from their source or the languages
 # disagree on keys.
 check-locales:
-    loc check -c web/i18n/config.cue
+    go run github.com/smegg99/s99locale/cmd/loc@v1.1.0 check -c web/i18n/config.cue
 
 # Lint the shared contract fragments against a probe document.
 contracts:
