@@ -41,7 +41,8 @@ Built with Go 1.27, Gin, Nuxt 4, Vue 3, Vuetify 4 and Pinia Colada.
 - Workspace tabs, navigation history, pointer drag and context menus, with
   optional native window hooks.
 - Ory Kratos self-service flow UI.
-- Release/download/update UI.
+- Release/download/update UI: download card with planned and experimental
+  platforms and fallback rows, changelog, release notice, repository counter.
 - Markdown rendering and lightweight syntax highlighting.
 - Keyboard shortcuts, motion and auto-height transitions.
 - Shared palettes, Vuetify defaults, textures and appearance preferences.
@@ -123,6 +124,33 @@ crumb when the page unmounts. The locale key `common.toggleTheme` is now
 link, as the nav trail always did, instead of showing nothing.
 `/browser` no longer re-exports composables; they are auto-imported. Toast
 functions (`show`, `dismiss`, `promise`, ...) are only on `useToast()`.
+
+Releases, rebuilt from SmeggTunerSite's download card:
+
+- Go: assets are classified as `android` and `web`, and `tar.zst`, `apk` and
+  `aab` are known kinds. `ghreleases.PlatformOther` is exported.
+  `mdlocale.Sections.For` and `Locales` are replaced by `Resolve(locale,
+  fallback)`, which tries the locale, its base tag (`pl-PL` reads `pl`), the
+  fallback locale's section, then the untagged text. A reader with no section
+  now gets the default locale's notes instead of an empty or preamble-only
+  body. `ttlcache.Cached.Invalidate` is removed.
+- `s99ab.releases` gains `planned`, `experimental`, `fallback`, `releasesUrl`,
+  `changelogPath` and `umami`; `order` and `primaryKind` now include android
+  and web.
+- `useDownloadGroups` returns `{ groups, detected, tab, current, live, pick }`.
+  `tab` is readonly; call `pick(key)`. Each group holds `rows`
+  (`DownloadRow`) instead of `assets` and `primaryKind`.
+- `UiDownloadAssetRow` takes `row` and `platform` instead of `asset`,
+  `primary` and `version`. `UiDownloadCard` emits `selectPlatform`,
+  `download` and `copyDigest`, and has a `foot` slot. New: `UiDownloadTabs`
+  and `UiReleaseNotice`.
+- `UiChangelog` takes `headingLevel` and `releasesUrl` and has `head` and
+  `entry-foot` slots. `useChangelog()` is the plain query; read `data`.
+- `UiRepoStat`'s `showForks` is `forks`; it adds `minStars` and `compact`.
+- `formatReleaseDate(iso, locale)` takes the locale and writes a long date.
+  `detectOS` answers `android` and `ios`. `fetchFromApi` takes an abort signal.
+- The locale keys `release.copyHash` and `release.olderBuild` take `{algo}`
+  and `{version}`; several release strings changed wording.
 
 ## Upgrading to 1.7.0
 
