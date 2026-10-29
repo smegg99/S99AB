@@ -37,6 +37,7 @@ defineProps<{
   eyebrow?: string
   lead?: string
 }>()
+defineSlots<{ actions?: () => unknown }>()
 </script>
 
 <style scoped>

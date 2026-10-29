@@ -31,6 +31,7 @@ defineProps<{
   title?: string
   description?: string
 }>()
+defineSlots<{ head?: () => unknown, default?: () => unknown }>()
 
 const slots = useSlots()
 </script>

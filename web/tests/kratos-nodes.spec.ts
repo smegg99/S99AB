@@ -68,7 +68,7 @@ describe('UiKratosNode', () => {
   it('explains pending submission without replacing the native disabled state', async () => {
     const w = render(node({ type: 'input', attributes: { name: 'method', type: 'submit', value: 'password' } }), { submitting: true })
     expect(w.find('button').attributes('disabled')).toBeDefined()
-    expect(w.findComponent({ name: 'VTooltip' }).props('text')).toBe('auth.pending')
+    expect(w.findComponent({ name: 'VTooltip' }).props('text')).toBe('Wait for the sign-in request to finish.')
     await w.setProps({ submitting: false })
     expect(w.find('button').attributes('disabled')).toBeUndefined()
     expect(w.find('.s99ab-disabled-hint').attributes('tabindex')).toBeUndefined()

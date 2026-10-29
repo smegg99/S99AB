@@ -62,6 +62,7 @@ import { kratosNodeKind, kratosSeverity } from '../../composables/kratos/interna
 import { kratosMessageText } from '../../composables/kratos/internal/rules'
 import { useTranslate } from '../../composables/useTranslate'
 import type { KratosMessage, KratosNode } from '../../composables/kratos/internal/types'
+import type { KratosNodeKind } from '../../composables/kratos/internal/nodes'
 
 /**
  * A Kratos flow's messages and nodes, with no form element or flow lifecycle.
@@ -73,7 +74,7 @@ const {
   values = {},
   errorsFor = () => [],
   hintsFor = () => [],
-  submitting = false,
+  submitting,
 } = defineProps<{
   nodes: readonly KratosNode[]
   /** Flow-level messages. Field-level ones come through errorsFor. */
@@ -92,6 +93,21 @@ const emit = defineEmits<{
   'run': [node: KratosNode]
   /** A node UiKratosNode cannot render. */
   'unsupported': [node: KratosNode]
+}>()
+
+defineSlots<{
+  prepend?: () => unknown
+  /** One node; `update` writes a value back, since the node is fully controlled. */
+  node?: (props: {
+    errors: string[]
+    hints: string[]
+    kind: KratosNodeKind
+    node: KratosNode
+    submitting: boolean
+    update: (next: string) => void
+    value: string
+  }) => unknown
+  append?: () => unknown
 }>()
 
 const t = useTranslate()

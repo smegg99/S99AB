@@ -36,6 +36,11 @@ import { useExplorerContext } from '../../composables/explorer/useExplorer'
 import { useExplorerKeys } from '../../composables/explorer/internal/keys'
 import { dragHasFiles, useExplorerActions } from '../../composables/explorer/internal/actions'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
+import type { ExplorerNode } from '../../composables/explorer/internal/tree'
+
+defineSlots<{
+  tile?: (props: { key: string, node: ExplorerNode }) => unknown
+}>()
 
 // Injected, so the grid can sit anywhere under <UiExplorer>.
 const explorer = useExplorerContext()

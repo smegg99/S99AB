@@ -95,6 +95,13 @@ const {
 
 const emit = defineEmits<{ retry: [] }>()
 
+defineSlots<{
+  loading?: () => unknown
+  error?: (props: { error: unknown }) => unknown
+  empty?: () => unknown
+  default?: () => unknown
+}>()
+
 const firstLoad = useFirstLoad(query)
 const isEmpty = useIsEmpty(query)
 

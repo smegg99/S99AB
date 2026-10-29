@@ -64,8 +64,9 @@ defineProps<{
   /** URL of a one-colour mark, drawn in the accent before the title. */
   logo?: string
 }>()
-
 const emit = defineEmits<{ toggleNav: [] }>()
+
+defineSlots<{ brand?: () => unknown, nav?: () => unknown, default?: () => unknown }>()
 
 const t = useTranslate()
 

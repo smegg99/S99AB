@@ -111,6 +111,7 @@ const {
   /** Drops the container's width cap. */
   wide?: boolean
 }>()
+defineSlots<{ 'brand'?: () => unknown, 'bar-nav'?: () => unknown, 'bar'?: () => unknown, 'nav-append'?: () => unknown, 'default'?: () => unknown, 'footer'?: () => unknown }>()
 
 const { hasNav, permanent, drawer, showNavToggle, toggleNav } = useShellDrawer(() => groups)
 

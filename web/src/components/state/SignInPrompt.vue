@@ -62,6 +62,7 @@ const { returnTo = '' } = defineProps<{
   /** Where signing in returns to. Defaults to the current page. */
   returnTo?: string
 }>()
+defineSlots<{ prepend?: () => unknown, actions?: () => unknown, append?: () => unknown }>()
 
 const t = useTranslate()
 const paths = useAuthPaths()

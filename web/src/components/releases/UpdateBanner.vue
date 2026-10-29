@@ -51,6 +51,7 @@ const { current, dismissible = true } = defineProps<{
   current?: string
   dismissible?: boolean
 }>()
+defineSlots<{ actions?: () => unknown }>()
 
 const t = useTranslate()
 const check = useUpdateCheck({ current: () => current })

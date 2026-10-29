@@ -75,6 +75,7 @@ const { title, flush } = defineProps<{
   /** Drops the body padding, for a table or a grid that pads itself. */
   flush?: boolean
 }>()
+defineSlots<{ head?: () => unknown, meta?: () => unknown, actions?: () => unknown, default?: () => unknown, footer?: () => unknown }>()
 
 const slots = useSlots()
 

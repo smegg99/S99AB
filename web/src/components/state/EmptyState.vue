@@ -61,8 +61,9 @@ const { icon = 'mdi-tray-remove', actionLabel } = defineProps<{
   /** What fixes the emptiness, e.g. "Create the first item". */
   actionLabel?: string
 }>()
-
 const emit = defineEmits<{ action: [] }>()
+
+defineSlots<{ prepend?: () => unknown, actions?: () => unknown, append?: () => unknown }>()
 
 const slots = useSlots()
 

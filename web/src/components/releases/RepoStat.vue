@@ -41,6 +41,7 @@ import { useTranslate } from '../../composables/useTranslate'
 // One bordered readout: mark and counts divided by hairlines. Renders nothing
 // when the repository could not be read.
 const { showForks = true } = defineProps<{ showForks?: boolean }>()
+defineSlots<{ prepend?: () => unknown, append?: () => unknown }>()
 
 const t = useTranslate()
 const query = useRepoStats()

@@ -70,8 +70,9 @@ const { searchable = true, busy } = defineProps<{
   /** A request is in flight, shown on the strip's bottom edge. */
   busy?: boolean
 }>()
-
 const model = defineModel<string>({ required: true })
+
+defineSlots<{ actions?: () => unknown }>()
 
 const t = useTranslate()
 

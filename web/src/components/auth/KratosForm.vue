@@ -141,6 +141,13 @@ const emit = defineEmits<{
   'update:flow': [flow: KratosFlow | null]
 }>()
 
+defineSlots<{
+  prepend?: () => unknown
+  append?: () => unknown
+  /** One node, as UiKratosNodes passes it. */
+  node?: InstanceType<typeof UiKratosNodes>['$slots']['node']
+}>()
+
 const t = useTranslate()
 const slots = useSlots()
 // The return URL from the query when the caller sets none. useReturnTo() drops

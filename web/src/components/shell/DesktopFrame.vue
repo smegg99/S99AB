@@ -20,6 +20,7 @@ defineProps<{
   /** The view is one full-size screen that owns its own scrolling: the workspace. */
   fill?: boolean
 }>()
+defineSlots<{ default?: () => unknown, status?: () => unknown }>()
 </script>
 
 <style scoped>

@@ -81,8 +81,9 @@ const { identity = null, canRegister = true, routed = true } = defineProps<{
   /** Off, it only emits: for a shell that opens the auth dialog or signs out itself. */
   routed?: boolean
 }>()
-
 const emit = defineEmits<{ signIn: [], signUp: [], signOut: [] }>()
+
+defineSlots<{ items?: () => unknown }>()
 
 const t = useTranslate()
 const paths = useAuthPaths()

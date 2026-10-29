@@ -119,6 +119,12 @@ import { useExplorerFolders } from '../../composables/explorer/internal/folders'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 import { useTranslate } from '../../composables/useTranslate'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
+import type { ExplorerNode } from '../../composables/explorer/internal/tree'
+
+defineSlots<{
+  selection?: (props: { nodes: ExplorerNode[] }) => unknown
+  actions?: () => unknown
+}>()
 
 const explorer = useExplorerContext()
 const folders = useExplorerFolders(explorer)

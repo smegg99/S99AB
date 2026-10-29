@@ -100,9 +100,10 @@ const { report, actions = {}, message } = defineProps<{
   /** Replaces the message the kind picks, for a failure the app can name better. */
   message?: string
 }>()
-
 // title is the window-title phrase, such as "not responding", for the app to put after its name.
 const emit = defineEmits<{ title: [phrase: string] }>()
+
+defineSlots<{ figure?: () => unknown, logo?: () => unknown }>()
 
 const COPIED_MS = 1600
 

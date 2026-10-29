@@ -30,4 +30,5 @@ defineProps<{
   /** Also the host's accessible name. */
   title?: string
 }>()
+defineSlots<{ default?: () => unknown, start?: () => unknown, actions?: () => unknown }>()
 </script>

@@ -152,12 +152,13 @@ const {
   /** The switch navigates. Off inside a dialog, where it emits instead. */
   routed?: boolean
 }>()
-
 const emit = defineEmits<{
   switch: [kind: KratosFlowKind]
   run: [node: KratosNode]
   unsupported: [node: KratosNode]
 }>()
+
+defineSlots<{ 'prepend'?: () => unknown, 'form-prepend'?: () => unknown, 'form-append'?: () => unknown, 'append'?: () => unknown, 'plate'?: () => unknown, 'plate-end'?: () => unknown, 'footer'?: () => unknown }>()
 
 const t = useTranslate()
 const versionLabel = computed(() => t('auth.version', 'version'))

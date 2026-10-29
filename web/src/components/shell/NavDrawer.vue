@@ -58,8 +58,9 @@ const {
   /** 0 follows --s99ab-rail-w. */
   width?: number
 }>()
-
 const model = defineModel<boolean>({ default: false })
+
+defineSlots<{ append?: () => unknown }>()
 
 // Read live, so retuning --s99ab-rail-w also moves the layout offset.
 const rail = useCssNumber('--s99ab-rail-w', 236)

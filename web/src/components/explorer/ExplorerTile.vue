@@ -103,6 +103,11 @@ import { useTranslate } from '../../composables/useTranslate'
 // picture is that picture with the name on a strip.
 const { node } = defineProps<{ node: ExplorerNode }>()
 
+defineSlots<{
+  badge?: (props: { node: ExplorerNode }) => unknown
+  thumb?: (props: { node: ExplorerNode }) => unknown
+}>()
+
 const t = useTranslate()
 const explorer = useExplorerContext()
 const {

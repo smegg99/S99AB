@@ -104,6 +104,7 @@ const { releasesUrl = '' } = defineProps<{
   /** Where "all releases" points when there is nothing to show. */
   releasesUrl?: string
 }>()
+defineSlots<{ unavailable?: () => unknown, actions?: () => unknown }>()
 
 const t = useTranslate()
 const query = useDownloads()

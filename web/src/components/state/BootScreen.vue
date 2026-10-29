@@ -20,6 +20,7 @@ import UiGoo from './Goo.vue'
 import { useTranslate } from '../../composables/useTranslate'
 
 const { app } = defineProps<{ app: string }>()
+defineSlots<{ logo?: () => unknown }>()
 
 const t = useTranslate()
 const label = computed(() => t('crash.starting', 'Starting {app}', { app }))
