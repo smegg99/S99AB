@@ -182,3 +182,16 @@ describe('an anchor node', () => {
     expect(wrapper.text()).toContain('Recover')
   })
 })
+
+describe('the password reveal', () => {
+  it('is reachable from the keyboard and reports whether the password shows', async () => {
+    const w = render(node({ type: 'input', attributes: { name: 'password', type: 'password' } }))
+    const reveal = w.get('button[aria-pressed]')
+    expect(reveal.attributes('tabindex')).not.toBe('-1')
+    expect(reveal.attributes('aria-pressed')).toBe('false')
+    await reveal.trigger('click')
+    expect(w.get('input').attributes('type')).toBe('text')
+    expect(reveal.attributes('aria-pressed')).toBe('true')
+    w.unmount()
+  })
+})

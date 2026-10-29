@@ -51,8 +51,8 @@
       hide-details="auto"
       @update:model-value="onInput"
     >
-      <!-- A button, since append-inner-icon has no accessible name.
-           tabindex -1 keeps it out of the tab order between fields. -->
+      <!-- A button, since append-inner-icon has no accessible name; in the tab
+           order after its field, so the keyboard can reveal the password too. -->
       <template
         v-if="isPassword"
         #append-inner
@@ -63,7 +63,6 @@
           :aria-pressed="revealed"
           variant="text"
           size="small"
-          tabindex="-1"
           @click="revealed = !revealed"
         >
           <v-icon :icon="revealed ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" />
