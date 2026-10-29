@@ -3,7 +3,7 @@
 // Client for the layer's releases endpoints (see apireleases.Register). Called
 // directly, since both ends ship in this layer.
 
-import { computed, type DeepReadonly, readonly } from 'vue'
+import { type DeepReadonly, readonly } from 'vue'
 import { useQuery } from '@pinia/colada'
 import { useLocale } from '../useTranslate'
 import { config, fetchFromApi } from './internal/api'
@@ -134,7 +134,7 @@ export function useDownloads() {
 export function useChangelog() {
   const locale = useLocale()
 
-  const q = useQuery({
+  return useQuery({
     key: () => [...keyed('changelog', locale.value)],
     query: ({ signal }) =>
       fetchFromApi<{ releases: Release[] }>('/releases', locale.value, signal).then(
@@ -142,8 +142,6 @@ export function useChangelog() {
       ),
     staleTime: config.staleTime,
   })
-
-  return { ...q, releases: computed(() => q.data.value ?? []) }
 }
 
 /** The repository's own star and fork counts. */
