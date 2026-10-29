@@ -91,11 +91,10 @@ export default defineAppConfig({
       withCredentials: true,
       reconnect: { delay: 1000, maxDelay: 15000, backoff: 2 },
     },
-    // Where apireleases is mounted, and how a download card orders and labels platforms.
+    // Where apireleases is mounted. Tab order, primary formats and the other release defaults live in
+    // composables/releases/internal/api.ts; an array set here would be concatenated with the app's.
     releases: {
       apiBase: '/api/v1',
-      order: ['linux', 'windows', 'macos'],
-      primaryKind: { linux: 'appimage', windows: 'installer' },
     },
     // The folder tree. Drawing-only numbers are --s99ab-tile-* stylesheet knobs.
     explorer: {

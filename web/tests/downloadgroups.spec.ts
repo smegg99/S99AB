@@ -27,12 +27,12 @@ function payload(): Downloads {
   }
 }
 
-function groupsOf(downloads: Downloads | null) {
+function groupsOf(downloads: Downloads | null, releasesUrl?: string) {
   const source = ref<Downloads | null>(downloads)
   let api!: ReturnType<typeof useDownloadGroups>
   mount(defineComponent({
     setup() {
-      api = useDownloadGroups(source)
+      api = useDownloadGroups(source, { releasesUrl: () => releasesUrl })
       return () => null
     },
   }), { global: { plugins: [createI18n({ legacy: false, globalInjection: true, locale: 'en', messages: withS99ab({ en: {}, pl: {} }) })] } })
@@ -115,5 +115,33 @@ describe('useDownloadGroups', () => {
     await nextTick()
     expect(api.tab.value).toBe('web')
     expect(api.current.value?.key).toBe('web')
+  })
+
+  // Nuxt concatenates app.config arrays, so an app's order can repeat the layer's.
+  it('shows each platform once when the order repeats it', () => {
+    configureReleases({ order: ['web', 'linux', 'windows', 'macos', 'linux'] })
+    const { api } = groupsOf(payload())
+    expect(api.groups.value.map(g => g.key)).toEqual(['web', 'linux', 'extras'])
+  })
+
+  // A release still uploading its binaries already has source archives.
+  it('keeps the release and its other files when no platform has a build yet', () => {
+    const { api } = groupsOf({ ...payload(), platforms: [] })
+    expect(api.live.value).toBe(true)
+    expect(api.groups.value.map(g => g.key)).toEqual(['extras'])
+  })
+
+  it('offers the fallback beside the other files of a release with no builds', () => {
+    configureReleases({ fallback: [{ platform: 'linux', assets: [{ kind: 'appimage' }] }] })
+    const { api } = groupsOf({ ...payload(), platforms: [] }, 'https://example.test/releases')
+    expect(api.groups.value.map(g => g.key)).toEqual(['linux', 'extras'])
+    expect(api.groups.value[0]!.rows[0]!.url).toBe('https://example.test/releases')
+  })
+
+  // A fallback row with nowhere to link to would open the current page.
+  it('shows no fallback without a releases page', () => {
+    configureReleases({ fallback: [{ platform: 'linux', assets: [{ kind: 'appimage' }] }] })
+    const { api } = groupsOf({ ...payload(), available: false, platforms: [] })
+    expect(api.groups.value).toEqual([])
   })
 })

@@ -14,7 +14,7 @@ import (
 
 var ErrNoIdentity = errors.New("kratosauth: no such identity")
 
-// Admin talks to Kratos's admin API, which must stay on loopback or a private network.
+// Admin talks to Kratos's admin API, which can read and change every identity, so keep it on loopback or a private network.
 type Admin struct {
 	baseURL string
 	client  *http.Client

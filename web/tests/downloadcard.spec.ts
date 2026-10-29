@@ -6,6 +6,8 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DownloadCard from '../src/components/releases/DownloadCard.vue'
 import DownloadAssetRow from '../src/components/releases/DownloadAssetRow.vue'
+import DownloadDialog from '../src/components/releases/DownloadDialog.vue'
+import DownloadTabs from '../src/components/releases/DownloadTabs.vue'
 import EmptyState from '../src/components/state/EmptyState.vue'
 import { configureReleases, resetReleasesConfig } from '../src/composables/releases/internal/api'
 import type { Downloads } from '../src/composables/releases/useReleases'
@@ -138,9 +140,18 @@ describe('UiDownloadCard', () => {
     await flushPromises()
 
     const windows = wrapper.findAll('.v-tab').find(t => t.text().includes('Windows'))!
-    expect(windows.text()).toContain('Windows*')
-    expect(windows.attributes('disabled')).toBeDefined()
-    expect(wrapper.text()).toContain('* No build for this platform yet.')
+    // A tab stays a tablist child and focusable, so its reason can be read.
+    expect(windows.attributes('aria-disabled')).toBe('true')
+    expect(windows.element.closest('[role="group"]')).toBeNull()
+    expect(windows.find('.s99ab-downloads__mark').attributes('aria-hidden')).toBe('true')
+    expect(windows.find('.s99ab-downloads__mark').text()).toBe('*')
+    expect(windows.find('.d-sr-only').text()).toBe('(no build yet)')
+    expect(wrapper.text()).toContain('* No build yet.')
+
+    // Clicking it opens nothing.
+    await windows.trigger('click')
+    await flushPromises()
+    expect(wrapper.findComponent(DownloadAssetRow).props('platform')).toBe('linux')
   })
 
   it('links the changelog and the releases page from config', async () => {
@@ -161,5 +172,55 @@ describe('UiDownloadCard', () => {
     const [row, platform] = wrapper.emitted('download')![0] as [{ label: string }, string]
     expect(row.label).toBe('appimage')
     expect(platform).toBe('linux')
+  })
+
+  it('says an experimental tab is experimental', async () => {
+    configureReleases({ experimental: ['macos'] })
+    const wrapper = mountCard()
+    await flushPromises()
+
+    const macos = wrapper.findAll('.v-tab').find(t => t.text().includes('macOS'))!
+    expect(macos.find('.s99ab-downloads__mark').text()).toBe('**')
+    expect(macos.find('.d-sr-only').text()).toBe('(experimental)')
+  })
+
+  it('links fallback rows to the card\'s own releases page', async () => {
+    configureReleases({ fallback: [{ platform: 'linux', assets: [{ kind: 'appimage' }] }] })
+    stubApi({}, false)
+    const wrapper = mount(DownloadCard, {
+      props: { releasesUrl: 'https://example.test/releases' },
+      global: { plugins: [createPinia(), PiniaColada, vuetify] },
+    })
+    await flushPromises()
+
+    expect(wrapper.findComponent(DownloadAssetRow).props('row').url).toBe('https://example.test/releases')
+  })
+})
+
+describe('UiDownloadDialog', () => {
+  it('passes the notes and the planned reason through to the card', async () => {
+    configureReleases({ planned: ['windows'], experimental: ['macos'] })
+    const wrapper = mount(DownloadDialog, {
+      props: { plannedNote: '* Soon.', experimentalNote: '** Try it.', plannedReason: 'Not yet.' },
+      global: { plugins: [createPinia(), PiniaColada, vuetify] },
+    })
+    await flushPromises()
+
+    const card = wrapper.findComponent(DownloadCard)
+    expect(card.props('plannedNote')).toBe('* Soon.')
+    expect(card.props('experimentalNote')).toBe('** Try it.')
+    expect(card.findComponent(DownloadTabs).props('plannedReason')).toBe('Not yet.')
+  })
+})
+
+describe('UiDownloadCard first load', () => {
+  // The fallback is for a failed or empty answer, not the moment before the first one.
+  it('shows no fallback rows while the first request is pending', async () => {
+    configureReleases({ releasesUrl: 'https://example.test/releases', fallback: [{ platform: 'linux', assets: [{ kind: 'appimage' }] }] })
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})))
+    const wrapper = mountCard()
+    await flushPromises()
+
+    expect(wrapper.findComponent(DownloadAssetRow).exists()).toBe(false)
   })
 })

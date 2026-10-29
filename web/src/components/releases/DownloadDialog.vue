@@ -20,6 +20,9 @@
       <UiDownloadCard
         :releases-url="releasesUrl"
         :changelog-path="changelogPath"
+        :planned-note="plannedNote"
+        :experimental-note="experimentalNote"
+        :planned-reason="plannedReason"
       />
     </v-card-text>
   </v-card>
@@ -31,12 +34,16 @@ import UiDownloadCard from './DownloadCard.vue'
 import { useDialog } from '../../composables/useDialog'
 import { useTranslate } from '../../composables/useTranslate'
 
-const { title = '', releasesUrl, changelogPath } = defineProps<{
+const { title = '', releasesUrl, changelogPath, plannedNote = '', experimentalNote = '', plannedReason = '' } = defineProps<{
   title?: string
   /** Overrides s99ab.releases.releasesUrl. */
   releasesUrl?: string
   /** Overrides s99ab.releases.changelogPath. */
   changelogPath?: string
+  /** Passed to the card; see UiDownloadCard. */
+  plannedNote?: string
+  experimentalNote?: string
+  plannedReason?: string
 }>()
 
 const { close } = useDialog()

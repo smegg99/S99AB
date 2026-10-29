@@ -1,4 +1,5 @@
 // net/sse/client_test.go
+
 package sse
 
 import (

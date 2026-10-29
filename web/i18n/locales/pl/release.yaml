@@ -88,7 +88,7 @@ webBuildSub:
   value: "Statyczna strona do postawienia u siebie"
   description: "Line under webBuild"
 plannedNote:
-  value: "* Brak wersji na tę platformę."
+  value: "* Jeszcze bez wersji."
   description: "Under the download card when a platform tab is planned; the asterisk matches the tab marker"
 plannedReason:
   value: "Brak wersji na tę platformę."
@@ -96,9 +96,6 @@ plannedReason:
 experimentalNote:
   value: "** Eksperymentalne."
   description: "Under the download card when a platform tab is experimental; the two asterisks match the tab marker"
-loading:
-  value: "Wczytywanie wydań"
-  description: "Accessible label of the changelog while it loads"
 failed:
   value: "Nie udało się wczytać wydań."
   description: "Changelog error title"
@@ -108,6 +105,12 @@ beta:
 feedback:
   value: "Podziel się uwagami lub zgłoś problem"
   description: "Default link label of the release notice"
+plannedMark:
+  value: "(jeszcze bez wersji)"
+  description: "Read by screen readers after a planned platform tab's name, in place of the asterisk"
+experimentalMark:
+  value: "(eksperymentalne)"
+  description: "Read by screen readers after an experimental platform tab's name, in place of the two asterisks"
 
 platforms:
   linux:

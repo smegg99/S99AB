@@ -91,7 +91,7 @@ webBuildSub:
   value: "Static site, host it yourself"
   description: "Line under webBuild"
 plannedNote:
-  value: "* No build for this platform yet."
+  value: "* No build yet."
   description: "Under the download card when a platform tab is planned; the asterisk matches the tab marker"
 plannedReason:
   value: "No build for this platform yet."
@@ -99,9 +99,6 @@ plannedReason:
 experimentalNote:
   value: "** Experimental."
   description: "Under the download card when a platform tab is experimental; the two asterisks match the tab marker"
-loading:
-  value: "Loading releases"
-  description: "Accessible label of the changelog while it loads"
 failed:
   value: "The releases could not be loaded."
   description: "Changelog error title"
@@ -111,6 +108,12 @@ beta:
 feedback:
   value: "Share feedback or report a problem"
   description: "Default link label of the release notice"
+plannedMark:
+  value: "(no build yet)"
+  description: "Read by screen readers after a planned platform tab's name, in place of the asterisk"
+experimentalMark:
+  value: "(experimental)"
+  description: "Read by screen readers after an experimental platform tab's name, in place of the two asterisks"
 
 platforms:
   linux:
@@ -126,11 +129,10 @@ platforms:
   extras:
     value: "Source & files"
     description: "Source archives, checksums and signatures: not an OS build"
-
-# Package formats. A dot is a path step in vue-i18n, so tar.gz is targz.
   web:
     value: "Web"
 
+# Package formats. A dot is a path step in vue-i18n, so tar.gz is targz.
 kinds:
   appimage:
     value: "AppImage"

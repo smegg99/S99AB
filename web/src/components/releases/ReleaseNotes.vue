@@ -30,8 +30,10 @@ const { notes, notesLocale = '' } = defineProps<{
 const t = useTranslate()
 const locale = useLocale()
 
-const untranslated = computed(() => Boolean(notesLocale) && notesLocale !== locale.value)
+// pl-PL reads pl notes: only the language part is compared.
+const language = (tag: string) => tag.toLowerCase().split(/[-_]/)[0]
+const untranslated = computed(() => Boolean(notesLocale) && language(notesLocale) !== language(locale.value))
 const untranslatedText = computed(() =>
-  t('release.notTranslated', 'These notes are not available in your language yet.'),
+  t('release.notTranslated', 'These notes have not been translated.'),
 )
 </script>

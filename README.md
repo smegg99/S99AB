@@ -103,6 +103,34 @@ Nuxt such as a desktop bridge, import from a subpath:
 | `@smegg99/s99ab/i18n` | the layer's catalogs |
 | `@smegg99/s99ab/styles` | the shared stylesheet |
 
+## Upgrading to 1.8.1
+
+Fixes to the 1.8.0 release packages:
+
+- The layer's `app.config` no longer sets `s99ab.releases.order` and
+  `primaryKind`, so the defaults with android, web and ios apply. Nuxt
+  concatenates app.config arrays; a repeated platform now shows once.
+- A published release whose platform builds are not uploaded yet keeps its
+  header and its other files; the fallback fills only the platform tabs.
+- `mdlocale.Sections.Resolve` returns the lowercase tag it matched, and the
+  "not translated" alert compares languages, so `pl-PL` reads `pl` notes
+  without it.
+- `useDownloadGroups(source, { releasesUrl })` takes the card's releases page
+  for fallback rows; with no releases page there is no fallback.
+- A planned tab is a focusable tab with `aria-disabled` and a tooltip, not a
+  disabled one; `*` and `**` are hidden from screen readers, which read
+  "(no build yet)" and "(experimental)". The card and the dialog take
+  `plannedReason`, and the dialog passes `plannedNote` and `experimentalNote`.
+- `useUpdateCheck({ current })` fetches `/version` while the getter answers
+  undefined, and `refresh()` skips it when the build is known.
+- `UiReleaseNotice` is a note, not an alert, and its stripes follow `tone`.
+- `UiChangelog`'s `head` slot shows in every state, and the error state links
+  the releases page.
+- Release dates are formatted in UTC, so server and client agree.
+- `pluralCount` is removed from `@smegg99/s99ab/releases`; nothing used it.
+- `web/i18n/generated` is built by loc 1.1.0: `web/loc-manifest.json` replaces
+  `generated/manifest.json`, and `keys.gen.ts` no longer exports `I18nKey`.
+
 ## Upgrading to 1.8.0
 
 The auto-import surface shrank from about 250 names to the composables. A

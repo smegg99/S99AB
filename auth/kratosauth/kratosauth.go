@@ -20,7 +20,7 @@ var (
 	ErrCallerGone = errors.New("kratosauth: the caller stopped waiting")
 )
 
-// callerGone tells a cancelled caller from an unreachable Kratos, which Client.Do reports alike.
+// callerGone tells a cancelled caller from an unreachable Kratos by ctx.Err, which the client Timeout never sets.
 func callerGone(ctx context.Context, err error) error {
 	if cause := ctx.Err(); cause != nil {
 		return fmt.Errorf("%w: %v", ErrCallerGone, cause)

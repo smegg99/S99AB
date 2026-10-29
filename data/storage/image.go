@@ -90,7 +90,7 @@ func Derive(ctx context.Context, st Storage, key string, opts ResizeOptions) (st
 	return derived, nil
 }
 
-// decode reads the header first and refuses a canvas over MaxPixels before allocating it.
+// decode reads the header first and refuses a canvas over maxPixels before allocating it.
 func decode(r io.Reader) (image.Image, error) {
 	var head bytes.Buffer
 	cfg, _, err := image.DecodeConfig(io.TeeReader(r, &head))

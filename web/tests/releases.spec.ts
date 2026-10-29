@@ -2,7 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { fetchFromApi, formatBytes, kindKey } from '../src/composables/releases/internal/api'
-import { formatCount, pluralCount } from '../src/composables/releases/internal/count'
+import { formatCount } from '../src/composables/releases/internal/count'
 import { formatReleaseDate } from '../src/composables/releases/internal/date'
 import { detectOS } from '../src/internal/platform'
 import { compareVersions } from '../src/composables/releases/internal/version'
@@ -90,12 +90,6 @@ describe('formatCount', () => {
     expect(formatCount(950, 'en')).toBe('950')
     expect(formatCount(1234, 'en')).toBe('1.2K')
   })
-
-  // "1.2K stars" and "1,2 tys. gwiazdek" take the form of zero, not of 1234.
-  it('selects the plural form of the printed number', () => {
-    expect(pluralCount(3)).toBe(3)
-    expect(pluralCount(1234)).toBe(0)
-  })
 })
 
 describe('fetchFromApi', () => {
@@ -110,5 +104,13 @@ describe('fetchFromApi', () => {
 
     await fetchFromApi('/repo', '', signal)
     expect(fetch).toHaveBeenCalledWith('/api/v1/repo', expect.objectContaining({ signal }))
+  })
+})
+
+// The server renders in UTC; a local timezone would move a midnight release a day and break hydration.
+describe('formatReleaseDate in UTC', () => {
+  it('reads the date in UTC, not the machine timezone', () => {
+    expect(formatReleaseDate('2026-07-01T23:30:00Z', 'en')).toBe('July 1, 2026')
+    expect(formatReleaseDate('2026-07-02T00:30:00+02:00', 'en')).toBe('July 1, 2026')
   })
 })

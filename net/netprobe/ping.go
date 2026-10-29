@@ -21,7 +21,7 @@ type Options struct {
 	ICMP bool
 	// Timeout bounds each attempt. Zero means 3s.
 	Timeout time.Duration
-	// TCPPorts is the connect-fallback set; nil means DefaultTCPPorts.
+	// TCPPorts is the connect-fallback set; nil means defaultTCPPorts.
 	TCPPorts []string
 	// Payload is the ICMP echo body; empty means "s99ab-ping".
 	Payload string

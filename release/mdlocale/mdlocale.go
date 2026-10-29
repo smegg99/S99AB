@@ -31,7 +31,7 @@ func Split(md string) Sections {
 	s.untagged = strings.TrimSpace(md[:loc[0][0]])
 
 	for i, m := range loc {
-		tag := strings.ToLower(md[m[2]:m[3]])
+		tag := strings.ToLower(strings.ReplaceAll(md[m[2]:m[3]], "_", "-"))
 
 		end := len(md)
 		if i+1 < len(loc) {
@@ -56,7 +56,8 @@ func Split(md string) Sections {
 // Resolve returns the locale's section, its base tag's (pl-PL reads pl), the fallback's, or the untagged text in fallback.
 func (s Sections) Resolve(locale, fallback string) (text, lang string) {
 	for _, tag := range []string{locale, baseTag(locale), fallback, baseTag(fallback)} {
-		if body := s.byLocale[strings.ToLower(tag)]; tag != "" && body != "" {
+		tag = strings.ToLower(strings.ReplaceAll(tag, "_", "-"))
+		if body := s.byLocale[tag]; tag != "" && body != "" {
 			return body, tag
 		}
 	}

@@ -15,12 +15,12 @@ export interface UpdateCheckOptions {
 
 /** Whether a newer release exists. An empty (dev) version is never behind. */
 export function useUpdateCheck(options: UpdateCheckOptions = {}) {
-  const build = useBuildVersion({ enabled: () => options.current === undefined })
+  // /version only when the caller has no build, or its getter has none yet.
+  const given = computed(() => toValue(options.current))
+  const build = useBuildVersion({ enabled: () => given.value === undefined })
   const latest = useLatestRelease()
 
-  const current = computed(
-    () => toValue(options.current) ?? build.version.value,
-  )
+  const current = computed(() => given.value ?? build.version.value)
   const latestVersion = computed(() =>
     latest.data.value?.available ? latest.data.value.version : '',
   )
@@ -39,6 +39,6 @@ export function useUpdateCheck(options: UpdateCheckOptions = {}) {
     checking: computed(
       () => build.loading.value || latest.asyncStatus.value === 'loading',
     ),
-    refresh: () => Promise.all([build.refresh(), latest.refetch()]),
+    refresh: () => Promise.all([given.value === undefined ? build.refresh() : undefined, latest.refetch()]),
   }
 }

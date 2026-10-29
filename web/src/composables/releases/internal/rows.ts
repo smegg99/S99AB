@@ -38,7 +38,7 @@ function kindLabel(t: Translate, kind: string): string {
   return t(`release.kinds.${kindKey(kind)}`, kind)
 }
 
-/** A platform's live build, its primary format first in the list order it came in. */
+/** A platform's live build in the order GitHub lists it, its primary format marked. */
 export function liveRows(t: Translate, platform: string, assets: ReleaseAsset[], primaryKind: string, version: string): DownloadRow[] {
   const web = platform === 'web'
   return assets.map(a => ({

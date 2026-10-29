@@ -39,7 +39,7 @@ func Dial(path string) *http.Client {
 	return &http.Client{Transport: Transport(path)}
 }
 
-// Listen takes the socket at path (ErrRunning if live, stale ones removed), 0700 dir and 0600 socket chmodded after bind.
+// Listen takes the socket at path (ErrRunning if live, stale removed); a new dir is 0700, an existing one is kept, so keep it private: the socket is chmodded 0600 only after bind.
 func Listen(path string) (net.Listener, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err

@@ -2,19 +2,39 @@
 <template>
   <!-- Animates the height as entries arrive or change with the language. -->
   <UiAutoHeight>
+    <!-- The page's own content above the list, in every state. -->
+    <slot name="head" />
+
     <UiLoadingState
       v-if="firstLoad"
       :rows="3"
       variant="skeleton"
     />
 
-    <UiErrorState
-      v-else-if="error"
-      :error="error"
-      :title="failedTitle"
-      :retrying="retrying"
-      @retry="query.refetch()"
-    />
+    <div v-else-if="error">
+      <UiErrorState
+        :error="error"
+        :title="failedTitle"
+        :retrying="retrying"
+        @retry="query.refetch()"
+      />
+      <div
+        v-if="allReleasesUrl"
+        class="d-flex justify-center"
+      >
+        <v-btn
+          :href="allReleasesUrl"
+          :data-umami-event="config.umami ? 'all-releases' : undefined"
+          variant="text"
+          size="small"
+          append-icon="mdi-open-in-new"
+          target="_blank"
+          rel="noopener"
+        >
+          {{ allReleasesLabel }}
+        </v-btn>
+      </div>
+    </div>
 
     <UiEmptyState
       v-else-if="!releases.length"
@@ -25,7 +45,6 @@
     />
 
     <template v-else>
-      <slot name="head" />
       <!-- A real heading and article per release, for screen reader navigation. -->
       <article
         v-for="release in releases"
@@ -114,7 +133,7 @@ const firstLoad = useDelayed(() => query.asyncStatus.value === 'loading' && !que
 // The error card owns no request, so the caller reports the retry for the spinner.
 const retrying = computed(() => query.asyncStatus.value === 'loading')
 
-const onGithubLabel = computed(() => t('release.onGithub', 'On GitHub'))
+const onGithubLabel = computed(() => t('release.onGithub', 'View on GitHub'))
 // Its own key; the download card's noneTitle is about files.
 const emptyTitle = computed(() => t('release.noHistory', 'No release has been published yet.'))
 const failedTitle = computed(() => t('release.failed', 'The releases could not be loaded.'))

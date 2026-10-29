@@ -8,6 +8,9 @@
       lines="one"
     />
 
+    <!-- Before the first answer, and before the delayed skeleton shows, the card stays empty. -->
+    <template v-else-if="pending" />
+
     <!-- Nothing published or GitHub unreachable, and no configured fallback: point to the releases page. -->
     <slot
       v-else-if="!groups.length"
@@ -48,6 +51,7 @@
         :groups="groups"
         :detected="detected"
         :model-value="tab"
+        :planned-reason="plannedReason"
         @select="select"
       />
 
@@ -117,7 +121,7 @@ import { useLocale, useTranslate } from '../../composables/useTranslate'
 import { inBrowser } from '../../browser/env'
 
 // The newest version, a tab per platform with the user's marked, and every format that platform ships.
-const { releasesUrl, changelogPath, plannedNote = '', experimentalNote = '' } = defineProps<{
+const { releasesUrl, changelogPath, plannedNote = '', experimentalNote = '', plannedReason = '' } = defineProps<{
   /** The releases page; overrides s99ab.releases.releasesUrl. */
   releasesUrl?: string
   /** The changelog route; overrides s99ab.releases.changelogPath. */
@@ -126,6 +130,8 @@ const { releasesUrl, changelogPath, plannedNote = '', experimentalNote = '' } = 
   plannedNote?: string
   /** Shown under the card when a tab is experimental; the layer's text when empty. */
   experimentalNote?: string
+  /** Why a planned tab opens nothing; the layer's text when empty. */
+  plannedReason?: string
 }>()
 const emit = defineEmits<{
   selectPlatform: [key: string]
@@ -140,15 +146,16 @@ const config = useReleasesConfig()
 const query = useDownloads()
 
 const downloads = computed(() => query.data.value ?? null)
-const firstLoad = useDelayed(() => query.asyncStatus.value === 'loading' && !query.data.value)
+const pending = computed(() => query.asyncStatus.value === 'loading' && !query.data.value && !query.error.value)
+const firstLoad = useDelayed(() => pending.value)
 
-const { groups, detected, tab, current, live, pick } = useDownloadGroups(downloads)
+const { groups, detected, tab, current, live, pick } = useDownloadGroups(downloads, { releasesUrl: () => releasesUrl })
 
 const allReleasesUrl = computed(() => releasesUrl ?? config.releasesUrl)
 const changelogTo = computed(() => changelogPath ?? config.changelogPath)
 
 const notes = computed(() => [
-  ...(groups.value.some(g => g.planned) ? [plannedNote || t('release.plannedNote', '* No build for this platform yet.')] : []),
+  ...(groups.value.some(g => g.planned) ? [plannedNote || t('release.plannedNote', '* No build yet.')] : []),
   ...(groups.value.some(g => g.experimental) ? [experimentalNote || t('release.experimentalNote', '** Experimental.')] : []),
 ])
 

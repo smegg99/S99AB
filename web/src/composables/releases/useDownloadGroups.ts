@@ -9,19 +9,23 @@ import { useTranslate } from '../useTranslate'
 
 export type { DownloadGroup, DownloadRow } from './internal/rows'
 
+export interface DownloadGroupsOptions {
+  /** Where fallback rows link; s99ab.releases.releasesUrl when unset. */
+  releasesUrl?: MaybeRefOrGetter<string | undefined>
+}
+
 /**
  * The download card's tabs and the open one: live builds, the configured fallback when there are none,
  * and planned platforms as disabled tabs. Call from setup.
  */
-export function useDownloadGroups(source: MaybeRefOrGetter<Downloads | null>) {
+export function useDownloadGroups(source: MaybeRefOrGetter<Downloads | null>, options: DownloadGroupsOptions = {}) {
   const t = useTranslate()
   const config = useReleasesConfig()
   const { os } = usePlatform()
 
-  const live = computed(() => {
-    const d = toValue(source)
-    return !!d?.available && d.platforms.length > 0
-  })
+  // A published release, even one whose platform builds are not uploaded yet.
+  const live = computed(() => !!toValue(source)?.available)
+  const releasesUrl = computed(() => toValue(options.releasesUrl) ?? config.releasesUrl)
 
   function group(key: string, rows: DownloadGroup['rows'], version = ''): DownloadGroup {
     return {
@@ -35,24 +39,26 @@ export function useDownloadGroups(source: MaybeRefOrGetter<Downloads | null>) {
     }
   }
 
+  // Nuxt concatenates app.config arrays, so the configured order may repeat a platform.
   function ordered(keys: string[]): string[] {
-    return [...config.order.filter(k => keys.includes(k)), ...keys.filter(k => !config.order.includes(k))]
+    return [...new Set([...config.order.filter(k => keys.includes(k)), ...keys])]
   }
 
   const groups = computed<DownloadGroup[]>(() => {
     const d = toValue(source)
     const built = new Map<string, DownloadGroup>()
 
-    if (live.value && d) {
+    if (d?.available && d.platforms.length) {
       for (const p of d.platforms) {
         // Otherwise it would repeat the version in the header.
         const version = p.current ? '' : p.version
         built.set(p.platform, group(p.platform, liveRows(t, p.platform, p.assets, config.primaryKind[p.platform] ?? '', version), version))
       }
     }
-    else {
+    // Fallback rows link to the releases page, so without one there is nothing to offer.
+    else if (releasesUrl.value) {
       for (const f of config.fallback) {
-        built.set(f.platform, group(f.platform, fallbackRows(t, f, config.primaryKind[f.platform] ?? '', config.releasesUrl)))
+        built.set(f.platform, group(f.platform, fallbackRows(t, f, config.primaryKind[f.platform] ?? '', releasesUrl.value)))
       }
     }
     if (live.value || built.size) {

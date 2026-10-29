@@ -12,7 +12,7 @@ import (
 	"modernc.org/sqlite"
 )
 
-// Rebind converts ? placeholders for driver, skipping literals, quoted names, comments and jsonb ?| and ?&.
+// Rebind converts ? placeholders for driver, skipping literals, quoted names, comments and jsonb ?| and ?&; write a bare jsonb ? as jsonb_exists().
 func Rebind(driver, query string) string {
 	if driver != Postgres {
 		return query

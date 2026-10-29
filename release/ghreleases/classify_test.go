@@ -1,4 +1,5 @@
 // release/ghreleases/classify_test.go
+
 package ghreleases
 
 import "testing"

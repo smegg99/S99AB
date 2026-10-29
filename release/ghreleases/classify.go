@@ -1,4 +1,5 @@
 // release/ghreleases/classify.go
+
 package ghreleases
 
 import (

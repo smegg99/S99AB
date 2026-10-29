@@ -1,4 +1,5 @@
 // auth/kratosclient/kratosclient_test.go
+
 package kratosclient_test
 
 import (

@@ -93,7 +93,7 @@ type Asset struct {
 	DownloadURL string `json:"download_url"`
 	Platform    string `json:"platform"` // linux | windows | macos | android | web | source | other
 	Arch        string `json:"arch"`     // x86_64 | arm64 | universal | ""
-	Kind        string `json:"kind"`     // appimage | deb | rpm | tar.gz | exe | msix | zip | dmg
+	Kind        string `json:"kind"`     // appimage | deb | rpm | pkg.tar.zst | tar.gz | tar.zst | installer | exe | msix | dmg | zip | apk | aab | binary | ext
 
 	// Digest is "algo:hex", empty for older assets and Source. It catches a truncated
 	// download or a tampering mirror; it is not a signature.

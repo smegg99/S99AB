@@ -69,3 +69,15 @@ describe('UiChangelog', () => {
     expect(wrapper.findComponent(EmptyState).props('actionLabel')).toBe('All releases')
   })
 })
+
+describe('UiChangelog states', () => {
+  it('keeps the page\'s head and offers the releases page when the list fails', async () => {
+    configureReleases({ releasesUrl: 'https://example.test/releases' })
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 500, json: async () => ({}) })))
+    const wrapper = mountChangelog({}, { head: () => h('p', { class: 'intro' }, 'Intro') })
+    await flushPromises()
+
+    expect(wrapper.find('.intro').exists()).toBe(true)
+    expect(wrapper.find('a[href="https://example.test/releases"]').exists()).toBe(true)
+  })
+})

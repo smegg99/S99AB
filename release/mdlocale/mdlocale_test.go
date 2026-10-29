@@ -1,4 +1,5 @@
 // release/mdlocale/mdlocale_test.go
+
 package mdlocale
 
 import (
@@ -37,6 +38,20 @@ func TestRegionalLocaleFindsItsBaseTag(t *testing.T) {
 
 	if text, lang := s.Resolve("pl-PL", "en"); text != "Polski" || lang != "pl" {
 		t.Errorf("pl-PL = (%q, %q), want the pl section", text, lang)
+	}
+}
+
+// The language comes back as the section's own lowercase tag, however the caller spelled it.
+func TestResolveReportsTheSectionsTag(t *testing.T) {
+	s := Split("<!-- lang:en -->\nEnglish\n<!-- lang:pl -->\nPolski")
+
+	if text, lang := Split("<!-- lang:pt_BR -->\nOla").Resolve("pt-BR", "en"); text != "Ola" || lang != "pt-br" {
+		t.Errorf("pt_BR marker = (%q, %q), want the section as pt-br", text, lang)
+	}
+	for _, locale := range []string{"PL", "pl_PL", "pl-PL"} {
+		if _, lang := s.Resolve(locale, "en"); lang != "pl" {
+			t.Errorf("%s: lang = %q, want pl", locale, lang)
+		}
 	}
 }
 

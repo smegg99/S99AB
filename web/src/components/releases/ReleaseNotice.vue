@@ -1,8 +1,10 @@
 <!-- web/src/components/releases/ReleaseNotice.vue -->
 <template>
+  <!-- A standing notice, so a note rather than Vuetify's assertive alert. -->
   <v-alert
     :type="tone"
-    :aria-label="heading"
+    :style="{ '--s99ab-notice': `var(--v-theme-${tone})` }"
+    role="note"
     variant="tonal"
     class="notice pa-5"
   >
@@ -61,7 +63,7 @@ const linkText = computed(() => linkLabel || t('release.feedback', 'Share feedba
   border: 1px solid rgb(var(--v-theme-edge));
   border-radius: var(--s99ab-radius);
   background-image: repeating-linear-gradient(-45deg,
-      color-mix(in srgb, rgb(var(--v-theme-warning)) 12%, transparent) 0 8px,
+      color-mix(in srgb, rgb(var(--s99ab-notice)) 12%, transparent) 0 8px,
       transparent 8px 16px);
 }
 </style>

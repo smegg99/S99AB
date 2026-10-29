@@ -1,4 +1,5 @@
 // net/sse/sse_test.go
+
 package sse
 
 import (
