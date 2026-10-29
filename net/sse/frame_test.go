@@ -52,7 +52,7 @@ func TestDecodeReadsEveryLineEnd(t *testing.T) {
 // A bad event is that event's problem: the stream, and every other subscriber's, stays open.
 func TestHandlerSkipsAnEventItCannotFrame(t *testing.T) {
 	b := NewBroker()
-	srv := httptest.NewServer(Handler(b, WithHeartbeat(0)))
+	srv := httptest.NewServer(Handler(b))
 	defer srv.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)

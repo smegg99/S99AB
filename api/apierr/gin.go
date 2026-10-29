@@ -29,7 +29,7 @@ type body struct {
 func Respond(c *gin.Context, err error) {
 	// The client is gone: nothing to send and nothing to log.
 	if callerGone(c) {
-		c.AbortWithStatus(StatusClientClosedRequest)
+		c.AbortWithStatus(statusClientClosedRequest)
 		return
 	}
 

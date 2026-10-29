@@ -27,7 +27,7 @@ func tempSocket(t *testing.T) string {
 
 func serve(t *testing.T, sock string, h http.Handler) {
 	t.Helper()
-	ln, err := Listen(sock)
+	ln, err := listen(sock)
 	if err != nil {
 		t.Fatalf("Listen: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestDialListenRoundTrip(t *testing.T) {
 		_, _ = io.WriteString(w, "pong")
 	}))
 
-	resp, err := Dial(sock).Get("http://daemon/ping")
+	resp, err := dial(sock).Get("http://daemon/ping")
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
@@ -72,7 +72,7 @@ func TestListenRefusesLiveSocket(t *testing.T) {
 	sock := tempSocket(t)
 	serve(t, sock, http.HandlerFunc(func(http.ResponseWriter, *http.Request) {}))
 
-	_, err := Listen(sock)
+	_, err := listen(sock)
 	if !errors.Is(err, ErrRunning) {
 		t.Fatalf("second Listen err = %v, want ErrRunning", err)
 	}
@@ -92,7 +92,7 @@ func TestListenClearsStaleSocket(t *testing.T) {
 	dead.SetUnlinkOnClose(false)
 	_ = dead.Close()
 
-	ln, err := Listen(sock)
+	ln, err := listen(sock)
 	if err != nil {
 		t.Fatalf("Listen over stale socket: %v", err)
 	}
@@ -109,7 +109,7 @@ func TestListenLeavesARegularFileAlone(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err := Listen(sock); !errors.Is(err, ErrNotSocket) {
+	if _, err := listen(sock); !errors.Is(err, ErrNotSocket) {
 		t.Fatalf("Listen = %v, want ErrNotSocket", err)
 	}
 	if data, err := os.ReadFile(sock); err != nil || string(data) != "notes" {
@@ -127,7 +127,7 @@ func TestEnsureRunningNoSpawnWhenUp(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 	defer cancel()
 	// A Command that would fail if it ran proves it does not run.
-	err := EnsureRunning(ctx, Config{
+	err := ensureRunning(ctx, Config{
 		Socket:  sock,
 		Command: []string{"/definitely/not/a/real/binary"},
 		Ready:   ok200,
@@ -141,7 +141,7 @@ func TestEnsureRunningNoSpawnWhenUp(t *testing.T) {
 func TestEnsureRunningNoCommand(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	err := EnsureRunning(ctx, Config{Socket: tempSocket(t)})
+	err := ensureRunning(ctx, Config{Socket: tempSocket(t)})
 	if err == nil {
 		t.Fatal("EnsureRunning with no command and nothing up = nil, want an error")
 	}
@@ -157,7 +157,7 @@ func TestEnsureRunningSpawns(t *testing.T) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 6*time.Second)
 	defer cancel()
-	err := EnsureRunning(ctx, Config{
+	err := ensureRunning(ctx, Config{
 		Socket:  sock,
 		Command: []string{os.Args[0], "-test.run=TestHelperDaemon"},
 		Ready:   ok200,
@@ -166,7 +166,7 @@ func TestEnsureRunningSpawns(t *testing.T) {
 	if err != nil {
 		t.Fatalf("EnsureRunning spawn: %v", err)
 	}
-	if err := ok200(ctx, Dial(sock)); err != nil {
+	if err := ok200(ctx, dial(sock)); err != nil {
 		t.Fatalf("daemon not answering after spawn: %v", err)
 	}
 }
@@ -180,7 +180,7 @@ func TestHelperDaemon(t *testing.T) {
 	if sock == "" {
 		return
 	}
-	ln, err := Listen(sock)
+	ln, err := listen(sock)
 	if err != nil {
 		os.Exit(1)
 	}

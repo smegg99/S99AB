@@ -84,18 +84,6 @@ func TestZeroSizeDisablesTheCap(t *testing.T) {
 	}
 }
 
-func TestMapBindErrorDistinguishesSizeFromShape(t *testing.T) {
-	tooBig := &http.MaxBytesError{Limit: 10}
-	if got := httpmw.MapBindError(tooBig); !strings.Contains(got.Error(), "too_large") {
-		t.Fatalf("size error mapped to %v", got)
-	}
-
-	shape := json.Unmarshal([]byte("{"), &struct{}{})
-	if got := httpmw.MapBindError(shape); strings.Contains(got.Error(), "too_large") {
-		t.Fatalf("a malformed body was reported as too large: %v", got)
-	}
-}
-
 // gin returns the rightmost untrusted X-Forwarded-For address; only the reverse
 // proxy may reach the port, since a trusted peer's header is believed.
 func TestForwardedForIsWalkedRightToLeft(t *testing.T) {

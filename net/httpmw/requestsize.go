@@ -37,11 +37,3 @@ func TooLarge(err error) bool {
 	var maxErr *http.MaxBytesError
 	return errors.As(err, &maxErr)
 }
-
-// MapBindError maps a binding failure to Validation, or TooLarge when the size cap tripped.
-func MapBindError(err error) error {
-	if TooLarge(err) {
-		return apierr.Wrap(err, apierr.TooLarge, "error.requestTooLarge")
-	}
-	return apierr.Wrap(err, apierr.Validation, "error.badRequest")
-}

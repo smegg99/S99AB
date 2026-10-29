@@ -52,7 +52,7 @@ func get(r *gin.Engine, ip string, headers map[string]string) *httptest.Response
 }
 
 func TestUnderTheLimitPasses(t *testing.T) {
-	r := engine(httpmw.RateLimit(60))
+	r := engine(httpmw.RateLimitWith(httpmw.RateLimitOptions{PerMinute: 60}))
 
 	for i := range 5 {
 		if code := get(r, "1.2.3.4", nil).Code; code != http.StatusOK {
@@ -195,7 +195,7 @@ func TestSkipExemptsHealthProbes(t *testing.T) {
 }
 
 func TestZeroRateDisablesTheLimiter(t *testing.T) {
-	r := engine(httpmw.RateLimit(0))
+	r := engine(httpmw.RateLimitWith(httpmw.RateLimitOptions{PerMinute: 0}))
 
 	for i := range 20 {
 		if code := get(r, "1.2.3.4", nil).Code; code != http.StatusOK {

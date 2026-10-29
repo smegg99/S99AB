@@ -26,7 +26,7 @@ func NewLocalDir(root, base string) *LocalDir {
 }
 
 func (l *LocalDir) path(key string) (string, error) {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return "", err
 	}
 	return filepath.Join(l.root, filepath.FromSlash(key)), nil
@@ -80,7 +80,7 @@ func (l *LocalDir) Get(_ context.Context, key string) (io.ReadCloser, error) {
 // URL returns a relative app-served path and ignores ttl. Relative tells the
 // caller the app serves the bytes; Bucket returns an absolute URL.
 func (l *LocalDir) URL(_ context.Context, key string, _ time.Duration) (string, error) {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return "", err
 	}
 

@@ -81,14 +81,6 @@ func jsonbOperator(rest string) bool {
 	return len(rest) < 2 || rest[1] != rest[0]
 }
 
-// Placeholders builds an `(?, ?, ?)` list for an IN clause of n values.
-func Placeholders(n int) string {
-	if n <= 0 {
-		return "()"
-	}
-	return "(" + strings.Repeat("?, ", n-1) + "?)"
-}
-
 // Detect names the driver behind an open pool from its type, without a query.
 func Detect(conn *sql.DB) (string, error) {
 	switch d := conn.Driver().(type) {

@@ -27,9 +27,9 @@ var (
 	Internal     = Kind{"internal", http.StatusInternalServerError}
 )
 
-// StatusClientClosedRequest is nginx's 499, sent without an envelope when the
+// statusClientClosedRequest is nginx's 499, sent without an envelope when the
 // caller is gone.
-const StatusClientClosedRequest = 499
+const statusClientClosedRequest = 499
 
 // Error carries a Kind to the client and the cause to the log only.
 type Error struct {
@@ -63,12 +63,6 @@ func (e *Error) Error() string {
 }
 
 func (e *Error) Unwrap() error { return e.cause }
-
-// Is reports whether err is, or wraps, an *Error of kind k.
-func Is(err error, k Kind) bool {
-	var e *Error
-	return errors.As(err, &e) && e.Kind == k
-}
 
 // kindOf maps an error that is not an *Error to 500 internal.
 func kindOf(err error) *Error {

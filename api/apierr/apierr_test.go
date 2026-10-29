@@ -59,11 +59,9 @@ func TestWrapKeepsCauseReachable(t *testing.T) {
 	if !errors.Is(err, errDomain) {
 		t.Fatal("errors.Is lost the cause")
 	}
-	if !apierr.Is(err, apierr.NotFound) {
-		t.Fatal("apierr.Is did not match the kind")
-	}
-	if apierr.Is(err, apierr.Conflict) {
-		t.Fatal("apierr.Is matched the wrong kind")
+	var e *apierr.Error
+	if !errors.As(err, &e) || e.Kind != apierr.NotFound {
+		t.Fatal("the kind is not reachable through errors.As")
 	}
 }
 
@@ -91,7 +89,7 @@ func TestCallerThatLeftGetsAStatusAndNothingElse(t *testing.T) {
 
 	apierr.Respond(c, context.Canceled)
 
-	if w.Code != apierr.StatusClientClosedRequest {
+	if w.Code != 499 {
 		t.Fatalf("code = %d, want 499", w.Code)
 	}
 	if body := w.Body.String(); body != "" {
@@ -117,7 +115,7 @@ func TestAnyErrorOnADeadRequestIsTheCallerLeaving(t *testing.T) {
 
 		apierr.Respond(c, err)
 
-		if w.Code != apierr.StatusClientClosedRequest {
+		if w.Code != 499 {
 			t.Fatalf("code = %d for %v, want 499 - the request is over", w.Code, err)
 		}
 		if body := w.Body.String(); body != "" {

@@ -23,22 +23,7 @@ func TestStringQueryWinsElseFallback(t *testing.T) {
 	}
 }
 
-func TestIntParsesElseFallback(t *testing.T) {
-	if got := Int(ctx("n=42"), "n", 7); got != 42 {
-		t.Errorf("valid query: got %d, want 42", got)
-	}
-	if got := Int(ctx("n=nope"), "n", 7); got != 7 {
-		t.Errorf("malformed query must fall back, not zero: got %d, want 7", got)
-	}
-	if got := Int(ctx(""), "n", 7); got != 7 {
-		t.Errorf("absent query: got %d, want 7", got)
-	}
-}
-
-func TestInt64AndBool(t *testing.T) {
-	if got := Int64(ctx("id=9000000000"), "id", 1); got != 9000000000 {
-		t.Errorf("int64: got %d", got)
-	}
+func TestBool(t *testing.T) {
 	if got := Bool(ctx("tls=true"), "tls", false); !got {
 		t.Error("bool true not read")
 	}

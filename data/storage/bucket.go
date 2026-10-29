@@ -84,7 +84,7 @@ func newClient(cfg BucketConfig, endpoint string) (*minio.Client, error) {
 }
 
 func (b *Bucket) Put(ctx context.Context, key string, r io.Reader, mime string) error {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return err
 	}
 	if mime == "" {
@@ -101,7 +101,7 @@ func (b *Bucket) Put(ctx context.Context, key string, r io.Reader, mime string) 
 }
 
 func (b *Bucket) Get(ctx context.Context, key string) (io.ReadCloser, error) {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return nil, err
 	}
 
@@ -124,7 +124,7 @@ func (b *Bucket) Get(ctx context.Context, key string) (io.ReadCloser, error) {
 
 // URL presigns a time-limited GET.
 func (b *Bucket) URL(ctx context.Context, key string, ttl time.Duration) (string, error) {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return "", err
 	}
 	if ttl <= 0 {
@@ -139,7 +139,7 @@ func (b *Bucket) URL(ctx context.Context, key string, ttl time.Duration) (string
 }
 
 func (b *Bucket) Delete(ctx context.Context, key string) error {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return err
 	}
 
@@ -151,7 +151,7 @@ func (b *Bucket) Delete(ctx context.Context, key string) error {
 }
 
 func (b *Bucket) Exists(ctx context.Context, key string) (bool, error) {
-	if err := CheckKey(key); err != nil {
+	if err := checkKey(key); err != nil {
 		return false, err
 	}
 

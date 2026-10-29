@@ -35,15 +35,15 @@ func Transport(path string) *http.Transport {
 	}
 }
 
-// Dial returns an http.Client for the unix socket at path; the URL host is ignored.
-func Dial(path string) *http.Client {
+// dial returns an http.Client for the unix socket at path; the URL host is ignored.
+func dial(path string) *http.Client {
 	return &http.Client{Transport: Transport(path)}
 }
 
-// Listen listens on the unix socket at path, returning ErrRunning if a live
+// listen listens on the unix socket at path, returning ErrRunning if a live
 // process owns it and removing a stale one. A new directory is 0700 and the socket is 0600; the
 // socket is chmodded after it is bound, so keep a directory you pass in private.
-func Listen(path string) (net.Listener, error) {
+func listen(path string) (net.Listener, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err
 	}

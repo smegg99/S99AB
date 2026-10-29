@@ -13,8 +13,8 @@ import (
 	"golang.org/x/net/ipv4"
 )
 
-// DefaultTCPPorts are probed when ICMP is off or fails.
-var DefaultTCPPorts = []string{"80", "443", "7"}
+// defaultTCPPorts are probed when ICMP is off or fails.
+var defaultTCPPorts = []string{"80", "443", "7"}
 
 type Options struct {
 	// ICMP tries an unprivileged echo first; it needs net.ipv4.ping_group_range on Linux.
@@ -102,7 +102,7 @@ func icmpEcho(ctx context.Context, ip string, timeout time.Duration, payload str
 
 func tcpConnect(ctx context.Context, ip string, timeout time.Duration, ports []string) Result {
 	if len(ports) == 0 {
-		ports = DefaultTCPPorts
+		ports = defaultTCPPorts
 	}
 	dialer := net.Dialer{Timeout: timeout}
 	for _, port := range ports {

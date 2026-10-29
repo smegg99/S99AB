@@ -18,26 +18,6 @@ func String(c *gin.Context, key, fallback string) string {
 	return fallback
 }
 
-// Int returns the query value for key as an int when valid, else fallback.
-func Int(c *gin.Context, key string, fallback int) int {
-	if v := c.Query(key); v != "" {
-		if n, err := strconv.Atoi(v); err == nil {
-			return n
-		}
-	}
-	return fallback
-}
-
-// Int64 is Int for int64 fields.
-func Int64(c *gin.Context, key string, fallback int64) int64 {
-	if v := c.Query(key); v != "" {
-		if n, err := strconv.ParseInt(v, 10, 64); err == nil {
-			return n
-		}
-	}
-	return fallback
-}
-
 // Bool returns the query value for key as a bool when valid, else fallback.
 func Bool(c *gin.Context, key string, fallback bool) bool {
 	if v := c.Query(key); v != "" {

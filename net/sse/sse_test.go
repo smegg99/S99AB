@@ -143,7 +143,7 @@ func TestWriteEventSplitsMultilineData(t *testing.T) {
 
 func TestHandlerStreamsEvents(t *testing.T) {
 	b := NewBroker()
-	srv := httptest.NewServer(Handler(b, WithHeartbeat(0)))
+	srv := httptest.NewServer(Handler(b))
 	defer srv.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
@@ -174,7 +174,7 @@ func TestHandlerStreamsEvents(t *testing.T) {
 
 func TestHandlerUnsubscribesOnDisconnect(t *testing.T) {
 	b := NewBroker()
-	srv := httptest.NewServer(Handler(b, WithHeartbeat(0)))
+	srv := httptest.NewServer(Handler(b))
 	defer srv.Close()
 
 	ctx, cancel := context.WithCancel(context.Background())

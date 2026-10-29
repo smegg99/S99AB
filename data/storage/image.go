@@ -13,11 +13,11 @@ import (
 	"github.com/disintegration/imaging"
 )
 
-// MaxDimension caps a requested resize.
-const MaxDimension = 4096
+// maxDimension caps a requested resize.
+const maxDimension = 4096
 
-// MaxPixels caps a decoded image: a small file can declare a canvas that needs gigabytes.
-const MaxPixels = 40_000_000
+// maxPixels caps a decoded image: a small file can declare a canvas that needs gigabytes.
+const maxPixels = 40_000_000
 
 var ErrNotImage = fmt.Errorf("storage: not an image")
 
@@ -49,8 +49,8 @@ func (o ResizeOptions) valid() error {
 	if o.Width <= 0 && o.Height <= 0 {
 		return fmt.Errorf("storage: resize needs a width or a height")
 	}
-	if o.Width > MaxDimension || o.Height > MaxDimension {
-		return fmt.Errorf("%w: over %d px", ErrTooLarge, MaxDimension)
+	if o.Width > maxDimension || o.Height > maxDimension {
+		return fmt.Errorf("%w: over %d px", ErrTooLarge, maxDimension)
 	}
 	return nil
 }
@@ -98,7 +98,7 @@ func decode(r io.Reader) (image.Image, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrNotImage, err)
 	}
-	if int64(cfg.Width)*int64(cfg.Height) > MaxPixels {
+	if int64(cfg.Width)*int64(cfg.Height) > maxPixels {
 		return nil, fmt.Errorf("%w: %dx%d px", ErrTooLarge, cfg.Width, cfg.Height)
 	}
 	img, err := imaging.Decode(io.MultiReader(&head, r), imaging.AutoOrientation(true))

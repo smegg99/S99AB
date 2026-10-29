@@ -12,26 +12,12 @@ import (
 	"time"
 )
 
-type HandlerOption func(*handlerConfig)
-
-type handlerConfig struct {
-	heartbeat time.Duration
-}
-
-// WithHeartbeat sets the `:` comment interval that keeps proxies from closing an
-// idle stream. Default 20s; zero disables it.
-func WithHeartbeat(d time.Duration) HandlerOption {
-	return func(c *handlerConfig) { c.heartbeat = d }
-}
+// heartbeat keeps idle proxies from closing the stream.
+const heartbeat = 20 * time.Second
 
 // Handler streams b's events until the client disconnects or b closes. The opening
 // comment fires onopen at once; X-Accel-Buffering: no stops proxy buffering.
-func Handler(b *Broker, opts ...HandlerOption) http.Handler {
-	cfg := handlerConfig{heartbeat: 20 * time.Second}
-	for _, o := range opts {
-		o(&cfg)
-	}
-
+func Handler(b *Broker) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		flusher, ok := w.(http.Flusher)
 		if !ok {
@@ -55,12 +41,9 @@ func Handler(b *Broker, opts ...HandlerOption) http.Handler {
 		events, cancel := b.Subscribe()
 		defer cancel()
 
-		var beat <-chan time.Time
-		if cfg.heartbeat > 0 {
-			ticker := time.NewTicker(cfg.heartbeat)
-			defer ticker.Stop()
-			beat = ticker.C
-		}
+		ticker := time.NewTicker(heartbeat)
+		defer ticker.Stop()
+		beat := ticker.C
 
 		ctx := r.Context()
 		for {

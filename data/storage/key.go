@@ -35,7 +35,7 @@ func DerivedKey(key, variant string) string {
 // operation.
 var validKey = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._/-]*$`)
 
-func CheckKey(key string) error {
+func checkKey(key string) error {
 	switch {
 	case key == "":
 		return fmt.Errorf("%w: empty", ErrKey)

@@ -152,6 +152,15 @@ Releases, rebuilt from SmeggTunerSite's download card:
 - The locale keys `release.copyHash` and `release.olderBuild` take `{algo}`
   and `{version}`; several release strings changed wording.
 
+Go exports no consumer used are gone. Removed: `apierr.Is` (use `errors.As`
+with `*apierr.Error`), `apiquery.Int`, `apiquery.Int64`, `db.MigrateDown`,
+`db.Placeholders`, `httpmw.RateLimit` (use `RateLimitWith`),
+`httpmw.MapBindError`, `sse.WithHeartbeat` and `sse.HandlerOption`
+(`sse.Handler(b)` beats every 20 s), `daemon.XDGSocket`. Now unexported:
+`apierr.StatusClientClosedRequest`, `outbox.MigrateWith`, `storage.CheckKey`,
+`MaxDimension`, `MaxPixels`, `netprobe.DefaultTCPPorts`, `daemon.Dial`,
+`daemon.Listen`, `daemon.EnsureRunning`.
+
 ## Upgrading to 1.7.0
 
 1.7.0 breaks these Go APIs:

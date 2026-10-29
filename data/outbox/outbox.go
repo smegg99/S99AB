@@ -119,11 +119,11 @@ func Migrate(ctx context.Context, conn *sql.DB) error {
 	if err != nil {
 		return fmt.Errorf("outbox: migrate: %w", err)
 	}
-	return MigrateWith(ctx, conn, driver)
+	return migrateWith(ctx, conn, driver)
 }
 
-// MigrateWith is Migrate with a known driver, skipping the probe.
-func MigrateWith(ctx context.Context, conn *sql.DB, driver string) error {
+// migrateWith is Migrate with a known driver, skipping the probe.
+func migrateWith(ctx context.Context, conn *sql.DB, driver string) error {
 	if _, err := conn.ExecContext(ctx, schemaFor(driver)); err != nil {
 		return fmt.Errorf("outbox: migrate: %w", err)
 	}

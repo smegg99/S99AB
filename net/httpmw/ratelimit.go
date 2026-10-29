@@ -47,11 +47,6 @@ func (o *RateLimitOptions) defaults() {
 	}
 }
 
-// RateLimit limits by client IP at a per-minute rate.
-func RateLimit(perMinute int) gin.HandlerFunc {
-	return RateLimitWith(RateLimitOptions{PerMinute: perMinute})
-}
-
 func RateLimitWith(opts RateLimitOptions) gin.HandlerFunc {
 	opts.defaults()
 
