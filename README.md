@@ -157,7 +157,8 @@ with `*apierr.Error`), `apiquery.Int`, `apiquery.Int64`, `db.Placeholders`, `htt
 `httpmw.MapBindError`, `sse.WithHeartbeat` and `sse.HandlerOption`
 (`sse.Handler(b)` beats every 20 s). Now unexported:
 `apierr.StatusClientClosedRequest`, `outbox.MigrateWith`, `storage.CheckKey`,
-`MaxDimension`, `MaxPixels` and `netprobe.DefaultTCPPorts`.
+`MaxDimension`, `MaxPixels`, `BlankVarianceThreshold` and
+`netprobe.DefaultTCPPorts`.
 
 ## Upgrading to 1.7.0
 

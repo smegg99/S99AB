@@ -7,13 +7,13 @@ import (
 	"math"
 )
 
-// BlankVarianceThreshold is the mean per-channel variance below which an image
+// blankVarianceThreshold is the mean per-channel variance below which an image
 // is treated as a single flat colour.
-const BlankVarianceThreshold = 12.0
+const blankVarianceThreshold = 12.0
 
 // IsBlank reports whether Variance(img) is below BlankVarianceThreshold.
 func IsBlank(img image.Image) bool {
-	return Variance(img) < BlankVarianceThreshold
+	return Variance(img) < blankVarianceThreshold
 }
 
 // Variance is the mean of the per-channel (R,G,B) variances over a ~10k-pixel

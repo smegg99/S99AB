@@ -44,7 +44,7 @@ func TestIsBlankNoisyImage(t *testing.T) {
 	if storage.IsBlank(img) {
 		t.Fatal("IsBlank = true, want false for an alternating black/white image")
 	}
-	if v := storage.Variance(img); v <= storage.BlankVarianceThreshold {
-		t.Fatalf("Variance = %v, want > %v for an alternating black/white image", v, storage.BlankVarianceThreshold)
+	if v := storage.Variance(img); v <= 12 {
+		t.Fatalf("Variance = %v, want above the blank threshold of 12 for an alternating black/white image", v)
 	}
 }
