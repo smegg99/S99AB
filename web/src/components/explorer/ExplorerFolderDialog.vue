@@ -55,7 +55,7 @@
       </v-btn>
       <!-- Flat, as in ConfirmDialog. -->
       <UiDisabledHint
-        :reason="canSave ? '' : t('explorer.nameRequired', 'A name is required.')"
+        :reason="canSave ? '' : nameRequiredLabel"
         :label="confirmLabel"
       >
         <v-btn
@@ -94,6 +94,7 @@ const { name = '', accent = '', icon = '', image = '' } = defineProps<{
 
 const { close } = useDialog<ExplorerFolderDraft>()
 const t = useTranslate()
+const nameRequiredLabel = computed(() => t('explorer.nameRequired', 'A name is required.'))
 const config = useExplorerConfig()
 
 const draft = ref(name)

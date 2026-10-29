@@ -74,7 +74,7 @@
   <!-- Full width, safe because the form is capped at --s99ab-auth-w. -->
   <UiDisabledHint
     v-else-if="kind === 'submit'"
-    :reason="submitting ? t('auth.pending') : disabledReason"
+    :reason="submitting ? pendingLabel : disabledReason"
     :label="label"
     block
   >
@@ -183,6 +183,7 @@ const emit = defineEmits<{
 }>()
 
 const t = useTranslate()
+const pendingLabel = computed(() => t('auth.pending', 'Wait for the sign-in request to finish.'))
 
 const kind = computed(() => kratosNodeKind(node))
 const label = computed(() => kratosLabel(node, t))

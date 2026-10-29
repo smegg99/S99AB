@@ -8,23 +8,23 @@
          the id is what Kratos logs are searched by. -->
     <dl class="s99ab-kx__head">
       <div>
-        <dt>{{ t('inspect.flow', 'flow') }}</dt>
+        <dt>{{ flowLabel }}</dt>
         <dd>{{ kind }}</dd>
       </div>
       <div>
-        <dt>{{ t('inspect.id', 'id') }}</dt>
+        <dt>{{ idLabel }}</dt>
         <dd class="num">
           {{ shortId }}
         </dd>
       </div>
       <div v-if="expires">
-        <dt>{{ t('inspect.expires', 'expires') }}</dt>
+        <dt>{{ expiresLabel }}</dt>
         <dd class="num">
           {{ expires }}
         </dd>
       </div>
       <div>
-        <dt>{{ t('inspect.method', 'method') }}</dt>
+        <dt>{{ methodLabel }}</dt>
         <dd>{{ flow.ui.method }}</dd>
       </div>
     </dl>
@@ -72,7 +72,7 @@
         <span
           v-if="row.dropped"
           class="s99ab-kx__dropped"
-        >{{ t('inspect.unsupported', 'not rendered') }}</span>
+        >{{ unsupportedLabel }}</span>
       </div>
     </section>
   </div>
@@ -99,6 +99,11 @@ const { flow, kind = '' } = defineProps<{
 }>()
 
 const t = useTranslate()
+const flowLabel = computed(() => t('inspect.flow', 'flow'))
+const idLabel = computed(() => t('inspect.id', 'id'))
+const expiresLabel = computed(() => t('inspect.expires', 'expires'))
+const methodLabel = computed(() => t('inspect.method', 'method'))
+const unsupportedLabel = computed(() => t('inspect.unsupported', 'not rendered'))
 
 // Long enough to match a log line without wrapping.
 const shortId = computed(() => (flow?.id ?? '').slice(0, 8))

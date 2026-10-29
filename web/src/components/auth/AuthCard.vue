@@ -55,15 +55,15 @@
         >
           <slot name="plate">
             <div v-if="build.version">
-              <dt>{{ t('auth.version', 'version') }}</dt>
+              <dt>{{ versionLabel }}</dt>
               <dd>{{ build.version }}</dd>
             </div>
             <div v-if="build.commit">
-              <dt>{{ t('auth.commit', 'commit') }}</dt>
+              <dt>{{ commitLabel }}</dt>
               <dd>{{ build.commit }}</dd>
             </div>
             <div v-if="build.builtAt">
-              <dt>{{ t('auth.built', 'built') }}</dt>
+              <dt>{{ builtLabel }}</dt>
               <dd>{{ build.builtAt }}</dd>
             </div>
           </slot>
@@ -160,6 +160,9 @@ const emit = defineEmits<{
 }>()
 
 const t = useTranslate()
+const versionLabel = computed(() => t('auth.version', 'version'))
+const commitLabel = computed(() => t('auth.commit', 'commit'))
+const builtLabel = computed(() => t('auth.built', 'built'))
 const paths = useAuthPaths()
 const slots = useSlots()
 

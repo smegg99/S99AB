@@ -34,7 +34,7 @@
               v-if="report.file"
               class="s99ab-crash__file"
             >
-              {{ t('crash.file', 'File: {path}', { path: report.file }) }}
+              {{ fileLabel }}
             </p>
             <code
               v-if="report.error"
@@ -43,7 +43,7 @@
           </div>
         </div>
         <template v-if="report.text">
-          <span class="s99ab-eyebrow">{{ t('crash.details', 'Details') }}</span>
+          <span class="s99ab-eyebrow">{{ detailsLabel }}</span>
           <pre class="s99ab-crash__report">{{ report.text }}</pre>
         </template>
         <div class="s99ab-dialog__actions">
@@ -115,6 +115,8 @@ interface Action {
 }
 
 const t = useTranslate()
+const fileLabel = computed(() => t('crash.file', 'File: {path}', { path: report.file ?? '' }))
+const detailsLabel = computed(() => t('crash.details', 'Details'))
 const busy = ref('')
 const status = ref('')
 const copied = ref(false)

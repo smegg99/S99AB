@@ -1,15 +1,15 @@
 <!-- web/src/components/auth/AuthBuild.vue -->
 <template>
   <div v-if="version">
-    <dt>{{ t('auth.version', 'version') }}</dt>
+    <dt>{{ versionLabel }}</dt>
     <dd>{{ version }}</dd>
   </div>
   <div v-if="commit">
-    <dt>{{ t('auth.commit', 'commit') }}</dt>
+    <dt>{{ commitLabel }}</dt>
     <dd>{{ commit }}</dd>
   </div>
   <div v-if="builtAt">
-    <dt>{{ t('auth.built', 'built') }}</dt>
+    <dt>{{ builtLabel }}</dt>
     <dd>{{ builtAt }}</dd>
   </div>
 </template>
@@ -23,6 +23,9 @@ import { useTranslate } from '../../composables/useTranslate'
 // The plate's rows from /version. A separate component so `v-if` keeps
 // useQuery (and Pinia) out of a sign-in form that does not ask for `build`.
 const t = useTranslate()
+const versionLabel = computed(() => t('auth.version', 'version'))
+const commitLabel = computed(() => t('auth.commit', 'commit'))
+const builtLabel = computed(() => t('auth.built', 'built'))
 const { version, commit, buildTime } = useBuildVersion()
 
 const builtAt = computed(() => formatReleaseDate(buildTime.value))
