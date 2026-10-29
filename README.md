@@ -102,7 +102,7 @@ Nuxt such as a desktop bridge, import from a subpath:
 | `@smegg99/s99ab/i18n` | the layer's catalogs |
 | `@smegg99/s99ab/styles` | the shared stylesheet |
 
-## Upgrading the Nuxt layer after 1.7.0
+## Upgrading to 1.8.0
 
 The auto-import surface shrank from about 250 names to the composables. A
 consumer that used one of these as a global imports it from the subpath above:
