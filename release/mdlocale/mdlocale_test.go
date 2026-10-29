@@ -2,24 +2,20 @@
 package mdlocale
 
 import (
-	"sort"
 	"strings"
 	"testing"
 )
 
-// Unmarked prose belongs to every locale.
+// Unmarked prose belongs to every locale, in the fallback language.
 func TestNoMarkersIsUntaggedForEveryLocale(t *testing.T) {
 	const body = "## What's Changed\n* Fixed a thing by @smegg99"
 
 	s := Split(body)
 
 	for _, locale := range []string{"en", "pl", "de"} {
-		text, matched := s.For(locale)
-		if matched {
-			t.Errorf("%s: matched = true, want false; nothing was marked", locale)
-		}
-		if text != body {
-			t.Errorf("%s: text = %q, want the whole document", locale, text)
+		text, lang := s.Resolve(locale, "en")
+		if text != body || lang != "en" {
+			t.Errorf("%s: (%q, %q), want the whole document in en", locale, text, lang)
 		}
 	}
 }
@@ -27,25 +23,37 @@ func TestNoMarkersIsUntaggedForEveryLocale(t *testing.T) {
 func TestSplitsOnMarkers(t *testing.T) {
 	s := Split("<!-- lang:en -->\nWhat's new\n\n<!-- lang:pl -->\nCo nowego")
 
-	en, ok := s.For("en")
-	if !ok || en != "What's new" {
-		t.Errorf("en = %q (matched %v), want \"What's new\"", en, ok)
+	if en, lang := s.Resolve("en", "en"); en != "What's new" || lang != "en" {
+		t.Errorf("en = (%q, %q)", en, lang)
 	}
-	pl, ok := s.For("pl")
-	if !ok || pl != "Co nowego" {
-		t.Errorf("pl = %q (matched %v), want \"Co nowego\"", pl, ok)
+	if pl, lang := s.Resolve("pl", "en"); pl != "Co nowego" || lang != "pl" {
+		t.Errorf("pl = (%q, %q)", pl, lang)
+	}
+}
+
+// pl-PL reads the pl section.
+func TestRegionalLocaleFindsItsBaseTag(t *testing.T) {
+	s := Split("<!-- lang:en -->\nEnglish\n<!-- lang:pl -->\nPolski")
+
+	if text, lang := s.Resolve("pl-PL", "en"); text != "Polski" || lang != "pl" {
+		t.Errorf("pl-PL = (%q, %q), want the pl section", text, lang)
+	}
+}
+
+// A body that starts with a marker has no preamble, so a locale without a section reads the fallback's.
+func TestMissingLocaleReadsTheFallbackSection(t *testing.T) {
+	s := Split("<!-- lang:en -->\nEnglish\n<!-- lang:pl -->\nPolski")
+
+	if text, lang := s.Resolve("de", "en"); text != "English" || lang != "en" {
+		t.Errorf("de = (%q, %q), want the en section", text, lang)
 	}
 }
 
 func TestUnknownLocaleFallsBackToUntagged(t *testing.T) {
 	s := Split("Shared preamble.\n\n<!-- lang:en -->\nEnglish only")
 
-	text, matched := s.For("pl")
-	if matched {
-		t.Error("matched = true, want false")
-	}
-	if text != "Shared preamble." {
-		t.Errorf("text = %q, want the untagged preamble", text)
+	if text, lang := s.Resolve("pl", "de"); text != "Shared preamble." || lang != "de" {
+		t.Errorf("pl = (%q, %q), want the untagged preamble", text, lang)
 	}
 }
 
@@ -53,12 +61,8 @@ func TestUnknownLocaleFallsBackToUntagged(t *testing.T) {
 func TestEmptySectionCountsAsNoSection(t *testing.T) {
 	s := Split("Preamble.\n\n<!-- lang:pl -->\n\n<!-- lang:en -->\nEnglish")
 
-	text, matched := s.For("pl")
-	if matched {
-		t.Error("matched = true for an empty section, want false")
-	}
-	if text != "Preamble." {
-		t.Errorf("text = %q, want the untagged preamble", text)
+	if text, lang := s.Resolve("pl", "de"); text != "Preamble." || lang != "de" {
+		t.Errorf("pl = (%q, %q), want the untagged preamble", text, lang)
 	}
 }
 
@@ -76,12 +80,9 @@ func TestMarkerSyntaxIsForgiving(t *testing.T) {
 
 	for name, body := range bodies {
 		t.Run(name, func(t *testing.T) {
-			text, matched := Split(body).For("pl")
-			if !matched {
-				t.Fatalf("matched = false for %q", body)
-			}
-			if strings.TrimSpace(text) != "Co nowego" {
-				t.Errorf("text = %q, want \"Co nowego\"", text)
+			text, lang := Split(body).Resolve("pl", "en")
+			if lang != "pl" || strings.TrimSpace(text) != "Co nowego" {
+				t.Errorf("(%q, %q), want the pl section", text, lang)
 			}
 		})
 	}
@@ -90,49 +91,22 @@ func TestMarkerSyntaxIsForgiving(t *testing.T) {
 func TestMarkerMidLineIsNotAMarker(t *testing.T) {
 	s := Split("Write `<!-- lang:pl -->` to start a section.")
 
-	if locales := s.Locales(); len(locales) != 0 {
-		t.Errorf("locales = %v, want none; the marker was inline prose", locales)
-	}
-	text, matched := s.For("pl")
-	if matched {
-		t.Error("matched = true, want false")
-	}
-	if !strings.Contains(text, "to start a section") {
-		t.Errorf("text = %q, want the prose kept whole", text)
+	text, lang := s.Resolve("pl", "en")
+	if lang != "en" || !strings.Contains(text, "to start a section") {
+		t.Errorf("(%q, %q), want the prose kept whole and untagged", text, lang)
 	}
 }
 
 func TestRepeatedLocaleAppends(t *testing.T) {
 	s := Split("<!-- lang:en -->\nFirst\n\n<!-- lang:pl -->\nPolskie\n\n<!-- lang:en -->\nSecond")
 
-	text, matched := s.For("en")
-	if !matched {
-		t.Fatal("matched = false")
-	}
-	if text != "First\n\nSecond" {
+	if text, _ := s.Resolve("en", "en"); text != "First\n\nSecond" {
 		t.Errorf("text = %q, want both English parts", text)
 	}
 }
 
-func TestLocalesListsOnlyNonEmptySections(t *testing.T) {
-	s := Split("<!-- lang:en -->\nEnglish\n<!-- lang:pl -->\n\n<!-- lang:de -->\nDeutsch")
-
-	got := s.Locales()
-	sort.Strings(got)
-	want := []string{"de", "en"}
-	if len(got) != len(want) {
-		t.Fatalf("locales = %v, want %v", got, want)
-	}
-	for i := range want {
-		if got[i] != want[i] {
-			t.Fatalf("locales = %v, want %v", got, want)
-		}
-	}
-}
-
 func TestEmptyDocument(t *testing.T) {
-	text, matched := Split("").For("en")
-	if matched || text != "" {
-		t.Errorf("text = %q, matched = %v; want empty and unmatched", text, matched)
+	if text, lang := Split("").Resolve("en", "en"); text != "" || lang != "en" {
+		t.Errorf("(%q, %q), want empty text in the fallback language", text, lang)
 	}
 }

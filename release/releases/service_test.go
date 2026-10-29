@@ -24,6 +24,12 @@ Naprawiono to coś.`
 // github serves one page of releases: a draft, a prerelease and two stable ones.
 func github(t *testing.T, hits *int) string {
 	t.Helper()
+	return githubWith(t, hits, body)
+}
+
+// githubWith is github with the newest stable release's notes set to body.
+func githubWith(t *testing.T, hits *int, body string) string {
+	t.Helper()
 
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if hits != nil {
@@ -90,10 +96,22 @@ func TestNotesResolveToTheReadersLanguage(t *testing.T) {
 		t.Fatalf("pl notes = %q (%s)", pl.Notes, pl.NotesLocale)
 	}
 
-	// A locale with no section gets the untagged preamble and its real language.
+	// A locale with no section gets the default locale's section, not the shorter preamble.
 	de := svc.Latest(context.Background(), "de")
-	if de.NotesLocale != "en" || de.Notes != "Untagged preamble." {
-		t.Fatalf("de notes = %q (%s), want the untagged text reported as en", de.Notes, de.NotesLocale)
+	if de.NotesLocale != "en" || de.Notes != "## What's new\nFixed the thing." {
+		t.Fatalf("de notes = %q (%s), want the en section", de.Notes, de.NotesLocale)
+	}
+}
+
+// Notes that open with a marker have no preamble: a locale with no section reads the default's.
+func TestNotesWithoutAPreambleReadTheDefaultSection(t *testing.T) {
+	svc := service(t, githubWith(t, nil, "<!-- lang:en -->\nEnglish notes\n<!-- lang:pl -->\nPolskie notatki"))
+
+	if de := svc.Latest(context.Background(), "de"); de.Notes != "English notes" || de.NotesLocale != "en" {
+		t.Fatalf("de notes = %q (%s), want the en section", de.Notes, de.NotesLocale)
+	}
+	if pl := svc.Latest(context.Background(), "pl-PL"); pl.Notes != "Polskie notatki" || pl.NotesLocale != "pl" {
+		t.Fatalf("pl-PL notes = %q (%s), want the pl section", pl.Notes, pl.NotesLocale)
 	}
 }
 

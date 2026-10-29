@@ -200,12 +200,7 @@ func (s *Service) resolve(p parsed, locale string) Release {
 		locale = s.defaultLocale
 	}
 
-	notes, matched := p.notes.For(locale)
-	notesLocale := locale
-	if !matched {
-		// Unmarked notes are written in the default locale.
-		notesLocale = s.defaultLocale
-	}
+	notes, notesLocale := p.notes.Resolve(locale, s.defaultLocale)
 
 	return Release{
 		Available:   true,

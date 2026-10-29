@@ -53,22 +53,18 @@ func Split(md string) Sections {
 	return s
 }
 
-// For returns the locale's section, or the untagged text with matched false. An
-// empty section counts as none.
-func (s Sections) For(locale string) (text string, matched bool) {
-	if body, ok := s.byLocale[strings.ToLower(locale)]; ok && body != "" {
-		return body, true
-	}
-	return s.untagged, false
-}
-
-// Locales lists the sectioned locales in no order, for diagnostics.
-func (s Sections) Locales() []string {
-	out := make([]string, 0, len(s.byLocale))
-	for k, v := range s.byLocale {
-		if v != "" {
-			out = append(out, k)
+// Resolve returns the locale's section, its base tag's (pl-PL reads pl), the fallback's, or the untagged text in fallback.
+func (s Sections) Resolve(locale, fallback string) (text, lang string) {
+	for _, tag := range []string{locale, baseTag(locale), fallback, baseTag(fallback)} {
+		if body := s.byLocale[strings.ToLower(tag)]; tag != "" && body != "" {
+			return body, tag
 		}
 	}
-	return out
+	return s.untagged, fallback
+}
+
+// baseTag is the language part of a tag such as pl-PL or pt_BR.
+func baseTag(tag string) string {
+	base, _, _ := strings.Cut(strings.ReplaceAll(tag, "_", "-"), "-")
+	return base
 }
