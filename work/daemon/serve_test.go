@@ -14,7 +14,7 @@ import (
 // cancelling ctx stops Serve and still runs AfterServe.
 func TestServeReturnsOnContextCancel(t *testing.T) {
 	sock := tempSocket(t)
-	ln, err := listen(sock)
+	ln, err := Listen(sock)
 	if err != nil {
 		t.Fatalf("Listen: %v", err)
 	}
@@ -64,7 +64,7 @@ func waitForSubscriber(t *testing.T, b *sse.Broker) {
 // An open SSE stream must not make Shutdown wait out the timeout.
 func TestServeClosesStreamsBeforeDrain(t *testing.T) {
 	sock := tempSocket(t)
-	ln, err := listen(sock)
+	ln, err := Listen(sock)
 	if err != nil {
 		t.Fatalf("Listen: %v", err)
 	}
@@ -85,7 +85,7 @@ func TestServeClosesStreamsBeforeDrain(t *testing.T) {
 		})
 	}()
 
-	client := dial(sock)
+	client := Dial(sock)
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://daemon/events", nil)
 	if err != nil {
 		t.Fatalf("NewRequest: %v", err)
@@ -118,7 +118,7 @@ func TestServeClosesStreamsBeforeDrain(t *testing.T) {
 // Control for TestServeClosesStreamsBeforeDrain.
 func TestServeWithoutBeforeShutdownBlocksForTimeout(t *testing.T) {
 	sock := tempSocket(t)
-	ln, err := listen(sock)
+	ln, err := Listen(sock)
 	if err != nil {
 		t.Fatalf("Listen: %v", err)
 	}
@@ -136,7 +136,7 @@ func TestServeWithoutBeforeShutdownBlocksForTimeout(t *testing.T) {
 		done <- Serve(ctx, ln, mux, ServeOptions{Timeout: timeout})
 	}()
 
-	client := dial(sock)
+	client := Dial(sock)
 	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://daemon/events", nil)
 	if err != nil {
 		t.Fatalf("NewRequest: %v", err)
@@ -169,7 +169,7 @@ func TestServeWithoutBeforeShutdownBlocksForTimeout(t *testing.T) {
 // A listener that fails to accept must still run AfterServe.
 func TestServeReturnsServeError(t *testing.T) {
 	sock := tempSocket(t)
-	ln, err := listen(sock)
+	ln, err := Listen(sock)
 	if err != nil {
 		t.Fatalf("Listen: %v", err)
 	}

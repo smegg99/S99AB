@@ -28,15 +28,15 @@ type Config struct {
 // pollEvery is how often EnsureRunning re-checks a starting daemon.
 const pollEvery = 50 * time.Millisecond
 
-// ensureRunning returns once a daemon answers on cfg.Socket, starting
+// EnsureRunning returns once a daemon answers on cfg.Socket, starting
 // cfg.Command detached if needed. The started process outlives the caller.
-func ensureRunning(ctx context.Context, cfg Config) error {
+func EnsureRunning(ctx context.Context, cfg Config) error {
 	if cfg.Socket == "" {
 		return errors.New("daemon: EnsureRunning needs a Socket")
 	}
 
 	// One client for every poll: a new transport per check would leak its idle connections.
-	client := dial(cfg.Socket)
+	client := Dial(cfg.Socket)
 	defer client.CloseIdleConnections()
 
 	if check(ctx, cfg, client) == nil {
