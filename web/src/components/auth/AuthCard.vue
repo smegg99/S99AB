@@ -77,7 +77,7 @@
           <slot name="plate-end">
             <UiRepoStat
               v-if="repo"
-              :show-forks="false"
+              :forks="false"
             />
           </slot>
         </span>

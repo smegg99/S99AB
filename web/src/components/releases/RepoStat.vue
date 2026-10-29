@@ -1,9 +1,8 @@
 <!-- web/src/components/releases/RepoStat.vue -->
 <template>
   <a
-    v-if="stats?.available"
+    v-if="shown && stats"
     :href="stats.html_url"
-    :title="title"
     :aria-label="label"
     class="repo"
     target="_blank"
@@ -11,6 +10,11 @@
   >
     <!-- Cells: the hairline pairs adjacent .repo__count elements, so added
          items get the same seam. -->
+    <v-tooltip
+      :text="title"
+      activator="parent"
+      location="bottom"
+    />
     <slot name="prepend" />
 
     <v-icon
@@ -19,14 +23,14 @@
     />
     <span class="repo__count">
       <v-icon icon="mdi-star-outline" />
-      {{ stats.stars }}
+      {{ count(stats.stars) }}
     </span>
     <span
-      v-if="showForks"
+      v-if="forks"
       class="repo__count"
     >
       <v-icon icon="mdi-source-fork" />
-      {{ stats.forks }}
+      {{ count(stats.forks) }}
     </span>
 
     <slot name="append" />
@@ -35,18 +39,32 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { formatCount } from '../../composables/releases/internal/count'
 import { useRepoStats } from '../../composables/releases/useReleases'
-import { useTranslate } from '../../composables/useTranslate'
+import { useLocale, useTranslate } from '../../composables/useTranslate'
 
 // One bordered readout: mark and counts divided by hairlines. Renders nothing
 // when the repository could not be read.
-const { showForks = true } = defineProps<{ showForks?: boolean }>()
+const { forks = true, minStars = 0, compact = true } = defineProps<{
+  forks?: boolean
+  /** Hides the readout until the repository has this many stars. */
+  minStars?: number
+  /** 1234 as 1.2K; the accessible name keeps the exact count. */
+  compact?: boolean
+}>()
 defineSlots<{ prepend?: () => unknown, append?: () => unknown }>()
 
 const t = useTranslate()
 const query = useRepoStats()
 
+const locale = useLocale()
+
 const stats = computed(() => query.data.value ?? null)
+const shown = computed(() => !!stats.value?.available && stats.value.stars >= minStars)
+
+function count(value: number): string {
+  return compact ? formatCount(value, locale.value) : String(value)
+}
 const title = computed(() => t('release.starOnGithub', 'GitHub'))
 
 // An accessible name for the bare numbers. One message per shape, since Polish
@@ -55,7 +73,7 @@ const label = computed(() => {
   const s = stats.value
   if (!s) return title.value
 
-  if (!showForks) {
+  if (!forks) {
     return t('release.starsLabel', 'GitHub: {stars} stars', { stars: s.stars })
   }
   return t('release.starsForksLabel', 'GitHub: {stars} stars, {forks} forks', {
