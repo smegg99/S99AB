@@ -4,7 +4,8 @@ import { computed, readonly } from 'vue'
 import { type ThemeTransition, THEME_TRANSITIONS, type ThemeTransitionConfig, config, resolvedTransition } from './internal/themeTransition'
 import { writeStored } from '../../browser/storage'
 
-export type { ThemeTransition, ThemeTransitionConfig, TransitionOrigin } from './internal/themeTransition'
+export type { ThemeTransition, ThemeTransitionConfig } from './internal/themeTransition'
+export type { TransitionOrigin } from './internal/cover'
 
 export function useThemeTransitionConfig(): Readonly<ThemeTransitionConfig> {
   return readonly(config)

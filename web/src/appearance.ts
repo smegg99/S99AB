@@ -7,4 +7,4 @@ export { type AppearanceSource, useAppearance } from './composables/appearance/u
 export { registerAppearanceSource, resetAppearanceSource } from './composables/appearance/internal/appearance'
 export { TEXTURES, applyTexture, textureConfig } from './composables/appearance/internal/texture'
 export { supportsWebgl } from './composables/appearance/internal/flow'
-export { originOf, type TransitionOrigin } from './composables/appearance/internal/themeTransition'
+export { originOf, type TransitionOrigin } from './composables/appearance/internal/cover'

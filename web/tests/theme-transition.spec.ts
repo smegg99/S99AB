@@ -3,7 +3,8 @@
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { configureMotion, resetMotion } from '../src/composables/motion/internal/motion'
-import { configureThemeTransition, coverRadius, durationFor, originOf, resetThemeTransition, resolvedTransition, runThemeTransition, COVER_SHAPES, THEME_TRANSITIONS } from '../src/composables/appearance/internal/themeTransition'
+import { configureThemeTransition, durationFor, resetThemeTransition, resolvedTransition, THEME_TRANSITIONS } from '../src/composables/appearance/internal/themeTransition'
+import { COVER_SHAPES, coverRadius, originOf, runThemeTransition } from '../src/composables/appearance/internal/cover'
 
 /** Stands in for the browser's entry point and records what it was given. */
 function fakeViewTransitions() {

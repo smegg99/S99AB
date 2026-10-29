@@ -3,10 +3,11 @@
 import { computed, onMounted, onScopeDispose, watch } from 'vue'
 import { useTheme } from 'vuetify'
 import { previewColors, rebuildThemes, themeState } from '../../theme'
-import { originOf, runThemeTransition, type ThemeTransition } from './internal/themeTransition'
+import { originOf, runThemeTransition } from './internal/cover'
 import { config, prefersMoreContrast, prefersDark, source, systemTick, listenForSystem, themePref, contrastPref } from './internal/appearance'
 import { readStored, writeStored, eraseStored } from '../../browser/storage'
 import { inBrowser } from '../../browser/env'
+import type { ThemeTransition } from './internal/themeTransition'
 
 /**
  * Light/dark and contrast. Light and dark are the two registered themes;

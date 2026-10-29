@@ -1,0 +1,283 @@
+// web/src/composables/appearance/internal/cover.ts
+
+import { motionLevel, resolveLevel } from '../../motion/internal/motion'
+import { config, durationFor, easingFor, resolvedTransition } from './themeTransition'
+import { inBrowser } from '../../../browser/env'
+import type { ThemeTransition } from './themeTransition'
+
+/**
+ * The cover shapes: arrive, hold with the change applied underneath, leave.
+ * `sheet` is the viewport; `disc` is seeded small and scaled up (see runCover).
+ */
+export interface CoverMove {
+  shape: 'disc' | 'sheet'
+  in: (to: number) => Keyframe[]
+  out: (to: number) => Keyframe[]
+}
+
+export const fadeIn = (): Keyframe[] => [{ opacity: 0 }, { opacity: 1 }]
+
+export const fadeOut = (): Keyframe[] => [{ opacity: 1 }, { opacity: 0 }]
+
+export const slide = (from: string, to: string) => (): Keyframe[] =>
+  [{ transform: `translate${from}` }, { transform: `translate${to}` }]
+
+export const COVER_MOVES: Partial<Record<ThemeTransition, CoverMove>> = {
+  'cover': {
+    shape: 'disc',
+    in: to => [{ transform: 'scale(0)' }, { transform: `scale(${to})` }],
+    out: fadeOut,
+  },
+  'cover-in': {
+    shape: 'disc',
+    in: to => [{ transform: 'scale(0)' }, { transform: `scale(${to})` }],
+    out: to => [{ transform: `scale(${to})` }, { transform: 'scale(0)' }],
+  },
+  // Nothing moves, so nothing re-rasterises: the choice for a slow machine.
+  'veil': { shape: 'sheet', in: fadeIn, out: fadeOut },
+  // Leaves forward instead of reversing.
+  'wipe': { shape: 'sheet', in: slide('Y(-100%)', 'Y(0)'), out: slide('Y(0)', 'Y(100%)') },
+  'wipe-up': { shape: 'sheet', in: slide('Y(100%)', 'Y(0)'), out: slide('Y(0)', 'Y(-100%)') },
+  'wipe-start': { shape: 'sheet', in: slide('X(-100%)', 'X(0)'), out: slide('X(0)', 'X(100%)') },
+  'wipe-end': { shape: 'sheet', in: slide('X(100%)', 'X(0)'), out: slide('X(0)', 'X(-100%)') },
+}
+
+/** Which shapes are the cover family. */
+export const COVER_SHAPES = new Set<ThemeTransition>(
+  Object.keys(COVER_MOVES) as ThemeTransition[],
+)
+
+export type StartViewTransition = (callback: () => void) => { finished: Promise<void> }
+
+/**
+ * The browser's startViewTransition, or null. Read at call time. Narrowed through
+ * `unknown` because the DOM types declare it as always present.
+ */
+export function viewTransitions(): StartViewTransition | null {
+  if (!inBrowser()) return null
+
+  const start = (document as unknown as { startViewTransition?: unknown }).startViewTransition
+  return typeof start === 'function'
+    ? (start as StartViewTransition).bind(document)
+    : null
+}
+
+export interface TransitionOrigin {
+  x: number
+  y: number
+}
+
+/**
+ * Runs `apply` inside the browser's transition callback; it must be synchronous.
+ * Falls through to `apply()` when the transition, motion or the API is off.
+ */
+export function runThemeTransition(
+  apply: () => void,
+  origin?: TransitionOrigin,
+  override?: ThemeTransition,
+  coverInk?: string,
+) {
+  // `override` previews one shape without changing the stored choice.
+  const kind = override ?? resolvedTransition()
+
+  // `off` allows no animation; `reduced` still allows a fade.
+  const level = resolveLevel(motionLevel())
+  const allowed = level === 'off'
+    ? 'none'
+    : level === 'reduced' && kind !== 'none' ? config.reducedFallback : kind
+
+  // Cover shapes need no View Transitions API, so they run first.
+  if (COVER_SHAPES.has(allowed) && canAnimate()) {
+    runCover(apply, allowed, origin ?? centre(), coverInk)
+    return
+  }
+
+  const start = viewTransitions()
+  if (allowed === 'none' || !start) {
+    if (config.suppressTransitions) applyInstantly(apply)
+    else apply()
+    return
+  }
+
+  const root = document.documentElement
+  const point = origin ?? centre()
+
+  // The clip-path reads these custom properties.
+  root.style.setProperty('--s99ab-vt-x', `${point.x}px`)
+  root.style.setProperty('--s99ab-vt-y', `${point.y}px`)
+  root.style.setProperty('--s99ab-vt-r', `${coverRadius(point)}px`)
+  root.style.setProperty('--s99ab-vt-duration', `${durationFor(allowed)}ms`)
+
+  // Only when the app set one; otherwise the stylesheet's $vt-easing applies.
+  const easing = easingFor(allowed)
+  if (easing) root.style.setProperty('--s99ab-vt-easing', easing)
+  else root.style.removeProperty('--s99ab-vt-easing')
+  root.dataset.s99abVt = allowed
+
+  // Suppressed so the "after" snapshot is not captured mid-interpolation.
+  const transition = start(() => {
+    if (config.suppressTransitions) applyInstantly(apply)
+    else apply()
+  })
+
+  // Cleared on both arms instead of `finally`: a hidden tab rejects with
+  // InvalidStateError, and `finally` would leave that rejection unhandled.
+  const clear = () => {
+    delete root.dataset.s99abVt
+  }
+  transition.finished.then(clear, clear)
+}
+
+/** Whether an element can be animated at all here. */
+export function canAnimate(): boolean {
+  return inBrowser()
+    && typeof document.body?.animate === 'function'
+}
+
+/**
+ * A disc of the incoming colour, out from the point and off again. Animates
+ * transform and opacity only and takes no snapshots; the change lands while the
+ * disc covers the screen.
+ */
+export function runCover(
+  apply: () => void,
+  kind: ThemeTransition,
+  origin: TransitionOrigin,
+  ink?: string,
+) {
+  const move = COVER_MOVES[kind]!
+  const total = durationFor(kind)
+  const easing = easingFor(kind) || 'cubic-bezier(0, 0, 0.2, 1)'
+
+  const el = document.createElement('div')
+  el.className = `s99ab-vt-cover s99ab-vt-cover--${move.shape}`
+
+  // Seeded small and scaled up, so the layer is not an 8,400px texture to raster.
+  let to = 1
+  if (move.shape === 'disc') {
+    const radius = coverRadius(origin)
+    const seed = Math.max(coverSeed(), 8)
+
+    to = (radius * 2) / seed
+    el.style.insetInlineStart = `${origin.x - seed / 2}px`
+    el.style.insetBlockStart = `${origin.y - seed / 2}px`
+    el.style.width = `${seed}px`
+    el.style.height = `${seed}px`
+  }
+
+  // The incoming ground, passed in because `--v-theme-bg` still resolves to the
+  // outgoing theme until `apply` runs.
+  if (ink) el.style.background = ink
+
+  document.body.append(el)
+
+  const hold = coverHold()
+  const arrive = Math.round(total * coverShare())
+  const leave = Math.max(total - arrive, 0)
+
+  // The sheet is removed however the animation ends.
+  const done = () => el.remove()
+
+  const startLeave = () => {
+    const out = el.animate(move.out(to), { duration: leave, easing, fill: 'forwards' })
+    out.finished.then(done, done)
+  }
+
+  const swap = () => {
+    // Vuetify's per-element colour transitions are suppressed while the sheet
+    // covers the screen, or the page keeps changing colour after it leaves.
+    if (config.suppressTransitions) applyInstantly(apply)
+    else apply()
+  }
+
+  const inward = el.animate(move.in(to), { duration: arrive, easing, fill: 'forwards' })
+
+  // The change lands at the start of the hold.
+  inward.finished.then(
+    () => {
+      swap()
+      if (hold > 0) setTimeout(startLeave, hold)
+      else startLeave()
+    },
+    () => {
+      apply()
+      done()
+    },
+  )
+}
+
+/** A knob as a number, or the fallback before the stylesheet loads. */
+export function knob(name: string, fallback: number): number {
+  if (!inBrowser()) return fallback
+
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name)
+  const value = Number.parseFloat(raw)
+  return Number.isFinite(value) ? value : fallback
+}
+
+/** Fraction of a cover shape's time spent arriving, clamped to leave time to leave. */
+export function coverShare(): number {
+  return Math.min(Math.max(knob('--s99ab-vt-cover-in', 0.6), 0.1), 0.9)
+}
+
+/** The disc's size before scaling. */
+export function coverSeed(): number {
+  return knob('--s99ab-vt-cover-seed', 240)
+}
+
+/** How long it holds full cover while the change lands. */
+export function coverHold(): number {
+  return Math.max(knob('--s99ab-vt-cover-hold', 90), 0)
+}
+
+export function centre(): TransitionOrigin {
+  if (!inBrowser()) return { x: 0, y: 0 }
+  return { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+}
+
+/**
+ * The circle's end radius from `point`: the hypotenuse to the farther half on
+ * each axis. A length, since circle() rejects `farthest-corner`.
+ */
+export function coverRadius(point: TransitionOrigin): number {
+  if (!inBrowser()) return 0
+
+  const x = Math.max(point.x, window.innerWidth - point.x)
+  const y = Math.max(point.y, window.innerHeight - point.y)
+  return Math.hypot(x, y)
+}
+
+/** Applies the change with page CSS transitions suppressed for one frame. */
+export function applyInstantly(apply: () => void) {
+  if (!inBrowser()) {
+    apply()
+    return
+  }
+
+  const root = document.documentElement
+  root.dataset.s99abVtInstant = ''
+  apply()
+
+  // Forces the new values to commit while suppression is on.
+  void root.offsetHeight
+
+  requestAnimationFrame(() => {
+    delete root.dataset.s99abVtInstant
+  })
+}
+
+/** Where a click happened, for a toggle that has the event in hand. */
+export function originOf(event?: Event): TransitionOrigin | undefined {
+  const pointer = event as MouseEvent | undefined
+  if (!pointer || typeof pointer.clientX !== 'number') return undefined
+
+  // Keyboard activation reports 0,0; use the button's position instead.
+  if (pointer.clientX === 0 && pointer.clientY === 0) {
+    const target = pointer.currentTarget as HTMLElement | null
+    if (!target?.getBoundingClientRect) return undefined
+
+    const box = target.getBoundingClientRect()
+    return { x: box.left + box.width / 2, y: box.top + box.height / 2 }
+  }
+  return { x: pointer.clientX, y: pointer.clientY }
+}
