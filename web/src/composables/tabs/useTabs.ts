@@ -1,3 +1,5 @@
+// web/src/composables/tabs/useTabs.ts
+
 import { computed, ref, watch, type Ref } from 'vue'
 
 export interface WorkspaceTab {

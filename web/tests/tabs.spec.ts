@@ -1,3 +1,5 @@
+// web/tests/tabs.spec.ts
+
 import { effectScope, nextTick } from 'vue'
 import { expect, it } from 'vitest'
 import { useTabs, type WorkspaceTab } from '../src/composables/tabs/useTabs'

@@ -8,11 +8,7 @@ import (
 	"strings"
 )
 
-// Key builds a content-addressed key with a two-level fan-out:
-//
-//	uploads/ab/cd/abcd1234...
-//
-// sha256Hex must be a lowercase SHA-256 hex digest.
+// Key builds prefix/ab/cd/abcd... from a lowercase SHA-256 hex digest.
 func Key(prefix, sha256Hex string) (string, error) {
 	if !sha256Digest.MatchString(sha256Hex) {
 		return "", fmt.Errorf("%w: %q is not a sha256 hex digest", ErrKey, sha256Hex)
@@ -31,8 +27,7 @@ func DerivedKey(key, variant string) string {
 	return "derived/" + strings.TrimPrefix(key, "uploads/") + "-" + variant
 }
 
-// Keys reject absolute paths, traversal and backslashes, checked on every
-// operation.
+// validKey refuses absolute paths, traversal and backslashes on every operation.
 var validKey = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._/-]*$`)
 
 func checkKey(key string) error {

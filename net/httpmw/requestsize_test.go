@@ -84,8 +84,7 @@ func TestZeroSizeDisablesTheCap(t *testing.T) {
 	}
 }
 
-// gin returns the rightmost untrusted X-Forwarded-For address; only the reverse
-// proxy may reach the port, since a trusted peer's header is believed.
+// gin trusts the rightmost untrusted X-Forwarded-For hop, so only the proxy may reach the port.
 func TestForwardedForIsWalkedRightToLeft(t *testing.T) {
 	seen := make(chan string, 1)
 

@@ -28,8 +28,7 @@ type Config struct {
 // pollEvery is how often EnsureRunning re-checks a starting daemon.
 const pollEvery = 50 * time.Millisecond
 
-// EnsureRunning returns once a daemon answers on cfg.Socket, starting
-// cfg.Command detached if needed. The started process outlives the caller.
+// EnsureRunning returns once a daemon answers on cfg.Socket, starting cfg.Command detached to outlive the caller.
 func EnsureRunning(ctx context.Context, cfg Config) error {
 	if cfg.Socket == "" {
 		return errors.New("daemon: EnsureRunning needs a Socket")

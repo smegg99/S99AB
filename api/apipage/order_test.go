@@ -64,8 +64,7 @@ func TestARepeatedFieldIsOrderedOnce(t *testing.T) {
 	}
 }
 
-// Sorting by a non-unique column needs the fallback after it, or rows with equal values move
-// between pages.
+// A non-unique sort column needs the fallback after it, or equal rows move between pages.
 func TestOrderEndsWithTheFallbackUnlessItsColumnIsSorted(t *testing.T) {
 	allowed := []string{"name", "id"}
 	for _, tc := range []struct{ sort, want string }{

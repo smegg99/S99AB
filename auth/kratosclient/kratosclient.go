@@ -59,8 +59,7 @@ type Session struct {
 	Identity  kratosauth.Identity `json:"identity"`
 }
 
-// Client speaks the native flow against one Kratos public endpoint or the path
-// an application proxies it at.
+// Client speaks the native flow against one Kratos public endpoint or its application proxy path.
 type Client struct {
 	httpClient *http.Client
 	base       string
@@ -115,8 +114,7 @@ func (c *Client) Whoami(ctx context.Context, token string) (Session, error) {
 	}, nil
 }
 
-// ChangePassword replaces the account's password through the settings flow.
-// The token keeps working afterwards.
+// ChangePassword replaces the password through the settings flow; the token keeps working.
 func (c *Client) ChangePassword(ctx context.Context, token, password string) error {
 	var flow struct {
 		ID string `json:"id"`
@@ -142,9 +140,7 @@ func (c *Client) ChangePassword(ctx context.Context, token, password string) err
 	return nil
 }
 
-// Refresh re-authenticates the token's session with a refresh-mode login flow.
-// A non-refresh flow means Kratos rejected the token and is ErrNoSession; only
-// message 4000006 maps to ErrCredentials.
+// Refresh re-authenticates the token's session; a non-refresh flow is ErrNoSession, and only message 4000006 is ErrCredentials.
 func (c *Client) Refresh(ctx context.Context, token, identifier, password string) error {
 	var flow struct {
 		ID      string `json:"id"`
@@ -222,8 +218,7 @@ type status struct {
 
 func (s *status) Error() string { return fmt.Sprintf("kratosclient: kratos answered %d", s.code) }
 
-// message returns the first error in ui.messages, then ui.nodes[].messages,
-// then the error object.
+// message returns the first error in ui.messages, then ui.nodes[].messages, then the error object.
 func (s *status) message() Text {
 	var flow struct {
 		UI struct {
@@ -261,8 +256,7 @@ func (s *status) message() Text {
 	return Text{}
 }
 
-// errorID is the machine id of a Kratos error answer, such as
-// session_refresh_required, or "" when the answer carries none.
+// errorID is a Kratos error's machine id, such as session_refresh_required, or "".
 func (s *status) errorID() string {
 	var answer struct {
 		Error struct {
@@ -275,8 +269,7 @@ func (s *status) errorID() string {
 	return answer.Error.ID
 }
 
-// Answered returns the status and body an error from this client carries, such
-// as a proxy's own refusal.
+// Answered returns the status and body an error from this client carries, such as a proxy's refusal.
 func Answered(err error) (code int, body []byte, ok bool) {
 	var answered *status
 	if !errors.As(err, &answered) {
@@ -293,8 +286,7 @@ func asStatus(err error, into **status) (int, bool) {
 	return (*into).code, true
 }
 
-// asRejection wraps a 4xx answer as a Rejection of kind. Transport failures and
-// 5xx answers pass through unchanged.
+// asRejection wraps a 4xx answer as a Rejection of kind; transport failures and 5xx pass through.
 func asRejection(err error, kind error) error {
 	var answered *status
 	if !errors.As(err, &answered) {

@@ -12,8 +12,7 @@ import (
 	"modernc.org/sqlite"
 )
 
-// Rebind converts `?` placeholders to the driver's own form. It skips string literals, quoted
-// identifiers, comments and the jsonb ?| and ?& operators; write jsonb's bare ? as jsonb_exists().
+// Rebind converts ? placeholders for driver, skipping literals, quoted names, comments and jsonb ?| and ?&.
 func Rebind(driver, query string) string {
 	if driver != Postgres {
 		return query
@@ -72,8 +71,7 @@ func Rebind(driver, query string) string {
 	return b.String()
 }
 
-// jsonbOperator reports whether rest follows a `?` that is jsonb's ?| or ?&, not a placeholder before
-// || (concatenation) or &&.
+// jsonbOperator reports whether a ? starts jsonb's ?| or ?&, not a placeholder before || or &&.
 func jsonbOperator(rest string) bool {
 	if rest == "" || (rest[0] != '|' && rest[0] != '&') {
 		return false

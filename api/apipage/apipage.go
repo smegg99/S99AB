@@ -24,8 +24,7 @@ type Query struct {
 	Search string
 }
 
-// Offset is the row to start at. It saturates at math.MaxInt because Page is
-// uncapped and an overflowed negative OFFSET is a database error.
+// Offset is the first row, saturating at math.MaxInt because an overflowed negative OFFSET is a database error.
 func (q Query) Offset() int {
 	if q.Page <= 1 || q.Limit <= 0 {
 		return 0
@@ -43,8 +42,7 @@ type Options struct {
 	MaxLimit int
 }
 
-// Parse reads and clamps the four parameters. Invalid values fall back to
-// defaults instead of a 422, so stale bookmarks keep working.
+// Parse reads and clamps the paging parameters; invalid values fall back to defaults so stale bookmarks work.
 func Parse(c *gin.Context, opts Options) Query {
 	if opts.DefaultLimit <= 0 {
 		opts.DefaultLimit = defaultLimit

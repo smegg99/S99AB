@@ -1,6 +1,6 @@
 // web/src/types.ts
 //
-// The public type surface, since Nuxt does not auto-import types:
+// Every type in a public signature, for code outside Nuxt's auto-imports:
 //   import type { ToastPosition } from '@smegg99/s99ab/types'
 
 export type {
@@ -238,3 +238,22 @@ export type {
 } from './components/state/crashScreen'
 
 export type { PickMods } from './browser/keys'
+export type { Crumb } from './composables/shell/useBreadcrumbs'
+export type { ToastRow } from './composables/toast/internal/rows'
+export type { MarkdownBlock } from './composables/markdown/useMarkdownView'
+export type { Block, Inline } from './composables/markdown/internal/markdown'
+export type { OS } from './composables/usePlatform'
+export type { Translate, TranslateParams } from './composables/useTranslate'
+export type { TableConfig, TableKey, TableRouter } from './composables/table/internal/types'
+export type {
+  Downloads,
+  FallbackPlatform,
+  PlatformBuild,
+  Release,
+  ReleaseAsset,
+  ReleasesConfig,
+  RepoStats,
+} from './composables/releases/useReleases'
+export type { DownloadGroup, DownloadRow } from './composables/releases/internal/rows'
+export type { DownloadDialogOptions } from './composables/releases/useDownloadDialog'
+export type { UpdateCheckOptions } from './composables/releases/useUpdateCheck'

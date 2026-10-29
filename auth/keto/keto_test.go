@@ -14,8 +14,7 @@ import (
 	"github.com/smegg99/s99ab/auth/keto"
 )
 
-// These run against a real Keto. The ports differ from Ory's 4466/4467 so the
-// tests cannot reach another project's Keto.
+// A real Keto on ports other than Ory's 4466/4467, so the tests cannot reach another project's Keto.
 const (
 	readURL  = "http://127.0.0.1:4566"
 	writeURL = "http://127.0.0.1:4567"

@@ -23,8 +23,7 @@ type ServeOptions struct {
 	AfterServe []func() error
 }
 
-// Serve runs h on ln until ctx ends or the server fails, then runs
-// BeforeShutdown, drains, and runs AfterServe. It returns the first error.
+// Serve runs h on ln until ctx ends or it fails, then BeforeShutdown, drain and AfterServe; it returns the first error.
 func Serve(ctx context.Context, ln net.Listener, h http.Handler, opts ServeOptions) error {
 	srv := &http.Server{Handler: h, ReadHeaderTimeout: 10 * time.Second}
 

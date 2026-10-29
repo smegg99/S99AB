@@ -72,8 +72,7 @@ func newCatcher(cfg Config, src mailSource) (*Catcher, error) {
 	return c, nil
 }
 
-// WaitForCode blocks until a verification code arrives for email, Close runs,
-// or timeout elapses.
+// WaitForCode blocks until a code arrives for email, Close runs, or timeout elapses.
 func (c *Catcher) WaitForCode(email string, timeout time.Duration) (string, error) {
 	key := strings.ToLower(email)
 	ch := make(chan string, 1)
@@ -109,8 +108,7 @@ func (c *Catcher) forget(key string, ch chan string) {
 	c.waiters[key] = rest
 }
 
-// Close stops polling and unblocks pending WaitForCode calls with ErrClosed. Later calls return
-// the first result.
+// Close stops polling and ends pending WaitForCode calls with ErrClosed; later calls return the first result.
 func (c *Catcher) Close() error {
 	c.closeOnce.Do(func() {
 		close(c.stop)

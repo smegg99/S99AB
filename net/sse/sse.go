@@ -37,8 +37,7 @@ func (e Event) Unmarshal(v any) error {
 	}
 }
 
-// Broker fans events out without blocking; a slow subscriber loses frames, so a
-// client that must not miss one reads a snapshot first.
+// Broker fans events out without blocking; a slow subscriber loses frames, so read a snapshot first when none may be missed.
 type Broker struct {
 	// mu guards subs and closed.
 	mu     sync.RWMutex
@@ -75,8 +74,7 @@ func NewBroker(opts ...Option) *Broker {
 	return b
 }
 
-// Subscribe returns an event channel and its cancel func. On a closed Broker the
-// channel is already closed.
+// Subscribe returns an event channel and its cancel; on a closed Broker the channel is already closed.
 func (b *Broker) Subscribe() (<-chan Event, func()) {
 	s := &subscriber{ch: make(chan Event, b.buf)}
 
@@ -97,8 +95,7 @@ func (b *Broker) Subscribe() (<-chan Event, func()) {
 	}
 }
 
-// Publish skips subscribers with a full buffer. Sending under the read lock cannot
-// hit a closed channel, since channels close only after removal under the write lock.
+// Publish skips full subscribers; channels close only after removal under the write lock, so sending under the read lock is safe.
 func (b *Broker) Publish(ev Event) {
 	b.mu.RLock()
 	defer b.mu.RUnlock()

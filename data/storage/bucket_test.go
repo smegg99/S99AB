@@ -20,12 +20,7 @@ import (
 	"github.com/smegg99/s99ab/data/storage"
 )
 
-// The bucket tests need a real S3 endpoint and skip without one.
-// S99AB_MINIO_ENDPOINT overrides the default:
-//
-//	docker run -d --name s99ab-minio -p 9400:9000 \
-//	  -e MINIO_ROOT_USER=minioadmin -e MINIO_ROOT_PASSWORD=minioadmin \
-//	  quay.io/minio/minio server /data
+// Bucket tests need a real S3 endpoint (MinIO on 127.0.0.1:9400, or S99AB_MINIO_ENDPOINT) and skip without one.
 const defaultEndpoint = "127.0.0.1:9400"
 
 func endpoint() string {

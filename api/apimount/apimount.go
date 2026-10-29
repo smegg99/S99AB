@@ -54,8 +54,7 @@ type Groups struct {
 	GuardedUploads *gin.RouterGroup
 }
 
-// Mount builds the group and returns where routes go. The middleware order
-// below matters; each step says why.
+// Mount builds the API group and returns where routes go; the middleware order matters.
 func Mount(r *gin.Engine, opts Options) (Groups, error) {
 	if opts.Prefix == "" {
 		opts.Prefix = defaultPrefix

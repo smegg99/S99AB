@@ -9,8 +9,7 @@ import (
 // afUnixBound stays under sun_path (108 bytes on Linux, 104 on macOS/BSD).
 const afUnixBound = 100
 
-// XDGSocket returns $XDG_RUNTIME_DIR/<app>/<file> and creates its directory
-// 0700. ok is false when that fails or the path is too long; the caller picks a fallback.
+// XDGSocket returns $XDG_RUNTIME_DIR/<app>/<file> with a 0700 dir, or false when that fails or the path is too long.
 func XDGSocket(app, file string) (string, bool) {
 	xdg := os.Getenv("XDG_RUNTIME_DIR")
 	if xdg == "" {

@@ -8,12 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// names must match what Register mounts; TestTheExemptSetIsWhatRegisterMounts
-// checks it.
+// names must match what Register mounts (TestTheExemptSetIsWhatRegisterMounts).
 var names = []string{"health", "ready", "version"}
 
-// Paths returns the probe endpoints under prefix. Register cannot know its
-// mount point, and a suffix match would also exempt an app's /items/health.
+// Paths returns the probe endpoints under prefix; a suffix match would also exempt an app's /items/health.
 func Paths(prefix string) []string {
 	prefix = strings.TrimSuffix(prefix, "/")
 

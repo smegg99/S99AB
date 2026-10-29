@@ -84,8 +84,7 @@ func (c *Client) BeginLogin(ctx context.Context) (Flow, error) {
 	return answer.flow(), nil
 }
 
-// SubmitLogin sends the flow's values. It returns a session token, or the
-// refused flow with its messages; err is set only when neither came back.
+// SubmitLogin returns a session token or the refused flow with its messages; err is set only when neither came back.
 func (c *Client) SubmitLogin(ctx context.Context, flowID string,
 	values map[string]any) (token string, again Flow, err error) {
 

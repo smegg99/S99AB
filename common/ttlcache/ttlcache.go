@@ -24,14 +24,12 @@ type Cached[T any] struct {
 	loaded bool
 }
 
-// New returns a cache that refetches once the value is older than ttl. A zero
-// ttl refetches on every Get.
+// New returns a cache that refetches once the value is older than ttl; zero refetches every Get.
 func New[T any](ttl time.Duration, fetch func(context.Context) (T, error)) *Cached[T] {
 	return &Cached[T]{ttl: ttl, fetch: fetch}
 }
 
-// Get returns the value, refreshing it when stale. A failed refresh returns the
-// last good value with no error, if there is one.
+// Get returns the value, refreshing it when stale; a failed refresh returns the last good value without an error.
 func (c *Cached[T]) Get(ctx context.Context) (T, error) {
 	if v, ok := c.fresh(); ok {
 		return v, nil

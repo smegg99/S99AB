@@ -27,8 +27,7 @@ type Storage interface {
 	Exists(ctx context.Context, key string) (bool, error)
 }
 
-// Object describes an accepted upload. The caller stores it beside its own
-// metadata.
+// Object describes an accepted upload for the caller to store beside its own metadata.
 type Object struct {
 	Key    string `json:"key"`
 	Mime   string `json:"mime"`

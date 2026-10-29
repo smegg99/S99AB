@@ -14,8 +14,7 @@ import (
 
 var ErrNoIdentity = errors.New("kratosauth: no such identity")
 
-// Admin talks to Kratos's admin API, which must stay on loopback or a private
-// network because it can read and modify every identity.
+// Admin talks to Kratos's admin API, which must stay on loopback or a private network.
 type Admin struct {
 	baseURL string
 	client  *http.Client
@@ -38,8 +37,7 @@ type Account struct {
 	Name  string `json:"name,omitempty"`
 }
 
-// FindByEmail resolves an address to an identity. Store the ID, not the
-// email: an email can change hands.
+// FindByEmail resolves an address to an identity; store the ID, since an email can change hands.
 func (a *Admin) FindByEmail(ctx context.Context, email string) (*Account, error) {
 	query := url.Values{}
 	query.Set("credentials_identifier", email)

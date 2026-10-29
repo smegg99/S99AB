@@ -105,8 +105,7 @@ func platformMarker(n string) string {
 	return ""
 }
 
-// archOf checks x86_64 before arm64 so "apple-intel" resolves to x86_64; "apple"
-// alone does not mean arm64.
+// archOf checks x86_64 before arm64, so apple-intel is x86_64 and apple alone is no arch.
 func archOf(n string) string {
 	switch {
 	case strings.Contains(n, "universal"):

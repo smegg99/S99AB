@@ -9,8 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// String returns the query value for key when non-empty, else fallback.
-// WebKitGTK's wails:// handler drops POST/PATCH bodies, so webviews use the query.
+// String returns the non-empty query value for key, else fallback; WebKitGTK's wails:// drops POST bodies, so webviews use the query.
 func String(c *gin.Context, key, fallback string) string {
 	if v := c.Query(key); v != "" {
 		return v

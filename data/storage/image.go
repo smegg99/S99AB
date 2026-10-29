@@ -21,8 +21,7 @@ const maxPixels = 40_000_000
 
 var ErrNotImage = fmt.Errorf("storage: not an image")
 
-// Sanitise re-encodes an image to drop metadata such as EXIF GPS, applying the
-// EXIF orientation first.
+// Sanitise re-encodes an image after applying its EXIF orientation, dropping metadata such as GPS.
 func Sanitise(r io.Reader) (*bytes.Buffer, string, error) {
 	img, err := decode(r)
 	if err != nil {

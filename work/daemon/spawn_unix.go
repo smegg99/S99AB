@@ -9,8 +9,7 @@ import (
 	"syscall"
 )
 
-// spawn starts the daemon in its own session, so signals to the CLI's terminal
-// or process group leave it running.
+// spawn starts the daemon in its own session, so signals to the CLI's terminal leave it running.
 func spawn(command []string) error {
 	cmd := exec.Command(command[0], command[1:]...)
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setsid: true}

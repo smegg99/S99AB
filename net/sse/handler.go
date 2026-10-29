@@ -15,8 +15,7 @@ import (
 // heartbeat keeps idle proxies from closing the stream.
 const heartbeat = 20 * time.Second
 
-// Handler streams b's events until the client disconnects or b closes. The opening
-// comment fires onopen at once; X-Accel-Buffering: no stops proxy buffering.
+// Handler streams b's events until the client leaves or b closes, with an opening comment and proxy buffering off.
 func Handler(b *Broker) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		flusher, ok := w.(http.Flusher)

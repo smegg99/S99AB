@@ -11,8 +11,7 @@ import (
 	"github.com/pressly/goose/v3"
 )
 
-// Migrate applies ordered .sql files from an embedded FS through goose as a library, so no CLI is
-// needed. Each call has its own goose provider, so concurrent callers never share state.
+// Migrate applies the embedded .sql files with a goose provider of its own, so concurrent callers share no state.
 func Migrate(ctx context.Context, conn *sql.DB, fsys fs.FS, driver string) error {
 	p, err := provider(conn, fsys, driver)
 	if err != nil {

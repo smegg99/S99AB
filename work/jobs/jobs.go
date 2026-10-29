@@ -115,8 +115,7 @@ func (s *Scheduler) Jobs() []Registered {
 	return out
 }
 
-// Start begins ticking; a second call does nothing and a call after Close is ErrClosed. ctx
-// cancellation stops every running job.
+// Start begins ticking; a second call does nothing, a call after Close is ErrClosed, and ctx stops every job.
 func (s *Scheduler) Start(ctx context.Context) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -132,8 +131,7 @@ func (s *Scheduler) Start(ctx context.Context) error {
 	return nil
 }
 
-// Close stops the schedule, cancels the context running jobs were given,
-// then waits for them.
+// Close stops the schedule, cancels the running jobs' context and waits for them.
 func (s *Scheduler) Close() error {
 	s.mu.Lock()
 	cancel := s.cancel

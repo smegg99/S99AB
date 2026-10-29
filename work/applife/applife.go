@@ -33,8 +33,7 @@ func (c *ctxCloser) Close() error { return c.fn(context.Background()) }
 
 func (c *ctxCloser) closeContext(ctx context.Context) error { return c.fn(ctx) }
 
-// WithContext adapts a Shutdown(ctx)-style function, such as http.Server's. It
-// receives the deadline from Options.Timeout.
+// WithContext adapts a Shutdown(ctx) function such as http.Server's, with the deadline from Options.Timeout.
 func WithContext(fn func(context.Context) error) Closer { return &ctxCloser{fn: fn} }
 
 type Options struct {
@@ -59,8 +58,7 @@ func New(opts Options) *Lifecycle {
 	return &Lifecycle{opts: opts}
 }
 
-// Wait blocks until SIGINT or SIGTERM, or until ctx is done. After a signal the
-// channel stays registered so a second signal exits with 130.
+// Wait blocks until SIGINT, SIGTERM or ctx; after a signal a second one exits with 130.
 func (l *Lifecycle) Wait(ctx context.Context) {
 	ch := make(chan os.Signal, 2)
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
@@ -76,8 +74,7 @@ func (l *Lifecycle) Wait(ctx context.Context) {
 	}
 }
 
-// Shutdown closes everything in reverse construction order. Later calls return
-// the first call's error.
+// Shutdown closes everything in reverse construction order; later calls return the first error.
 func (l *Lifecycle) Shutdown() error {
 	l.once.Do(func() { l.err = l.shutdown() })
 	return l.err

@@ -124,8 +124,7 @@ type ghRelease struct {
 	} `json:"assets"`
 }
 
-// List returns up to limit releases, newest first (default 30, max 100). It drops
-// drafts, which any repo-scoped token sees, and flags prereleases.
+// List returns up to limit releases newest first (default 30, max 100), dropping drafts and flagging prereleases.
 func (c *Client) List(ctx context.Context, limit int) ([]Release, error) {
 	if limit <= 0 {
 		limit = defaultLimit
@@ -209,8 +208,7 @@ func (c *Client) convert(gh *ghRelease) Release {
 	return rel
 }
 
-// sourceArchives names the tag archives as downloaded (repo-tag.zip). It returns a
-// non-nil slice so JSON gets [] and not null.
+// sourceArchives names the tag archives repo-tag.zip and .tar.gz, never nil so JSON gets [].
 func (c *Client) sourceArchives(gh *ghRelease) []Asset {
 	stem := c.repo + "-" + strings.TrimPrefix(gh.TagName, "v")
 

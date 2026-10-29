@@ -4,9 +4,7 @@ package apipage
 
 import "strings"
 
-// Order builds ORDER BY from sort using only strings from allowed, dropping
-// unknown fields, then fallback's terms for columns sort did not name. fallback
-// must end in a unique column, or pages have no stable order.
+// Order builds ORDER BY from allowed fields of sort, then fallback's other terms; fallback must end in a unique column.
 func Order(sort string, allowed []string, fallback string) string {
 	clauses := make([]string, 0, len(allowed))
 	seen := make(map[string]bool, len(allowed))

@@ -11,8 +11,7 @@ import (
 // Server is what Serve runs. *http.Server satisfies it.
 type Server interface{ ListenAndServe() error }
 
-// Serve runs srv until it stops or a signal arrives, so a failed bind exits.
-// Shutdown is left to the caller.
+// Serve runs srv until it stops or a signal arrives, so a failed bind exits; the caller shuts down.
 func (l *Lifecycle) Serve(ctx context.Context, srv Server) error {
 	// Buffered so the goroutine can report after Serve has returned.
 	stopped := make(chan error, 1)

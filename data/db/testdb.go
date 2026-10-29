@@ -9,8 +9,7 @@ import (
 	"testing"
 )
 
-// TestDB returns a migrated SQLite database in the test's temp directory. On
-// disk because :memory: gives each pooled connection its own database.
+// TestDB returns a migrated SQLite file in the test's temp dir; :memory: gives each pooled connection its own database.
 func TestDB(t *testing.T, migrations fs.FS) *sql.DB {
 	t.Helper()
 

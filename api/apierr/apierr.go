@@ -27,8 +27,7 @@ var (
 	Internal     = Kind{"internal", http.StatusInternalServerError}
 )
 
-// statusClientClosedRequest is nginx's 499, sent without an envelope when the
-// caller is gone.
+// statusClientClosedRequest is nginx's 499, sent with no envelope when the caller is gone.
 const statusClientClosedRequest = 499
 
 // Error carries a Kind to the client and the cause to the log only.

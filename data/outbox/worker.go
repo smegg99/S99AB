@@ -55,8 +55,7 @@ func NewWorker(conn *sql.DB, handlers map[string]Handler, opts Options) *Worker 
 // sql rewrites a statement for the worker's driver.
 func (w *Worker) sql(query string) string { return db.Rebind(w.opts.Driver, query) }
 
-// Start polls until Close. It returns immediately; a second call does nothing, and a call after Close
-// is ErrClosed.
+// Start polls until Close and returns at once; a second call does nothing and a call after Close is ErrClosed.
 func (w *Worker) Start(ctx context.Context) error {
 	if w.err != nil {
 		return w.err
@@ -94,8 +93,7 @@ func (w *Worker) Start(ctx context.Context) error {
 	return nil
 }
 
-// Close stops the worker and waits for the current pass. It returns at once
-// for a worker that was never started.
+// Close stops the worker and waits for the current pass, returning at once if it never started.
 func (w *Worker) Close() error {
 	w.mu.Lock()
 	started := w.started
@@ -112,8 +110,7 @@ func (w *Worker) Close() error {
 	return nil
 }
 
-// Drain processes one batch and reports how many succeeded. A failed handler is a retry, not an error;
-// the error is a claim or a result that could not be recorded.
+// Drain runs one batch and counts successes; a failed handler is a retry, and the error is a claim or record failure.
 func (w *Worker) Drain(ctx context.Context) (int, error) {
 	if w.err != nil {
 		return 0, w.err
@@ -137,8 +134,7 @@ func (w *Worker) Drain(ctx context.Context) (int, error) {
 	return done, errors.Join(errs...)
 }
 
-// claim returns the due jobs this worker won, via an optimistic update that
-// pushes next_try_at a lease ahead (SQLite has no SKIP LOCKED).
+// claim takes due jobs with an optimistic update that leases next_try_at, since SQLite has no SKIP LOCKED.
 func (w *Worker) claim(ctx context.Context) ([]Job, error) {
 	now := w.opts.Now()
 	due := stamp(now)

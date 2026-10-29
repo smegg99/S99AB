@@ -25,8 +25,7 @@ const stampLayout = "2006-01-02T15:04:05.000000000Z"
 
 func stamp(t time.Time) string { return t.UTC().Format(stampLayout) }
 
-// Handler does the work. It must be idempotent: a crash after the work but
-// before the row is marked done means it runs again.
+// Handler does the work and must be idempotent: a crash before the row is marked done runs it again.
 type Handler func(ctx context.Context, payload []byte) error
 
 type Options struct {
@@ -75,8 +74,7 @@ func (o *Options) defaults() {
 	}
 }
 
-// The table per dialect: SQLite and Postgres spell the auto-increment key and
-// byte column differently.
+// The table per dialect: SQLite and Postgres spell the auto-increment key and byte column differently.
 const schemaSQLite = `
 CREATE TABLE IF NOT EXISTS outbox (
 	id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -112,8 +110,7 @@ func schemaFor(driver string) string {
 	return schemaSQLite
 }
 
-// Migrate creates the table for the driver detected from the pool. Idempotent
-// DDL keeps it out of the app's migration version sequence.
+// Migrate creates the outbox table for the pool's driver; idempotent DDL keeps it out of the app's migrations.
 func Migrate(ctx context.Context, conn *sql.DB) error {
 	driver, err := db.Detect(conn)
 	if err != nil {
@@ -140,8 +137,7 @@ type Option func(*settings)
 
 type settings struct{ driver string }
 
-// For names the transaction's driver so the placeholders match. Required on
-// Postgres because a Tx cannot report its driver.
+// For names the transaction's driver for placeholders; required on Postgres, whose Tx cannot report it.
 func For(driver string) Option {
 	return func(s *settings) { s.driver = driver }
 }

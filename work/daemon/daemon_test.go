@@ -173,8 +173,7 @@ func TestEnsureRunningSpawns(t *testing.T) {
 
 const helperSocketEnv = "DAEMON_TEST_SOCKET"
 
-// TestHelperDaemon is the process TestEnsureRunningSpawns starts. Without the
-// env var it does nothing; with it, it serves on the socket for a few seconds.
+// TestHelperDaemon is the process TestEnsureRunningSpawns starts; without its env var it does nothing.
 func TestHelperDaemon(t *testing.T) {
 	sock := os.Getenv(helperSocketEnv)
 	if sock == "" {

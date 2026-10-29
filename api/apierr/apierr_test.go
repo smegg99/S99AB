@@ -100,8 +100,7 @@ func TestCallerThatLeftGetsAStatusAndNothingElse(t *testing.T) {
 	}
 }
 
-// kratosauth.ErrCallerGone hides its cause behind %v, so only the request
-// context can tell that the caller left.
+// kratosauth.ErrCallerGone hides its cause, so only the request context shows the caller left.
 func TestAnyErrorOnADeadRequestIsTheCallerLeaving(t *testing.T) {
 	sentinel := errors.New("kratosauth: the caller stopped waiting")
 

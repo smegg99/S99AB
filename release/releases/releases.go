@@ -159,8 +159,7 @@ func (s *Service) Latest(ctx context.Context, locale string) Release {
 	return list[0]
 }
 
-// List returns stable releases, newest first; empty when none exist or GitHub is
-// unreachable with nothing cached.
+// List returns stable releases newest first, empty when none exist or GitHub is unreachable with nothing cached.
 func (s *Service) List(ctx context.Context, locale string) []Release {
 	items, err := s.releases.Get(ctx)
 	if err != nil {

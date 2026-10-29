@@ -75,8 +75,7 @@ func New(opts Options) (*Client, error) {
 	return &Client{opts: opts}, nil
 }
 
-// Check asks whether a subject holds a relation on an object. On error it
-// returns false; callers must not treat the error as a permit.
+// Check asks whether a subject holds a relation on an object; on error it returns false, never a permit.
 func (c *Client) Check(ctx context.Context, t Tuple) (bool, error) {
 	query := url.Values{}
 	query.Set("namespace", t.Namespace)
@@ -230,8 +229,7 @@ func (c *Client) Objects(ctx context.Context, namespace, subject string, rel Rel
 	return out, nil
 }
 
-// list follows next_page_token through every page; one page would truncate the
-// result without an error.
+// list follows next_page_token through every page, since one page would truncate silently.
 func (c *Client) list(ctx context.Context, query url.Values) ([]Tuple, error) {
 	query.Set("page_size", "500")
 

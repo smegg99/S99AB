@@ -100,8 +100,7 @@ export function useTexture() {
   }
 
   return {
-    /* The catalogue, exposed here because a template cannot reach an
-       auto-imported const. */
+    // TEXTURES is not auto-imported, so pickers read the catalogue here.
     catalogue: TEXTURES,
     current,
     perPlane,

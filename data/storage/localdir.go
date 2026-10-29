@@ -13,8 +13,7 @@ import (
 	"time"
 )
 
-// LocalDir keeps objects as files under a root, for desktop apps, development
-// and tests.
+// LocalDir keeps objects as files under a root, for desktop apps, development and tests.
 type LocalDir struct {
 	root string
 	// base prefixes the app-served path URL returns.
@@ -77,8 +76,7 @@ func (l *LocalDir) Get(_ context.Context, key string) (io.ReadCloser, error) {
 	return f, nil
 }
 
-// URL returns a relative app-served path and ignores ttl. Relative tells the
-// caller the app serves the bytes; Bucket returns an absolute URL.
+// URL returns a relative app-served path and ignores ttl; Bucket returns an absolute URL.
 func (l *LocalDir) URL(_ context.Context, key string, _ time.Duration) (string, error) {
 	if err := checkKey(key); err != nil {
 		return "", err

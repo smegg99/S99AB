@@ -101,8 +101,7 @@ var managed = []string{
 	"synchronous(NORMAL)",
 }
 
-// sqliteDSN merges the managed pragmas into the caller's query. Built by hand
-// because url.Values escapes the parentheses and reorders the repeated _pragma.
+// sqliteDSN merges the managed pragmas into the query by hand, since url.Values escapes and reorders them.
 func sqliteDSN(raw string) string {
 	base, query, hasQuery := strings.Cut(raw, "?")
 

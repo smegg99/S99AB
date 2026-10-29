@@ -14,8 +14,7 @@ type Result[R any] struct {
 	Err   error
 }
 
-// Run returns one Result per item in input order. On ctx cancellation it stops
-// dispatching and unprocessed items carry ctx.Err(). workers is clamped to [1, len(items)].
+// Run returns one Result per item in order; on cancellation the rest carry ctx.Err(), and workers is clamped to [1, len(items)].
 func Run[T, R any](ctx context.Context, items []T, workers int, fn func(context.Context, T) (R, error)) []Result[R] {
 	n := len(items)
 	if n == 0 {

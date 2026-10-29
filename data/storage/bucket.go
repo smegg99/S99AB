@@ -29,8 +29,7 @@ type BucketConfig struct {
 	PublicEndpoint string
 }
 
-// Bucket stores objects in an S3-compatible bucket and serves them through
-// presigned URLs.
+// Bucket stores objects in an S3-compatible bucket and serves presigned URLs.
 type Bucket struct {
 	client *minio.Client
 	cfg    BucketConfig
@@ -39,8 +38,7 @@ type Bucket struct {
 	presign *minio.Client
 }
 
-// NewBucket connects and verifies the bucket exists, so a wrong name fails at
-// boot.
+// NewBucket connects and checks the bucket exists, so a wrong name fails at boot.
 func NewBucket(ctx context.Context, cfg BucketConfig) (*Bucket, error) {
 	if cfg.Endpoint == "" || cfg.Bucket == "" {
 		return nil, fmt.Errorf("storage: endpoint and bucket are required")

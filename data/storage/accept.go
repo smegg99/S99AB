@@ -22,8 +22,7 @@ type AcceptOptions struct {
 	Prefix string
 }
 
-// Accept sniffs, size-limits and stores an upload. The type comes from the
-// bytes, never from the client.
+// Accept sniffs, size-limits and stores an upload, typing it from the bytes, never the client.
 func Accept(ctx context.Context, st Storage, r io.Reader, opts AcceptOptions) (*Object, error) {
 	head := make([]byte, 3072)
 	n, err := io.ReadFull(r, head)

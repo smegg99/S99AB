@@ -12,8 +12,7 @@ import (
 	"github.com/smegg99/s99ab/data/outbox"
 )
 
-// TestQueueOnPostgres covers the schema and placeholders SQLite accepts and
-// Postgres rejects. Set S99AB_TEST_PG_DSN to run it.
+// Covers what SQLite accepts and Postgres rejects; set S99AB_TEST_PG_DSN to run it.
 func TestQueueOnPostgres(t *testing.T) {
 	dsn := os.Getenv("S99AB_TEST_PG_DSN")
 	if dsn == "" {

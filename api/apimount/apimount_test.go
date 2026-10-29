@@ -16,8 +16,7 @@ import (
 
 func init() { gin.SetMode(gin.TestMode) }
 
-// gin copies the parent chain when a child group is made, so Session must be
-// mounted before any Group().
+// gin copies the parent chain into each child group, so Session must be mounted before any Group().
 func TestGuardedRoutesSeeTheSessionMiddleware(t *testing.T) {
 	r := gin.New()
 	gs := mount(t, r, apimount.Options{Kratos: upKratos(t)})

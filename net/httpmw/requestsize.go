@@ -10,8 +10,7 @@ import (
 	"github.com/smegg99/s99ab/api/apierr"
 )
 
-// RequestSize caps the request body. Content-Length rejects early; MaxBytesReader
-// enforces the cap when the header is absent or wrong.
+// RequestSize caps the body: Content-Length rejects early and MaxBytesReader holds when the header lies.
 func RequestSize(maxBytes int64) gin.HandlerFunc {
 	if maxBytes <= 0 {
 		// Unset: no cap.

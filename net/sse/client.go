@@ -24,8 +24,7 @@ func NewDecoder(r io.Reader) *Decoder {
 	return &Decoder{sc: sc}
 }
 
-// Decode blocks for the next event, skipping comments, or returns io.EOF.
-// Data is a string; `id` carries over to later events as the last id.
+// Decode blocks for the next event, skipping comments, or returns io.EOF; an id carries over as the last id.
 func (d *Decoder) Decode() (Event, error) {
 	var data strings.Builder
 	eventType := ""

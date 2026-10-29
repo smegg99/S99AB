@@ -20,8 +20,7 @@ var (
 	ErrCallerGone = errors.New("kratosauth: the caller stopped waiting")
 )
 
-// callerGone separates a cancelled caller from an unreachable Kratos, which
-// Client.Do reports alike; the client Timeout leaves ctx untouched.
+// callerGone tells a cancelled caller from an unreachable Kratos, which Client.Do reports alike.
 func callerGone(ctx context.Context, err error) error {
 	if cause := ctx.Err(); cause != nil {
 		return fmt.Errorf("%w: %v", ErrCallerGone, cause)
@@ -29,8 +28,7 @@ func callerGone(ctx context.Context, err error) error {
 	return fmt.Errorf("%w: %v", ErrUpstream, err)
 }
 
-// Identity is the part of a Kratos session an app authorizes on. Traits stay
-// raw JSON because the schema belongs to the app.
+// Identity is the part of a Kratos session an app authorizes on; Traits stay raw JSON for the app's schema.
 type Identity struct {
 	ID     string          `json:"id"`
 	Traits json.RawMessage `json:"traits"`
@@ -56,8 +54,7 @@ func (i Identity) Trait(name string, into any) error {
 	return json.Unmarshal(raw, into)
 }
 
-// Meta decodes one field out of the identity's public metadata, which only the
-// admin API writes.
+// Meta decodes one field of the identity's public metadata, which only the admin API writes.
 func (i Identity) Meta(name string, into any) error {
 	var meta map[string]json.RawMessage
 	if len(i.MetadataPublic) == 0 {
@@ -130,8 +127,7 @@ func (c *Client) credentialed(r *http.Request) bool {
 	return false
 }
 
-// Whoami validates the request's session cookie or session token with Kratos. A request with
-// neither is ErrNoSession without a call.
+// Whoami validates the session cookie or token with Kratos; a request with neither is ErrNoSession without a call.
 func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error) {
 	if !c.credentialed(r) {
 		return nil, ErrNoSession

@@ -11,8 +11,7 @@ import (
 	"github.com/smegg99/s99ab/release/releases"
 )
 
-// Register mounts /releases, /releases/latest, /downloads and /repo on group.
-// They answer 200 with an empty result when GitHub is unreachable and uncached.
+// Register mounts /releases, /releases/latest, /downloads and /repo, answering 200 with empty results when GitHub is unreachable.
 func Register(group gin.IRoutes, svc *releases.Service) {
 	group.GET("/releases", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"releases": svc.List(c.Request.Context(), locale(c))})

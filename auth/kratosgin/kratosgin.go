@@ -12,8 +12,7 @@ import (
 	"github.com/smegg99/s99ab/auth/kratosauth"
 )
 
-// Session resolves a session when one is present and lets the request through
-// either way. Require rejects anonymous requests.
+// Session resolves a session when present and lets every request through; Require rejects anonymous ones.
 func Session(c *kratosauth.Client) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		identity, err := c.Whoami(ctx.Request.Context(), ctx.Request)
@@ -66,8 +65,7 @@ func From(c *gin.Context) (*kratosauth.Identity, bool) {
 	return kratosauth.FromContext(c.Request.Context())
 }
 
-// MustFrom is From for handlers behind Require; it answers 401 itself when the
-// identity is missing.
+// MustFrom is From for handlers behind Require, answering 401 itself when the identity is missing.
 func MustFrom(c *gin.Context) (*kratosauth.Identity, bool) {
 	identity, ok := From(c)
 	if !ok {
@@ -77,8 +75,7 @@ func MustFrom(c *gin.Context) (*kratosauth.Identity, bool) {
 	return identity, true
 }
 
-// RequireFunc admits only an identity the predicate accepts. A rejected caller
-// gets a 404 so the route's existence is not confirmed.
+// RequireFunc admits only identities ok accepts, answering 404 so the route is not confirmed.
 func RequireFunc(ok func(*kratosauth.Identity) bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		identity, found := From(c)
@@ -96,8 +93,7 @@ func RequireFunc(ok func(*kratosauth.Identity) bool) gin.HandlerFunc {
 	}
 }
 
-// RequireMeta admits an identity whose public metadata field, a string or a
-// list of strings, holds one of the allowed values.
+// RequireMeta admits an identity whose public metadata field, a string or list, holds an allowed value.
 func RequireMeta(name string, allowed ...string) gin.HandlerFunc {
 	return RequireFunc(func(i *kratosauth.Identity) bool { return kratosauth.HasMeta(i, name, allowed...) })
 }
