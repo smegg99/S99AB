@@ -1,0 +1,41 @@
+// web/src/styles/_tiles-pickers.scss
+//
+// The accent and glyph pickers in the explorer's folder dialog.
+
+/* Accent and icon pickers in the folder dialog. */
+
+/* A field's name, as UiFormField sets it. */
+.s99ab-swatches__label {
+  margin-bottom: 6px;
+  color: rgb(var(--v-theme-ink));
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  opacity: 1;
+}
+
+.s99ab-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s99ab-control-gap);
+}
+
+/* The tint is the whole face, without the key hairline _surfaces.scss gives a
+   flat button. */
+.s99ab-swatches .s99ab-swatch.v-btn {
+  border-color: transparent;
+  background-color: rgb(var(--s99ab-tile-accent));
+}
+
+/* The one picked, a tint or a glyph: the ink ring with a gap of the surface
+   between, drawn by the shadow the flat button otherwise leaves empty. */
+.s99ab-swatches .s99ab-swatch--active {
+  box-shadow:
+    0 0 0 2px rgb(var(--v-theme-surface)),
+    0 0 0 calc(2px + var(--s99ab-tile-ring)) rgb(var(--v-theme-on-surface));
+}
+
+/* Each glyph choice shows the glyph itself. */
+.s99ab-glyph.v-btn {
+  border: 1px solid rgb(var(--v-theme-edge));
+}

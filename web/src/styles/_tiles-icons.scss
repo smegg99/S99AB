@@ -1,0 +1,134 @@
+// web/src/styles/_tiles-icons.scss
+//
+// The explorer's icon view: glyph plates instead of cards.
+
+/* ---------------------------------------------------------- icon view ----
+
+   A glyph or preview with the name under it and no ground. An override of the
+   card, sharing its drop, drag, pick and disabled states. */
+[data-tile-variant='icon'] .s99ab-tile {
+  aspect-ratio: auto;
+  gap: var(--s99ab-tile-glyph-gap);
+  padding: var(--s99ab-tile-pad);
+  border-color: transparent;
+  background-color: transparent;
+}
+
+/* The glyph's plate hugs it and lights when picked. */
+[data-tile-variant='icon'] .s99ab-tile__thumb {
+  flex: 0 0 auto;
+  width: fit-content;
+  min-width: var(--s99ab-tile-glyph);
+  height: calc(var(--s99ab-tile-glyph) + var(--s99ab-tile-glyph-pad) * 2);
+  margin-inline: auto;
+  padding: var(--s99ab-tile-glyph-pad);
+  border-radius: var(--s99ab-tile-radius);
+  background-color: transparent;
+  background-image: none;
+  transition: background-color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+[data-tile-variant='icon'] .s99ab-tile__icon,
+[data-tile-variant='icon'] .s99ab-tile__thumb .s99ab-tile__icon {
+  font-size: var(--s99ab-tile-glyph);
+}
+
+/* Previews are contained, not cropped, and laid out in flow. */
+[data-tile-variant='icon'] .s99ab-tile__image {
+  position: static;
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* The name wraps up to the configured lines, centred. */
+[data-tile-variant='icon'] .s99ab-tile__label {
+  padding: 0;
+  border-top: 0;
+  text-align: center;
+}
+
+/* Inline, so the highlight follows the name's shape. */
+[data-tile-variant='icon'] .s99ab-tile__title {
+  display: -webkit-box;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: calc(var(--s99ab-control-gap) / 2);
+  border-radius: var(--s99ab-tile-radius);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--s99ab-tile-lines);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  transition:
+    background-color var(--s99ab-motion-fast) var(--s99ab-motion-easing),
+    color var(--s99ab-motion-fast) var(--s99ab-motion-easing);
+}
+
+/* No tint bar or count chip; the glyph carries the tint. */
+[data-tile-variant='icon'] .s99ab-tile--folder::after {
+  content: none;
+}
+
+/* Marks sit at the glyph plate's edge, not the cell's: half the cell minus half
+   the plate. */
+[data-tile-variant='icon'] .s99ab-tile__count,
+[data-tile-variant='icon'] .s99ab-tile__pin,
+[data-tile-variant='icon'] .s99ab-tile__more.v-btn {
+  top: var(--s99ab-tile-pad);
+}
+
+[data-tile-variant='icon'] .s99ab-tile__count {
+  left: calc(50% - var(--s99ab-tile-glyph) / 2 - var(--s99ab-tile-glyph-pad));
+  border-radius: var(--s99ab-chip-radius);
+}
+
+[data-tile-variant='icon'] .s99ab-tile__pin,
+[data-tile-variant='icon'] .s99ab-tile__more.v-btn {
+  right: calc(50% - var(--s99ab-tile-glyph) / 2 - var(--s99ab-tile-glyph-pad));
+  /* Straddles the corner so it covers less of the glyph. */
+  transform: translate(40%, -40%);
+}
+
+/* No ground, including the texture plane _textures.scss would paint on a well. */
+[data-tile-variant='icon'] .s99ab-tile,
+[data-tile-variant='icon'] .s99ab-tile:hover {
+  border-color: transparent;
+  background-color: transparent;
+}
+
+[data-tile-variant='icon'] .s99ab-tile::before {
+  content: none;
+}
+
+/* Hover lights the glyph's plate only; a filled label means picked. */
+[data-tile-variant='icon'] .s99ab-tile:hover .s99ab-tile__thumb {
+  background-color: rgba(var(--s99ab-tile-accent), var(--s99ab-tile-tint));
+}
+
+/* Picked: a plate under the glyph and a label in surface colour on the accent. */
+[data-tile-variant='icon'] .s99ab-tile--selected {
+  border-color: transparent;
+  box-shadow: none;
+  background-color: transparent;
+}
+
+[data-tile-variant='icon'] .s99ab-tile--selected .s99ab-tile__thumb {
+  background-color: rgba(var(--s99ab-tile-accent), var(--s99ab-tile-pick));
+}
+
+[data-tile-variant='icon'] .s99ab-tile--selected .s99ab-tile__title {
+  background-color: rgb(var(--s99ab-tile-accent));
+  color: rgb(var(--v-theme-well));
+}
+
+/* The drop target keeps its ring next to picked tiles. */
+[data-tile-variant='icon'] .s99ab-tile--target {
+  box-shadow: inset 0 0 0 var(--s99ab-tile-ring) rgb(var(--s99ab-tile-accent));
+  background-color: rgba(var(--s99ab-tile-accent), var(--s99ab-tile-tint));
+}
+
+[data-tile-variant='icon'] .s99ab-tile--up {
+  border-color: rgb(var(--v-theme-line));
+}

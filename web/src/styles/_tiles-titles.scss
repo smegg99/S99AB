@@ -1,0 +1,12 @@
+// web/src/styles/_tiles-titles.scss
+//
+// The title clamp every explorer layout shares; last, so it wins on source order.
+
+/* Multiline titles use the same clamp across explorer layouts and WebKit versions. */
+.s99ab-explorer--multiline .s99ab-tile__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--s99ab-title-lines);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
