@@ -79,3 +79,6 @@ pin:
 unpin:
   value: "Odepnij"
   description: "Context menu entry: stop keeping this node at the front"
+contents:
+  value: "Zawartość folderu"
+  description: "The explorer grid's accessible name: the list of tiles in the open folder"

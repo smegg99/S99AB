@@ -236,13 +236,13 @@ export function useExplorerNode<T = unknown>(
 
   /** Spread onto the tile root: role, focus, the tile marker and handlers, nothing visual. */
   const bind = computed(() => ({
-    'role': 'button',
-    'tabindex': 0,
+    'role': 'option',
+    'tabindex': explorer.tabStop.value === target.value.id ? 0 : -1,
     // Carries the id, which the grid's keys and rubber band read from the DOM.
     [TILE_ATTR]: target.value.id,
     'draggable': explorer.canDrag(target.value),
     'aria-disabled': disabled.value || undefined,
-    'aria-selected': selectable.value ? selected.value : undefined,
+    'aria-selected': selectable.value ? selected.value : false,
     'onClick': onClick,
     'onDblclick': onDblclick,
     'onKeydown': onKeydown,

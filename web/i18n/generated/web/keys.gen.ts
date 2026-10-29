@@ -103,6 +103,7 @@ export type I18nKey =
   | 'explorer.clearSelection'
   | 'explorer.confirmDelete'
   | 'explorer.confirmDeleteAll'
+  | 'explorer.contents'
   | 'explorer.deleteFolder'
   | 'explorer.deleteFolderAll'
   | 'explorer.dragging'

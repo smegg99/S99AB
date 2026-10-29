@@ -604,3 +604,21 @@ describe('the arrow keys', () => {
     expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([['docs', 'photo']])
   })
 })
+
+describe('the grid as a listbox', () => {
+  it('has one Tab stop, which follows the focused tile', async () => {
+    const wrapper = mountExplorer(movable())
+    await flushPromises()
+
+    const grid = wrapper.get('.s99ab-explorer__grid')
+    expect(grid.attributes('role')).toBe('listbox')
+    const stops = () => wrapper.findAll('[role="option"]').filter(tile => tile.attributes('tabindex') === '0')
+    expect(stops()).toHaveLength(1)
+
+    const second = wrapper.findAll('[role="option"]')[1]!
+    second.element.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    await nextTick()
+    expect(stops()).toHaveLength(1)
+    expect(stops()[0]!.element).toBe(second.element)
+  })
+})

@@ -10,6 +10,10 @@
     tag="div"
     name="s99ab-flip"
     class="s99ab-explorer__grid"
+    role="listbox"
+    :aria-label="contentsLabel"
+    :aria-multiselectable="selection?.mode.value === 'multi' || undefined"
+    @focusin="onFocusin"
     @dragover.prevent="onDragover"
     @drop.prevent="onDrop"
     @keydown="onKeydown"
@@ -30,6 +34,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import UiExplorerTile from './ExplorerTile.vue'
 import UiExplorerUpTile from './ExplorerUpTile.vue'
 import { useExplorerContext } from '../../composables/explorer/useExplorer'
@@ -37,6 +42,8 @@ import { useExplorerKeys } from '../../composables/explorer/internal/keys'
 import { dragHasFiles, useExplorerActions } from '../../composables/explorer/internal/actions'
 import { useExplorerSelectionContext } from '../../composables/explorer/useExplorerSelection'
 import type { ExplorerNode } from '../../composables/explorer/internal/tree'
+import { useTranslate } from '../../composables/useTranslate'
+import { TILE_ATTR } from '../../browser/tiles'
 
 defineSlots<{
   tile?: (props: { key: string, node: ExplorerNode }) => unknown
@@ -46,6 +53,14 @@ defineSlots<{
 const explorer = useExplorerContext()
 const actions = useExplorerActions()
 const selection = useExplorerSelectionContext()
+const t = useTranslate()
+const contentsLabel = computed(() => t('explorer.contents', 'Folder contents'))
+
+/** The focused tile keeps the grid's Tab stop, so Tab returns to it. */
+function onFocusin(event: FocusEvent) {
+  const id = (event.target as Element | null)?.closest?.(`[${TILE_ATTR}]`)?.getAttribute(TILE_ATTR)
+  if (id !== null && id !== undefined) explorer.lastFocused.value = id
+}
 
 const { onKeydown } = useExplorerKeys({
   enabled: () => explorer.behaviour.value.keyboard,

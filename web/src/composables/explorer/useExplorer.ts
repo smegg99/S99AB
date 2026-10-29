@@ -63,6 +63,13 @@ function createExplorer<T = unknown>(
     () => preview.value ?? groups.value.get(currentId.value) ?? [],
   )
 
+  // The grid's one Tab stop: the tile focused last, else the first shown ('' is the ".." tile).
+  const lastFocused = ref<string | null>(null)
+  const tabStop = computed(() => {
+    const ids = [...(currentId.value !== null ? [''] : []), ...children.value.map(node => node.id)]
+    return lastFocused.value !== null && ids.includes(lastFocused.value) ? lastFocused.value : ids[0] ?? null
+  })
+
   const can = computed(() => ({
     move: typeof source.move === 'function',
     create: typeof source.createFolder === 'function',
@@ -248,6 +255,8 @@ function createExplorer<T = unknown>(
     currentId,
     current,
     path,
+    lastFocused,
+    tabStop,
     loading,
     initialized,
     error,
