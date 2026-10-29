@@ -91,7 +91,7 @@ type Asset struct {
 	Name        string `json:"name"`
 	Size        int64  `json:"size"`
 	DownloadURL string `json:"download_url"`
-	Platform    string `json:"platform"` // linux | windows | macos | source | other
+	Platform    string `json:"platform"` // linux | windows | macos | android | web | source | other
 	Arch        string `json:"arch"`     // x86_64 | arm64 | universal | ""
 	Kind        string `json:"kind"`     // appimage | deb | rpm | tar.gz | exe | msix | zip | dmg
 
@@ -100,8 +100,11 @@ type Asset struct {
 	Digest string `json:"digest"`
 }
 
-// PlatformSource marks the generated source archives.
-const PlatformSource = "source"
+// PlatformSource marks the generated source archives; PlatformOther an asset for no platform.
+const (
+	PlatformSource = "source"
+	PlatformOther  = "other"
+)
 
 type ghRelease struct {
 	TagName     string `json:"tag_name"`

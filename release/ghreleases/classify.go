@@ -3,8 +3,12 @@ package ghreleases
 
 import (
 	"path/filepath"
+	"regexp"
 	"strings"
 )
+
+// webMarker matches "web" as a whole name part, so "webview" is no marker.
+var webMarker = regexp.MustCompile(`(^|[-_.])web([-_.]|$)`)
 
 // kindPlatform maps kinds whose extension alone names the platform; .zip is absent.
 var kindPlatform = map[string]string{
@@ -17,6 +21,8 @@ var kindPlatform = map[string]string{
 	"exe":         "windows",
 	"msix":        "windows",
 	"dmg":         "macos",
+	"apk":         "android",
+	"aab":         "android",
 }
 
 // classify infers platform, arch and kind from an asset filename.
@@ -36,6 +42,12 @@ func kindOf(n string) string {
 		return "rpm"
 	case strings.HasSuffix(n, ".pkg.tar.zst"):
 		return "pkg.tar.zst"
+	case strings.HasSuffix(n, ".tar.zst"):
+		return "tar.zst"
+	case strings.HasSuffix(n, ".apk"):
+		return "apk"
+	case strings.HasSuffix(n, ".aab"):
+		return "aab"
 	case strings.HasSuffix(n, ".tar.gz"), strings.HasSuffix(n, ".tgz"):
 		return "tar.gz"
 	// The NSIS installer is <app>-<ver>-windows-<arch>-installer.exe; a plain
@@ -72,10 +84,10 @@ func platformOf(n, kind string) string {
 		// An unmarked zip is a Windows portable build by convention.
 		return "windows"
 	}
-	return "other"
+	return PlatformOther
 }
 
-// platformMarker checks macOS before Windows.
+// platformMarker checks macOS, then Windows, android, web and linux.
 func platformMarker(n string) string {
 	switch {
 	case strings.Contains(n, "darwin"), strings.Contains(n, "macos"),
@@ -83,6 +95,10 @@ func platformMarker(n string) string {
 		return "macos"
 	case strings.Contains(n, "windows"), strings.Contains(n, "win"):
 		return "windows"
+	case strings.Contains(n, "android"):
+		return "android"
+	case webMarker.MatchString(n):
+		return "web"
 	case strings.Contains(n, "linux"):
 		return "linux"
 	}

@@ -79,13 +79,13 @@ func TestPlatformNeverMixesReleases(t *testing.T) {
 
 // Checksums and signatures must not become a platform tab of their own.
 func TestUnclassifiedAssetsAreNotPlatforms(t *testing.T) {
-	items := []parsed{rel("v1.0.0", "linux", platformOther)}
+	items := []parsed{rel("v1.0.0", "linux", ghreleases.PlatformOther)}
 
 	got := newestByPlatform(items)
 
 	for _, p := range got {
-		if p.Platform == platformOther {
-			t.Errorf("%q became a platform", platformOther)
+		if p.Platform == ghreleases.PlatformOther {
+			t.Errorf("%q became a platform", ghreleases.PlatformOther)
 		}
 	}
 	if len(got) != 1 {
@@ -98,7 +98,7 @@ func TestExtrasComeFromTheNewestReleaseOnly(t *testing.T) {
 	newest := ghreleases.Release{
 		Version: "v1.0.1",
 		Assets: []ghreleases.Asset{
-			{Name: "checksums.txt", Platform: platformOther},
+			{Name: "checksums.txt", Platform: ghreleases.PlatformOther},
 			{Name: "app.AppImage", Platform: "linux"},
 		},
 	}

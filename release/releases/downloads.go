@@ -8,9 +8,6 @@ import (
 	"github.com/smegg99/s99ab/release/ghreleases"
 )
 
-// platformOther marks a file that is not an OS build, such as a checksum.
-const platformOther = "other"
-
 /*
 Downloads is a download card's whole model, resolved for one reader.
 
@@ -74,7 +71,7 @@ func (s *Service) Downloads(ctx context.Context, locale string) Downloads {
 func extrasOf(rel ghreleases.Release) []ghreleases.Asset {
 	out := make([]ghreleases.Asset, 0, len(rel.Assets))
 	for _, a := range rel.Assets {
-		if a.Platform == platformOther {
+		if a.Platform == ghreleases.PlatformOther {
 			out = append(out, a)
 		}
 	}
@@ -95,7 +92,7 @@ func newestByPlatform(items []parsed) []Platform {
 
 	for _, p := range items {
 		for _, a := range p.rel.Assets {
-			if a.Platform == "" || a.Platform == platformOther {
+			if a.Platform == "" || a.Platform == ghreleases.PlatformOther {
 				continue
 			}
 

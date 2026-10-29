@@ -38,6 +38,12 @@ func TestClassify(t *testing.T) {
 		{"nsis installer", "smeggtuner-1.0.0-windows-amd64-installer.exe", "windows", "x86_64", "installer"},
 		{"portable exe", "smeggtuner-1.0.0-windows-amd64.exe", "windows", "x86_64", "exe"},
 
+		{"android apk", "smeggtuner-1.4.0-android-arm64.apk", "android", "arm64", "apk"},
+		{"android bundle", "smeggtuner-1.4.0-android-arm64.aab", "android", "arm64", "aab"},
+		{"apk without platform marker", "smeggtuner-1.4.0-arm64.apk", "android", "arm64", "apk"},
+		{"linux arm64 archive", "smeggtuner-1.4.0-linux-arm64.tar.zst", "linux", "arm64", "tar.zst"},
+		{"browser edition", "smeggtuner-1.4.0-web.tar.zst", "web", "", "tar.zst"},
+		{"web inside a word is no marker", "smeggtuner-1.4.0-webview-notes.txt", "other", "", "txt"},
 		{"unknown extension", "checksums.txt", "other", "", "txt"},
 		{"no extension", "LICENSE", "other", "", ""},
 	}
