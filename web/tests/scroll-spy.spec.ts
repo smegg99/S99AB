@@ -2,7 +2,7 @@
 
 import { defineComponent, h, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useScrollSpy } from '../src/composables/shell/useScrollSpy'
 import { anchorsIn } from '../src/composables/shell/internal/anchors'
 
@@ -35,7 +35,7 @@ function page(sections: Array<[id: string, top: number]>, height = 4000) {
 async function scrollTo(main: HTMLElement, top: number) {
   ;(main as unknown as { scrollTop: number }).scrollTop = top
   main.dispatchEvent(new Event('scroll'))
-  await new Promise(resolve => setTimeout(resolve, 40))
+  await vi.advanceTimersByTimeAsync(40)
 }
 
 /** Runs the spy inside a mounted component, as a real call site is. */
@@ -51,7 +51,13 @@ function spyOn(ids: string[]) {
 }
 
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'Date'] })
   document.body.innerHTML = ''
+})
+
+afterEach(async () => {
+  await vi.runAllTimersAsync()
+  vi.useRealTimers()
 })
 
 describe('which section is being read', () => {
@@ -152,7 +158,7 @@ describe('which section is being read', () => {
     await nextTick()
     const look = vi.spyOn(document, 'querySelector')
     wrapper.unmount()
-    await new Promise(resolve => setTimeout(resolve, 80))
+    await vi.advanceTimersByTimeAsync(80)
     expect(look).not.toHaveBeenCalledWith('.shell__main')
     look.mockRestore()
   })
@@ -165,7 +171,7 @@ describe('what may write the URL', () => {
     const main = page([['a', 500], ['b', 1500]])
     const spy = spyOn(['a', 'b'])
     await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 60))
+    await vi.advanceTimersByTimeAsync(60)
 
     // Read at the top without a scroll event: the value is taken, the URL untouched.
     expect(spy.current.value).toBe('')

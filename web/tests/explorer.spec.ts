@@ -2,6 +2,7 @@
 
 import { nextTick } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 import {
   disposeExplorer,
   type ExplorerMove,
@@ -225,7 +226,8 @@ describe('moving a node into a folder', () => {
 
     explorer.drag.begin(explorer.children.value[1]!)
     explorer.drag.dropInto('docs')
-    await vi.waitFor(() => expect(explorer.actionError.value).toBeInstanceOf(Error))
+    await flushPromises()
+    expect(explorer.actionError.value).toBeInstanceOf(Error)
 
     // The reload undoes the optimistic move.
     expect(explorer.children.value.map(n => n.id)).toEqual(['docs', 'photo'])

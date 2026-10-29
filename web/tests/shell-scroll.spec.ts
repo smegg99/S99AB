@@ -32,15 +32,18 @@ function panel(id: string, top: number) {
   return el
 }
 
-/** Long enough for the behaviour's own timers to run. */
-const settle = () => new Promise(resolve => setTimeout(resolve, 120))
+/** Long enough for the behaviour's own timers to run, on the fake clock. */
+const settle = () => vi.advanceTimersByTimeAsync(120)
 
 beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame', 'Date'] })
   document.body.innerHTML = ''
   delete document.documentElement.dataset.motion
 })
 
-afterEach(() => {
+// Landings count on a cell shared by every test, so each runs its own out before the next.
+afterEach(async () => {
+  await vi.runAllTimersAsync()
   vi.useRealTimers()
 })
 
@@ -157,7 +160,7 @@ describe('an anchor means that anchor', () => {
 
     shellScrollBehavior(at('/theme', '#late'), at('/textures'), null)
     setTimeout(() => panel('late', 1200), 60)
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await vi.advanceTimersByTimeAsync(300)
 
     expect(el.scrollTop).toBe(1200)
   })
@@ -167,7 +170,7 @@ describe('an anchor means that anchor', () => {
     const { el } = region(2400)
 
     shellScrollBehavior(at('/theme', '#missing'), at('/textures'), null)
-    await new Promise(resolve => setTimeout(resolve, 260))
+    await vi.advanceTimersByTimeAsync(260)
 
     expect(el.scrollTop).toBe(0)
   })
@@ -237,7 +240,7 @@ describe('one navigation at a time', () => {
 
     // The panel the first navigation was waiting for arrives.
     setTimeout(() => panel('slow', 2400), 60)
-    await new Promise(resolve => setTimeout(resolve, 300))
+    await vi.advanceTimersByTimeAsync(300)
 
     expect(el.scrollTop).toBe(0)
   })
@@ -270,7 +273,7 @@ describe('what else may read the page while this scrolls it', () => {
     panel('spacing', 400)
 
     shellScrollBehavior(at('/theme', '#spacing'), at('/theme'), null)
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await vi.advanceTimersByTimeAsync(400)
 
     expect(scrollSettling()).toBe(false)
   })
@@ -282,7 +285,7 @@ describe('what else may read the page while this scrolls it', () => {
     shellScrollBehavior(at('/textures'), at('/theme'), null)
     expect(scrollSettling()).toBe(true)
 
-    await new Promise(resolve => setTimeout(resolve, 400))
+    await vi.advanceTimersByTimeAsync(400)
     expect(scrollSettling()).toBe(false)
   })
 })
@@ -309,7 +312,7 @@ describe('a scroll the reader already made', () => {
 
     // Claimed for a navigation that never happens.
     quietScroll('/theme#spacing')
-    await new Promise(resolve => setTimeout(resolve, 260))
+    await vi.advanceTimersByTimeAsync(260)
 
     // A real click on that row.
     shellScrollBehavior(at('/theme', '#spacing'), at('/theme'), null)
@@ -330,7 +333,7 @@ describe('the region itself', () => {
       el = region(0).el
       panel('late-shell', 1800)
     }, 60)
-    await new Promise(resolve => setTimeout(resolve, 320))
+    await vi.advanceTimersByTimeAsync(320)
 
     expect(el).not.toBeNull()
     expect(el!.scrollTop).toBe(1800)
@@ -341,7 +344,7 @@ describe('the region itself', () => {
     shellScrollBehavior(at('/theme', '#nothing'), at('/'), null)
 
     // No region or panel appears; nothing should throw or hang.
-    await new Promise(resolve => setTimeout(resolve, 200))
+    await vi.advanceTimersByTimeAsync(200)
     expect(document.querySelector('.shell__main')).toBeNull()
   })
 })

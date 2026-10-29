@@ -2,6 +2,7 @@
 
 import { ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 import { useSession, type SessionIdentity } from '../src/composables/kratos/useSession'
 import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
 
@@ -40,7 +41,8 @@ describe('useSession', () => {
     const use = await fresh()
 
     const s = use()
-    await vi.waitFor(() => expect(s.ready.value).toBe(true))
+    await flushPromises()
+    expect(s.ready.value).toBe(true)
 
     expect(s.signedIn.value).toBe(true)
     expect(s.trait('email')).toBe('biuro@kawapressco.pl')
@@ -53,7 +55,8 @@ describe('useSession', () => {
     const use = await fresh()
 
     const s = use()
-    await vi.waitFor(() => expect(s.ready.value).toBe(true))
+    await flushPromises()
+    expect(s.ready.value).toBe(true)
 
     expect(s.signedIn.value).toBe(false)
     expect(s.identity.value).toBeNull()
@@ -69,7 +72,8 @@ describe('useSession', () => {
     const a = use()
     use()
     use()
-    await vi.waitFor(() => expect(a.ready.value).toBe(true))
+    await flushPromises()
+    expect(a.ready.value).toBe(true)
 
     expect(fetcher).toHaveBeenCalledTimes(1)
   })
@@ -81,7 +85,8 @@ describe('useSession', () => {
     const use = await fresh()
 
     const s = use()
-    await vi.waitFor(() => expect(s.ready.value).toBe(true))
+    await flushPromises()
+    expect(s.ready.value).toBe(true)
     await s.refresh()
 
     expect(fetcher).toHaveBeenCalledTimes(2)

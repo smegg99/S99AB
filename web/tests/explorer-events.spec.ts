@@ -2,6 +2,7 @@
 
 import { effectScope } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 import {
   disposeExplorer,
   type ExplorerSource,
@@ -157,7 +158,8 @@ describe('what an explorer announces', () => {
 
     explorer.drag.begin(explorer.children.value[1]!)
     explorer.drag.dropInto('docs')
-    await vi.waitFor(() => expect(failed).toHaveBeenCalledTimes(2))
+    await flushPromises()
+    expect(failed).toHaveBeenCalledTimes(2)
 
     expect(failed).toHaveBeenCalledWith(boom)
   })
