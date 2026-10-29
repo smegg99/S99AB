@@ -110,7 +110,7 @@
 </template>
 
 <script setup lang="ts" generic="T extends WorkspaceTab">
-import { computed, nextTick, onMounted, onScopeDispose, ref, watch, type ComponentPublicInstance } from 'vue'
+import { computed, nextTick, ref, watch, type ComponentPublicInstance } from 'vue'
 import UiDisabledHint from '../primitives/DisabledHint.vue'
 import type { MenuEntry } from '../../composables/tabs/internal/contextMenu'
 import { openContextMenu, useContextMenuState } from '../../composables/tabs/internal/contextMenu'
@@ -118,7 +118,7 @@ import { useTabDrag, type TabWorkspace, type NativeTabDrag } from '../../composa
 import type { WorkspaceTab } from '../../composables/tabs/useTabs'
 import { hintTooltipOpen, setHintTooltipOpen } from '../../composables/primitives/internal/tooltip'
 import { titleWords } from '../../composables/tabs/internal/titleWords'
-import { drawChip } from '../../composables/tabs/internal/drawChip'
+import { INCOMING, useNativeStrip } from '../../composables/tabs/internal/nativeStrip'
 
 const props = defineProps<{
   workspace: TabWorkspace<T>
@@ -138,7 +138,6 @@ const dropping = defineModel<boolean>('dropping', { default: false })
 /** While dropping, the slot's span from the strip's left edge, for .s99ab-drop--slot. */
 const dropSlot = defineModel<{ left: number, width: number } | null>('dropSlot', { default: null })
 const ws = props.workspace
-const INCOMING = 'incoming-native-tab'
 
 const group = ref<ComponentPublicInstance | null>(null)
 const list = computed(() => group.value?.$el as HTMLElement | undefined)
@@ -156,88 +155,17 @@ const { shown, dragging, glide, ghost, onPointerdown, wasDropped } = useTabDrag(
   icon: props.iconOf(tab),
   tint: props.tintOf(tab),
 }))
-const incomingFace = computed(() => props.native?.incoming?.face)
-let slotFrame = 0
-function nameOf(tab: T) {
-  return tab.id === INCOMING ? incomingFace.value?.title ?? '' : props.titleOf(tab)
-}
-watch(() => !!props.native?.incoming, (on) => {
-  dropping.value = on
-  cancelAnimationFrame(slotFrame)
-  if (on) slotFrame = requestAnimationFrame(measureSlot)
-  else dropSlot.value = null
-}, { immediate: true })
-
-// Measured every frame while dropping: the slot slides and the strip scrolls.
-function measureSlot() {
-  const el = elements.get(INCOMING)
-  const strip = list.value?.parentElement
-  let next: { left: number, width: number } | null = null
-  if (el && strip && list.value) {
-    const origin = strip.getBoundingClientRect().left
-    const view = list.value.getBoundingClientRect()
-    const box = el.getBoundingClientRect()
-    const left = Math.max(box.left, view.left)
-    const right = Math.min(box.right, view.right)
-    if (right > left) next = { left: Math.round(left - origin), width: Math.round(right - left) }
-  }
-  const was = dropSlot.value
-  if (next?.left !== was?.left || next?.width !== was?.width) dropSlot.value = next
-  slotFrame = requestAnimationFrame(measureSlot)
-}
-
-// The native drag image, drawn once per drag from the pill.
 const ghostEl = ref<HTMLElement | null>(null)
-let pictured = ''
-watch(ghostEl, (el) => {
-  const id = props.native?.dragging
-  if (!el || !id || pictured === id) return
-  pictured = id
-  const scale = Math.max(1, Math.ceil(window.devicePixelRatio || 1))
-  const png = drawChip(el, scale)
-  if (png) props.native?.image(png, scale, GRAB, GRAB)
-}, { flush: 'post' })
-const displayed = computed(() => {
-  const tabs = [...shown.value]
-  if (props.native?.incoming) tabs.splice(props.native?.incoming.slot, 0, { id: INCOMING } as T)
-  return tabs
-})
-// Describe layout coordinates, excluding the incoming gap and transforms.
-let observer: ResizeObserver | undefined
-let frame = 0
-function queueStrip() {
-  cancelAnimationFrame(frame)
-  frame = requestAnimationFrame(() => {
-    const el = list.value
-    if (!el || !props.native) return
-    const bounds = el.getBoundingClientRect()
-    const gap = elements.get(INCOMING)
-    const gapWidth = gap ? gap.offsetWidth + 2 : 0
-    const tabs = shown.value.flatMap((tab) => {
-      const item = elements.get(tab.id)
-      if (!item) return []
-      const shift = gap && item.offsetLeft > gap.offsetLeft ? gapWidth : 0
-      return [{ id: tab.id, x: Math.round(bounds.left + item.offsetLeft - el.scrollLeft - shift), width: item.offsetWidth, pinned: !!tab.pinned }]
-    })
-    props.native.strip({ bounds: { x: Math.round(bounds.left), y: Math.round(bounds.top), width: Math.round(bounds.width), height: Math.round(bounds.height) }, tabs })
-  })
-}
-onMounted(() => {
-  observer = new ResizeObserver(queueStrip)
-  if (list.value) {
-    observer.observe(list.value)
-    list.value.addEventListener('scroll', queueStrip)
-  }
-  queueStrip()
-})
-watch(displayed, () => {
-  void nextTick(queueStrip)
-}, { deep: true })
-onScopeDispose(() => {
-  observer?.disconnect()
-  cancelAnimationFrame(frame)
-  cancelAnimationFrame(slotFrame)
-  list.value?.removeEventListener('scroll', queueStrip)
+const { incomingFace, nameOf, displayed } = useNativeStrip({
+  native: () => props.native,
+  list,
+  elements,
+  shown,
+  titleOf: props.titleOf,
+  dropping,
+  dropSlot,
+  ghost: ghostEl,
+  grab: GRAB,
 })
 
 watch(() => ws.activeId, async (id) => {
