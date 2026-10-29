@@ -15,7 +15,7 @@ export interface UpdateCheckOptions {
 
 /** Whether a newer release exists. An empty (dev) version is never behind. */
 export function useUpdateCheck(options: UpdateCheckOptions = {}) {
-  const build = useBuildVersion()
+  const build = useBuildVersion({ enabled: () => options.current === undefined })
   const latest = useLatestRelease()
 
   const current = computed(
