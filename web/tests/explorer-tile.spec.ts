@@ -622,3 +622,19 @@ describe('the grid as a listbox', () => {
     expect(stops()[0]!.element).toBe(second.element)
   })
 })
+
+describe('a touch on the grid', () => {
+  // A touch scroll starts with pointerdown too; only the tap's compatibility mousedown deselects.
+  it('keeps the selection until the touch turns out to be a tap', async () => {
+    configureExplorer({ behaviour: { select: 'multi' } })
+    const wrapper = mountExplorer(movable(), { selected: ['docs'] })
+    await flushPromises()
+
+    const grid = wrapper.get('.s99ab-explorer__grid')
+    await grid.trigger('pointerdown', { pointerType: 'touch' })
+    expect(wrapper.emitted('update:selected')).toBeUndefined()
+
+    await grid.trigger('mousedown')
+    expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([[]])
+  })
+})

@@ -31,6 +31,7 @@
     <div
       class="s99ab-explorer__scroll"
       @pointerdown="onPointerdown"
+      @mousedown="onTap"
     >
       <!-- Skeleton tiles in the real grid, so nothing moves when the tiles arrive. -->
       <slot
@@ -273,12 +274,29 @@ const bandStyle = computed(() => ({
   height: `${band.value?.height ?? 0}px`,
 }))
 
+/** A touch's pointerdown may start a scroll; only its tap, reported by mousedown, deselects. */
+let touched = false
+
+function onTap(event: MouseEvent) {
+  if (!touched) return
+  touched = false
+  deselectOutside(event)
+}
+
 /** Deselects on press, so deselect and a following rubber band are one gesture. */
 function onPointerdown(event: PointerEvent) {
+  if (event.pointerType === 'touch') {
+    touched = true
+    return
+  }
+  deselectOutside(event)
+  startBand(event)
+}
+
+function deselectOutside(event: MouseEvent) {
   const onTile = (event.target as HTMLElement | null)?.closest('.s99ab-tile')
   if (!onTile && !pickMods(event).ctrl) selection.clear()
   base = onTile ? [] : [...selection.ids.value]
-  startBand(event)
 }
 
 const tileStyle = computed(() => ({
