@@ -19,6 +19,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.vue",
+    "plugins/*.ts",
     "tests/**/*.ts",
     "i18n/*.ts"
   ]

@@ -2,6 +2,7 @@
 //
 // Feeds app.config into the framework-free modules under src/.
 
+import { defineNuxtPlugin, navigateTo, useAppConfig, useRoute, useRouter } from 'nuxt/app'
 import AuthDialog from '../src/components/auth/AuthDialog.vue'
 import ConfirmDialog from '../src/components/overlay/ConfirmDialog.vue'
 import PromptDialog from '../src/components/overlay/PromptDialog.vue'
@@ -15,7 +16,7 @@ import {
   configureAuthFlowRoutes,
   registerAuthRouting,
 } from '../src/composables/kratos/internal/route'
-import type { KratosFlowKind, configureKratos, type KratosConfig } from '../src/composables/kratos/internal/types'
+import { configureKratos, type KratosConfig, type KratosFlowKind } from '../src/composables/kratos/internal/types'
 import { registerAuthDialog } from '../src/composables/kratos/internal/dialog'
 import { registerDialogPresets } from '../src/internal/dialog'
 import { configureDelay, type DelayConfig } from '../src/internal/delay'

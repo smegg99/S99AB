@@ -3,6 +3,7 @@
 // Resolves the session before the first paint: per-request state and the
 // request cookie for the framework-free useSession.
 
+import { defineNuxtPlugin, useNuxtApp, useRequestHeaders, useRuntimeConfig, useState } from 'nuxt/app'
 import { config } from '../src/composables/kratos/internal/types'
 import type { SessionIdentity } from '../src/composables/kratos/useSession'
 import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
