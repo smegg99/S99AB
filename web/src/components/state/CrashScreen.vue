@@ -129,7 +129,7 @@ watch(() => texts.value.window, phrase => emit('title', phrase), { immediate: tr
 
 async function copy(): Promise<string> {
   const done = actions.copy ? await actions.copy() : await browserCopy(report.text ?? '')
-  if (!done) throw new Error('clipboard')
+  if (!done) throw new Error('s99ab: the clipboard refused the report')
   copied.value = true
   clearTimeout(copiedTimer)
   copiedTimer = setTimeout(() => {

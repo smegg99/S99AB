@@ -78,10 +78,10 @@ export async function kratosSignOut(options: { returnTo?: string } = {}): Promis
   let res = await ask(path ? origin + path : '')
   // An unlisted return_to is refused with 400; sign out without it.
   if (!res.ok && path) res = await ask('')
-  if (!res.ok) throw new Error(`kratos logout ${res.status}`)
+  if (!res.ok) throw new Error(`s99ab: kratos logout ${res.status}`)
 
   const { logout_url: url } = (await res.json()) as { logout_url?: string }
-  if (!url) throw new Error('kratos logout: no logout_url')
+  if (!url) throw new Error('s99ab: kratos logout has no logout_url')
   // A navigation so the clearing Set-Cookie lands; on this origin so the cookie is sent.
   window.location.href = onThisOrigin(url, true)
 }

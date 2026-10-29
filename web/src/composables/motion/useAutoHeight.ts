@@ -1,7 +1,7 @@
 // web/src/composables/motion/useAutoHeight.ts
 
 import {
-  onBeforeUnmount,
+  onScopeDispose,
   onBeforeUpdate,
   onMounted,
   onUpdated,
@@ -62,7 +62,7 @@ export function useAutoHeight(content: ElementRef, ghost: ElementRef) {
     if (content.value) observer.observe(content.value)
   })
 
-  onBeforeUnmount(() => {
+  onScopeDispose(() => {
     observer?.disconnect()
     if (ghostTimer) clearTimeout(ghostTimer)
   })

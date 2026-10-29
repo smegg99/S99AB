@@ -1,6 +1,6 @@
 // web/src/composables/useCssNumber.ts
 
-import { onBeforeUnmount, onMounted, ref, type Ref } from 'vue'
+import { onScopeDispose, onMounted, ref, type Ref } from 'vue'
 import { inBrowser } from '../browser/env'
 
 /**
@@ -31,7 +31,7 @@ export function useCssNumber(name: string, fallback: number): Ref<number> {
     })
   })
 
-  onBeforeUnmount(() => {
+  onScopeDispose(() => {
     observer?.disconnect()
     observer = null
   })

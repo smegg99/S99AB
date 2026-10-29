@@ -1,6 +1,6 @@
 // web/src/composables/toast/internal/hold.ts
 
-import { onBeforeUnmount, ref } from 'vue'
+import { onScopeDispose, ref } from 'vue'
 import { POSITIONS } from './config'
 import { pause, resume, visibleAt } from './queue'
 import { useToast } from '../useToast'
@@ -48,7 +48,7 @@ export function useToastHold() {
 
   if (inBrowser()) {
     document.addEventListener('visibilitychange', onVisibility)
-    onBeforeUnmount(() => document.removeEventListener('visibilitychange', onVisibility))
+    onScopeDispose(() => document.removeEventListener('visibilitychange', onVisibility))
   }
 
   return { hold, isPaused, release }

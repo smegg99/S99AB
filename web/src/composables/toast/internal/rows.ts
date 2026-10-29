@@ -1,6 +1,6 @@
 // web/src/composables/toast/internal/rows.ts
 
-import { onBeforeUnmount, reactive } from 'vue'
+import { onScopeDispose, reactive } from 'vue'
 import { useMotion } from '../../motion/useMotion'
 import { iconOf, progressOf } from './config'
 import { visibleAt } from './queue'
@@ -43,7 +43,7 @@ export function useToastStack() {
         }
       })
 
-  onBeforeUnmount(() => observer?.disconnect())
+  onScopeDispose(() => observer?.disconnect())
 
   function measure(id: number, el: unknown) {
     const node = (el ?? null) as HTMLElement | null
