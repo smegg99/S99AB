@@ -22,7 +22,7 @@ afterEach(() => {
   mounted.splice(0).forEach(wrapper => wrapper.unmount())
 })
 
-function render(moving: boolean) {
+function render(moving: boolean, native?: unknown) {
   const ws = reactive({
     tabs: [{ id: 'home', pinned: true }, { id: 'one', moving }] as WorkspaceTab[],
     activeId: 'one',
@@ -41,6 +41,7 @@ function render(moving: boolean) {
       movingReason: 'Moving tab',
       tabMenu: () => [],
       stripMenu: () => [],
+      native: native as never,
     },
     attachTo: document.body,
     global: { plugins: [vuetify] },
@@ -77,5 +78,19 @@ describe('tab strip close', () => {
     expect(ws.close).toHaveBeenCalledTimes(3)
     expect(ws.close).toHaveBeenCalledWith('one')
     expect(ws.activate).not.toHaveBeenCalled()
+  })
+})
+
+describe('tab strip keys', () => {
+  // The incoming gap of a drag from another window sits in the strip but is no tab.
+  it('steps between workspace tabs while another window\'s tab hovers', async () => {
+    const native = {
+      incoming: { slot: 0 }, dragging: '', closing: false, track: null,
+      allowed: () => true, beginDrag: async () => false, cancelDrag: () => {},
+      image: () => {}, tearOff: () => {}, strip: () => {},
+    }
+    const { ws, tab } = render(false, native)
+    await tab.trigger('keydown', { key: 'ArrowLeft' })
+    expect(ws.activate).toHaveBeenLastCalledWith('home')
   })
 })

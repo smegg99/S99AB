@@ -27,9 +27,10 @@ noResults:
 noResultsHint:
   value: "Try a different search."
   description: "Shown under noResults"
-toggleTheme:
-  value: "Toggle theme"
-  description: "ThemeToggle's accessible name and tooltip"
+darkTheme:
+  value: "Dark theme"
+  description: "UiThemeToggle's accessible name and tooltip. The same in both states;
+    aria-pressed carries whether the dark theme is on"
 menu:
   value: "Menu"
   description: "AppBar's navigation toggle, shown below the rail's breakpoint"

@@ -6,6 +6,7 @@
     v-if="!locked"
     :icon="icon"
     :aria-label="label"
+    :aria-pressed="dark"
     :title="label"
     :ripple="false"
     variant="text"
@@ -32,5 +33,5 @@ const { dark, toggle } = useThemePreference(() => storageKey)
 const t = useTranslate()
 
 const icon = computed(() => (dark.value ? 'mdi-weather-night' : 'mdi-weather-sunny'))
-const label = computed(() => t('common.toggleTheme', 'Toggle theme'))
+const label = computed(() => t('common.darkTheme', 'Dark theme'))
 </script>

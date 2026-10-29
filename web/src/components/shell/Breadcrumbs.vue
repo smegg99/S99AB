@@ -18,6 +18,7 @@
       <span
         class="crumbs__step"
         :class="{ 'crumbs__step--current': i === trail.length - 1 }"
+        :aria-current="i === trail.length - 1 ? 'page' : undefined"
       >{{ crumb.label }}</span>
     </template>
   </nav>

@@ -17,7 +17,7 @@
       @wheel="onWheel"
     >
       <div
-        v-for="(tab, i) in displayed"
+        v-for="tab in displayed"
         :id="`tab-${tab.id}`"
         :key="tab.id"
         :ref="el => mark(tab.id, el)"
@@ -41,7 +41,7 @@
         @pointerdown="onPointerdown($event, tab)"
         @auxclick="onAuxclick($event, tab)"
         @contextmenu="openContextMenu($event, tabMenu(tab))"
-        @keydown="onKeydown($event, i)"
+        @keydown="onKeydown($event, tab)"
       >
         <v-icon
           :icon="tab.id === INCOMING ? incomingFace?.icon ?? 'mdi-tab-plus' : iconOf(tab)"
@@ -178,8 +178,6 @@ function onWheel(event: WheelEvent) {
   list.value.scrollLeft += event.deltaY
 }
 
-// ---- mouse and keys ---------------------------------------------------------
-
 function onClick(tab: T) {
   // Ignore the click that ends a drop.
   if (wasDropped() || tab.id === INCOMING) return
@@ -195,9 +193,12 @@ function onAuxclick(event: MouseEvent, tab: T) {
   if (event.button === 1 && !tab.moving) ws.close(tab.id)
 }
 
-function onKeydown(event: KeyboardEvent, i: number) {
+// The tab's index in the workspace, not in `displayed`, which can hold the incoming gap and a drag's order.
+function onKeydown(event: KeyboardEvent, from: T) {
   // Modified arrows belong to app shortcuts.
   if (event.altKey || event.ctrlKey || event.metaKey) return
+  const i = ws.tabs.findIndex(tab => tab.id === from.id)
+  if (i === -1) return
   const count = ws.tabs.length
   const to = {
     ArrowRight: (i + 1) % count,
@@ -219,8 +220,6 @@ function onKeydown(event: KeyboardEvent, i: number) {
     if (tab && !tab.moving) ws.close(tab.id)
   }
 }
-
-// ---- context menu -----------------------------------------------------------
 
 const menu = useContextMenuState()
 
