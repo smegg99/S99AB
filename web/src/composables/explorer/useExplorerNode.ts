@@ -234,15 +234,19 @@ export function useExplorerNode<T = unknown>(
     menu(event)
   }
 
+  // A tile of the open folder is an option in the grid's listbox and shares its one Tab stop;
+  // a row drawn elsewhere (a sidebar tree) is a button of its own.
+  const inGrid = computed(() => explorer.children.value.some(child => child.id === target.value.id))
+
   /** Spread onto the tile root: role, focus, the tile marker and handlers, nothing visual. */
   const bind = computed(() => ({
-    'role': 'option',
-    'tabindex': explorer.tabStop.value === target.value.id ? 0 : -1,
+    'role': inGrid.value ? 'option' : 'button',
+    'tabindex': !inGrid.value || explorer.tabStop.value === target.value.id ? 0 : -1,
     // Carries the id, which the grid's keys and rubber band read from the DOM.
     [TILE_ATTR]: target.value.id,
     'draggable': explorer.canDrag(target.value),
     'aria-disabled': disabled.value || undefined,
-    'aria-selected': selectable.value ? selected.value : false,
+    'aria-selected': inGrid.value ? selectable.value && selected.value : undefined,
     'onClick': onClick,
     'onDblclick': onDblclick,
     'onKeydown': onKeydown,

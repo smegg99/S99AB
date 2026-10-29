@@ -1,6 +1,6 @@
 // web/tests/explorer-tile.spec.ts
 
-import { nextTick } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Explorer from '../src/components/explorer/Explorer.vue'
@@ -11,6 +11,8 @@ import {
 } from '../src/composables/explorer/useExplorer'
 import { configureExplorer } from '../src/composables/explorer/internal/config'
 import type { ExplorerNode } from '../src/composables/explorer/internal/tree'
+import { explorerKey } from '../src/composables/explorer/internal/context'
+import { useExplorerNode } from '../src/composables/explorer/useExplorerNode'
 import { vuetify } from './mount'
 
 // docs (folder, with a cover), note (leaf, disabled), photo (leaf)
@@ -636,5 +638,29 @@ describe('a touch on the grid', () => {
 
     await grid.trigger('mousedown')
     expect(wrapper.emitted('update:selected')?.at(-1)).toEqual([[]])
+  })
+})
+
+describe('a row drawn outside the grid', () => {
+  // A sidebar tree binds rows with useExplorerNode too; only the open folder's tiles share the grid's Tab stop.
+  it('keeps its own Tab stop and stays a button', async () => {
+    const explorer = movable()
+    await explorer.refresh()
+    const inner = seed().find(node => node.id === 'inner')!
+    let bind: Record<string, unknown> = {}
+    const Row = defineComponent({
+      setup() {
+        const node = useExplorerNode(inner)
+        return () => {
+          bind = node.bind.value
+          return h('div')
+        }
+      },
+    })
+    const wrapper = mount(Row, { global: { plugins: [vuetify], provide: { [explorerKey as symbol]: explorer } } })
+    await flushPromises()
+    expect(bind.role).toBe('button')
+    expect(bind.tabindex).toBe(0)
+    wrapper.unmount()
   })
 })
