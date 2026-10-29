@@ -8,3 +8,6 @@ export { registerAppearanceSource, resetAppearanceSource } from './composables/a
 export { TEXTURES, applyTexture, textureConfig } from './composables/appearance/internal/texture'
 export { supportsWebgl } from './composables/appearance/internal/flow'
 export { originOf, type TransitionOrigin } from './composables/appearance/internal/cover'
+export { applyGround, configureGround, groundConfig } from './composables/appearance/internal/flow'
+export { DEFAULT_PLANES } from './composables/appearance/internal/texture'
+export { THEME_TRANSITIONS } from './composables/appearance/internal/themeTransition'

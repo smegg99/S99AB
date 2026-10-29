@@ -30,3 +30,5 @@ export type {
   KratosNodeAttributes,
 } from './composables/kratos/internal/types'
 export type { KratosFlowApi, KratosFlowOptions, KratosNotice, KratosSuccess } from './composables/kratos/internal/api'
+export { configureAuthPaths } from './composables/kratos/internal/paths'
+export { authFlowKind, resolveReturnTo } from './composables/kratos/internal/route'

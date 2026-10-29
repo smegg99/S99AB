@@ -1,6 +1,6 @@
 // web/src/composables/shell/useBreadcrumbs.ts
 import type { MaybeRefOrGetter } from 'vue'
-import { computed, toValue } from 'vue'
+import { computed, onScopeDispose, toValue, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { tail } from './internal/breadcrumbs'
 import { flattenLinks, linkMatches } from './internal/nav'
@@ -13,7 +13,7 @@ export interface Crumb {
 }
 
 // The nav trail for the active route, "Group > Item". The deepest matching `to`
-// wins, so a detail route resolves to its section; no match yields no crumbs.
+// wins, so a detail route resolves to its section; a `/` link catches the rest.
 export function useBreadcrumbs(groups: MaybeRefOrGetter<NavGroup[]>) {
   // Without a router provider useRoute returns nothing, which yields no crumbs.
   const route = useRoute() as ReturnType<typeof useRoute> | undefined
@@ -41,4 +41,14 @@ export function useBreadcrumbs(groups: MaybeRefOrGetter<NavGroup[]>) {
   })
 
   return { trail }
+}
+
+/** Shows `label` as the trailing crumb while the calling component lives; undefined shows none. */
+export function useBreadcrumbTail(label: MaybeRefOrGetter<string | undefined>) {
+  watch(() => toValue(label), (next) => {
+    tail.value = next
+  }, { immediate: true })
+  onScopeDispose(() => {
+    tail.value = undefined
+  })
 }

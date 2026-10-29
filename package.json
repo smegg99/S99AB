@@ -25,7 +25,8 @@
     "./state": "./web/src/state.ts",
     "./markdown": "./web/src/markdown.ts",
     "./releases": "./web/src/releases.ts",
-    "./explorer": "./web/src/explorer.ts"
+    "./explorer": "./web/src/explorer.ts",
+    "./toast": "./web/src/toast.ts"
   },
   "peerDependencies": {
     "@firecms/neat": "^0.8.0 || ^1.0.0",

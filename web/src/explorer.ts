@@ -19,3 +19,5 @@ export type {
   ExplorerOptions,
   ExplorerSource,
 } from './composables/explorer/internal/types'
+export { applyExplorerTints, configureExplorer } from './composables/explorer/internal/config'
+export { accentTriplet } from './composables/explorer/internal/accents'

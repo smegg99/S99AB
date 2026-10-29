@@ -89,12 +89,13 @@ Nuxt such as a desktop bridge, import from a subpath:
 | Subpath | Holds |
 |---|---|
 | `@smegg99/s99ab/browser` | focus, pointer tracking and drag, tiles, edit undo, text fitting, `takeRow`, `createPendingSaves`, `prefersReducedMotion` |
-| `@smegg99/s99ab/explorer` | tree helpers (`pathOf`, `groupByParent`, `childrenOf`, ...), `bindExplorerEvents`, explorer types |
-| `@smegg99/s99ab/kratos` | node helpers, `kratosRules`, `kratosMessageText`, sign-out and refresh, sign-in routes, Kratos types |
-| `@smegg99/s99ab/appearance` | `useAppearance`, the appearance source, textures, `supportsWebgl`, `originOf` |
+| `@smegg99/s99ab/explorer` | tree helpers (`pathOf`, `groupByParent`, `childrenOf`, ...), `bindExplorerEvents`, `configureExplorer`, `applyExplorerTints`, `accentTriplet`, explorer types |
+| `@smegg99/s99ab/kratos` | node helpers, `kratosRules`, `kratosMessageText`, `kratosSignOut`, `kratosRefreshSession`, sign-in routes (`isAuthFlowRoute`, `authFlowKind`, `resolveReturnTo`, ...), `configureAuthPaths`, Kratos types |
+| `@smegg99/s99ab/appearance` | `useAppearance`, the appearance source, textures and `DEFAULT_PLANES`, the ground (`configureGround`, `applyGround`, `groundConfig`, `supportsWebgl`), `THEME_TRANSITIONS`, `originOf` |
 | `@smegg99/s99ab/releases` | `formatBytes`, `kindKey`, `PLATFORM_NAMES`, `compareVersions`, `formatReleaseDate` |
 | `@smegg99/s99ab/markdown` | `parseMarkdown`, `parseInline`, `tokenise` |
 | `@smegg99/s99ab/state` | `settle`, `toApiError` |
+| `@smegg99/s99ab/toast` | `configureToast`; showing toasts is `useToast()` |
 | `@smegg99/s99ab/tabs` | `useTabs`, the tab context menu, native tab drag types |
 | `@smegg99/s99ab/theme` | palettes and Vuetify theme helpers |
 | `@smegg99/s99ab/types` | every type in a public signature |
@@ -109,8 +110,17 @@ consumer that used one of these as a global imports it from the subpath above:
 `createPointerDrag`, `inZone`, `fitWordRun`, `isCut`, `wordBoxes`, `wordsRoom`,
 `takeRow`, `originOf`, `registerAppearanceSource`, `resetAppearanceSource`,
 `TEXTURES`, `applyTexture`, `textureConfig`, `supportsWebgl`, `formatBytes`,
-`kindKey`, `parseMarkdown`, `prefersReducedMotion`, `settle`. Renamed:
-`injectKeyTips` is `useKeyTipsContext`, `pendingSaves` is `createPendingSaves`.
+`kindKey`, `parseMarkdown`, `prefersReducedMotion`, `settle`, `toApiError`,
+`isAuthFlowRoute`, `authFlowKind`, `resolveReturnTo`, `kratosSignOut`,
+`kratosRefreshSession`, `configureAuthPaths`, `configureExplorer`,
+`applyExplorerTints`, `accentTriplet`, `configureGround`, `applyGround`,
+`groundConfig`, `DEFAULT_PLANES`, `THEME_TRANSITIONS`, `configureToast`. Renamed:
+`injectKeyTips` is `useKeyTipsContext`, `pendingSaves` is `createPendingSaves`,
+and `setBreadcrumbTail(label)` is `useBreadcrumbTail(label)`, which clears the
+crumb when the page unmounts. The locale key `common.toggleTheme` is now
+`common.darkTheme` ("Dark theme"), since UiThemeToggle reports its state with
+`aria-pressed`. Breadcrumbs for a page outside the nav now fall back to a `/`
+link, as the nav trail always did, instead of showing nothing.
 `/browser` no longer re-exports composables; they are auto-imported. Toast
 functions (`show`, `dismiss`, `promise`, ...) are only on `useToast()`.
 
