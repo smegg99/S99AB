@@ -1,4 +1,28 @@
 <!-- web/src/components/decor/Wave.vue -->
+<template>
+  <svg
+    class="wave"
+    :class="{ flip }"
+    :style="{ height: `${height}px` }"
+    viewBox="0 0 1440 120"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      v-if="stack"
+      class="back"
+      :d="back"
+      fill="currentColor"
+      transform="translate(-90 14)"
+    />
+    <path
+      :d="d"
+      fill="currentColor"
+    />
+  </svg>
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -24,30 +48,6 @@ const PATHS: Record<Variant, string> = {
 const d = computed(() => PATHS[variant])
 const back = computed(() => PATHS[variant === 'crest' ? 'ripple' : 'crest'])
 </script>
-
-<template>
-  <svg
-    class="wave"
-    :class="{ flip }"
-    :style="{ height: `${height}px` }"
-    viewBox="0 0 1440 120"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path
-      v-if="stack"
-      class="back"
-      :d="back"
-      fill="currentColor"
-      transform="translate(-90 14)"
-    />
-    <path
-      :d="d"
-      fill="currentColor"
-    />
-  </svg>
-</template>
 
 <style scoped lang="scss">
 // currentColor from the parent; block display avoids the inline half-pixel gap.

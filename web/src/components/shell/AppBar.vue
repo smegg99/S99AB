@@ -10,7 +10,7 @@
       class="bar__burger"
       variant="text"
       size="small"
-      @click="emit('toggle-nav')"
+      @click="emit('toggleNav')"
     />
 
     <div class="bar__brand">
@@ -65,7 +65,7 @@ defineProps<{
   logo?: string
 }>()
 
-const emit = defineEmits<{ 'toggle-nav': [] }>()
+const emit = defineEmits<{ toggleNav: [] }>()
 
 const t = useTranslate()
 

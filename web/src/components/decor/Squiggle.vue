@@ -1,4 +1,23 @@
 <!-- web/src/components/decor/Squiggle.vue -->
+<template>
+  <svg
+    class="squiggle"
+    :style="{ height: `${height}px` }"
+    viewBox="0 0 1440 32"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      :d="d"
+      :stroke-width="stroke"
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+    />
+  </svg>
+</template>
+
 <script setup lang="ts">
 import { computed } from 'vue'
 
@@ -18,25 +37,6 @@ const PATHS: Record<Weight, string> = {
 const d = computed(() => PATHS[weight])
 const stroke = computed(() => (weight === 'line' ? 3 : 2))
 </script>
-
-<template>
-  <svg
-    class="squiggle"
-    :style="{ height: `${height}px` }"
-    viewBox="0 0 1440 32"
-    preserveAspectRatio="none"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path
-      :d="d"
-      :stroke-width="stroke"
-      fill="none"
-      stroke="currentColor"
-      stroke-linecap="round"
-    />
-  </svg>
-</template>
 
 <style scoped lang="scss">
 .squiggle {

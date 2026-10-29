@@ -82,7 +82,7 @@ const { identity = null, canRegister = true, routed = true } = defineProps<{
   routed?: boolean
 }>()
 
-const emit = defineEmits<{ 'sign-in': [], 'sign-up': [], 'sign-out': [] }>()
+const emit = defineEmits<{ signIn: [], signUp: [], signOut: [] }>()
 
 const t = useTranslate()
 const paths = useAuthPaths()
@@ -96,17 +96,17 @@ const canSignUp = computed(() => canRegister && Boolean(paths.signUpPath))
 
 // Each handler emits first, telling the app whether the layer will also act.
 function signIn() {
-  emit('sign-in')
+  emit('signIn')
   if (routed) goToSignIn()
 }
 
 function signUp() {
-  emit('sign-up')
+  emit('signUp')
   if (routed) goToSignUp()
 }
 
 function signOut() {
-  emit('sign-out')
+  emit('signOut')
   if (routed) void endSession()
 }
 

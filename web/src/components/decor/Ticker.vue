@@ -1,14 +1,4 @@
 <!-- web/src/components/decor/Ticker.vue -->
-<script setup lang="ts">
-// A scrolling strip for short notices. Colour is inherited; --s99ab-ticker-mark
-// tints the separator. The track holds the list twice and slides half its width
-// for a seamless loop; the second copy is hidden from screen readers.
-const { items, seconds = 44 } = defineProps<{
-  items: string[]
-  seconds?: number
-}>()
-</script>
-
 <template>
   <div class="ticker">
     <div
@@ -33,6 +23,16 @@ const { items, seconds = 44 } = defineProps<{
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+// A scrolling strip for short notices. Colour is inherited; --s99ab-ticker-mark
+// tints the separator. The track holds the list twice and slides half its width
+// for a seamless loop; the second copy is hidden from screen readers.
+const { items, seconds = 44 } = defineProps<{
+  items: string[]
+  seconds?: number
+}>()
+</script>
 
 <style scoped lang="scss">
 .ticker {
