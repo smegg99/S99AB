@@ -58,15 +58,21 @@
         #append-inner
       >
         <v-btn
-          :icon="revealed ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
+          icon
           :aria-label="revealLabel"
           :aria-pressed="revealed"
-          :title="revealLabel"
           variant="text"
           size="small"
           tabindex="-1"
           @click="revealed = !revealed"
-        />
+        >
+          <v-icon :icon="revealed ? 'mdi-eye-off-outline' : 'mdi-eye-outline'" />
+          <v-tooltip
+            :text="revealLabel"
+            activator="parent"
+            location="bottom"
+          />
+        </v-btn>
       </template>
     </v-text-field>
   </UiDisabledHint>

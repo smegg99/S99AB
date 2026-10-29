@@ -31,13 +31,17 @@
       <v-btn
         v-if="hex"
         :prepend-icon="copyIcon"
-        :title="copyTitle"
         :aria-label="copyTitle"
         class="s99ab-asset__digest"
         variant="text"
         size="x-small"
         @click="copy(hex)"
       >
+        <v-tooltip
+          :text="copyTitle"
+          activator="parent"
+          location="bottom"
+        />
         {{ algo }} {{ short }}
       </v-btn>
     </div>

@@ -4,15 +4,21 @@
        animates the whole screen. -->
   <v-btn
     v-if="!locked"
-    :icon="icon"
+    icon
     :aria-label="label"
     :aria-pressed="dark"
-    :title="label"
     :ripple="false"
     variant="text"
     size="small"
     @click="toggle"
-  />
+  >
+    <v-icon :icon="icon" />
+    <v-tooltip
+      :text="label"
+      activator="parent"
+      location="bottom"
+    />
+  </v-btn>
 </template>
 
 <script setup lang="ts">

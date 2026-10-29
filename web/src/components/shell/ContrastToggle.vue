@@ -2,15 +2,21 @@
 <template>
   <!-- No ripple: the change already animates the whole screen. -->
   <v-btn
-    :icon="icon"
+    icon
     :aria-label="label"
     :aria-pressed="high"
-    :title="label"
     :ripple="false"
     variant="text"
     size="small"
     @click="toggleContrast"
-  />
+  >
+    <v-icon :icon="icon" />
+    <v-tooltip
+      :text="label"
+      activator="parent"
+      location="bottom"
+    />
+  </v-btn>
 </template>
 
 <script setup lang="ts">

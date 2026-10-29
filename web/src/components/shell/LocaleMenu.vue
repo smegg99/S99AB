@@ -5,10 +5,14 @@
       <v-btn
         v-bind="activator"
         :aria-label="label"
-        :title="label"
         variant="text"
         size="small"
       >
+        <v-tooltip
+          :text="label"
+          activator="parent"
+          location="bottom"
+        />
         <v-icon
           icon="mdi-translate"
           start

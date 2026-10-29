@@ -30,12 +30,18 @@
       <v-btn
         v-if="model"
         :aria-label="clearLabel"
-        :title="clearLabel"
-        icon="mdi-close"
+        icon
         size="x-small"
         variant="text"
         @click="clear"
-      />
+      >
+        <v-icon icon="mdi-close" />
+        <v-tooltip
+          :text="clearLabel"
+          activator="parent"
+          location="bottom"
+        />
+      </v-btn>
     </div>
 
     <div
