@@ -63,14 +63,6 @@ func (c *Cached[T]) Get(ctx context.Context) (T, error) {
 	return v.(T), nil
 }
 
-// Invalidate drops the value, so the next Get refetches.
-func (c *Cached[T]) Invalidate() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.loaded = false
-	c.at = time.Time{}
-}
-
 func (c *Cached[T]) fresh() (T, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

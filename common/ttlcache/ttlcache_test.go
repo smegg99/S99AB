@@ -137,18 +137,3 @@ func TestCallerCancellationDoesNotPoisonTheSharedFetch(t *testing.T) {
 		t.Errorf("the fetch saw ctx.Err() = %v, want nil: it must not inherit the caller's cancellation", fetchCtxErr)
 	}
 }
-
-func TestInvalidateForcesARefetch(t *testing.T) {
-	var calls atomic.Int64
-	c := New(time.Hour, func(context.Context) (int64, error) {
-		return calls.Add(1), nil
-	})
-
-	if v, _ := c.Get(context.Background()); v != 1 {
-		t.Fatalf("first Get = %d", v)
-	}
-	c.Invalidate()
-	if v, _ := c.Get(context.Background()); v != 2 {
-		t.Errorf("Get after Invalidate = %d, want a refetched 2", v)
-	}
-}
