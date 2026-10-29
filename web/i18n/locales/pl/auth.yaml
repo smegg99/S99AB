@@ -148,3 +148,8 @@ disabled:
 pending:
   value: Poczekaj na zakończenie żądania logowania.
   description: Reason for a disabled submit control while an authentication request is pending
+accountOf:
+  value: "Konto: {name}"
+  description: "UiAccountMenu's avatar button, naming whose account it opens"
+  placeholders:
+    name: {type: string}

@@ -2,6 +2,7 @@
 
 export type I18nKey =
   | 'auth.account'
+  | 'auth.accountOf'
   | 'auth.alreadySignedIn'
   | 'auth.alreadySignedInGo'
   | 'auth.backHome'
@@ -55,6 +56,7 @@ export type I18nKey =
   | 'common.loading'
   | 'common.location'
   | 'common.menu'
+  | 'common.navigation'
   | 'common.noResults'
   | 'common.noResultsHint'
   | 'common.pending'

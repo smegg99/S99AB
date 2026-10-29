@@ -114,7 +114,9 @@ function signOut() {
 const signInLabel = computed(() => t('auth.signIn', 'Sign in'))
 const signUpLabel = computed(() => t('auth.signUp', 'Create account'))
 const signOutLabel = computed(() => t('auth.signOut', 'Sign out'))
-const accountLabel = computed(() => t('auth.account', 'Account'))
+const accountLabel = computed(() => (name.value
+  ? t('auth.accountOf', 'Account: {name}', { name: name.value })
+  : t('auth.account', 'Account')))
 </script>
 
 <style scoped>

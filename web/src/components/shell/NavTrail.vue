@@ -47,6 +47,7 @@
     </svg>
 
     <v-list
+      :aria-label="navigationLabel"
       class="nav__list trail__rows"
       density="compact"
       nav
@@ -106,6 +107,7 @@
 <script setup lang="ts">
 import { computed, useTemplateRef, watchEffect } from 'vue'
 import { useNavTrail } from '../../composables/shell/internal/navTrail'
+import { useTranslate } from '../../composables/useTranslate'
 import type { NavGroup, NavLit } from '../../types'
 
 // A rail beside the nav with a disc that moves to the current page. The rows
@@ -123,6 +125,8 @@ const active = defineModel<number | undefined>({ default: undefined })
 
 const el = useTemplateRef<SVGPathElement>('pathEl')
 const trail = useNavTrail(() => groups, active)
+const t = useTranslate()
+const navigationLabel = computed(() => t('common.navigation', 'Navigation'))
 
 // Hands the composable the element refs it measures from.
 watchEffect(() => {

@@ -151,3 +151,8 @@ disabled:
 pending:
   value: Wait for the sign-in request to finish.
   description: Reason for a disabled submit control while an authentication request is pending
+accountOf:
+  value: "Account: {name}"
+  description: "UiAccountMenu's avatar button, naming whose account it opens"
+  placeholders:
+    name: {type: string}

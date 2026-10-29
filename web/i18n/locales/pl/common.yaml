@@ -70,3 +70,6 @@ pending:
 location:
   value: "Położenie"
   description: "UiBreadcrumbs' accessible name: the nav landmark that shows where the page sits"
+navigation:
+  value: "Nawigacja"
+  description: "UiNavTrail's list of pages: the accessible name of the side navigation"
