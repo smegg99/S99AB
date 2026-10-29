@@ -32,7 +32,7 @@
         role="tab"
         :aria-hidden="tab.id === INCOMING || undefined"
         :data-accent="tab.id === INCOMING ? incomingFace?.tint : tintOf(tab)"
-        :aria-label="tab.pinned ? titleOf(tab) : undefined"
+        :aria-label="tab.id === INCOMING ? undefined : titleOf(tab)"
         :aria-selected="tab.id === ws.activeId"
         :aria-controls="`panel-${tab.id}`"
         :tabindex="tab.id === ws.activeId ? 0 : -1"

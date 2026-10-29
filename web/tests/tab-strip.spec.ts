@@ -94,3 +94,12 @@ describe('tab strip keys', () => {
     expect(ws.activate).toHaveBeenLastCalledWith('home')
   })
 })
+
+describe('tab strip names', () => {
+  // The cross sits inside the tab; without its own name the tab would read "Lessons Close Lessons".
+  it('names each tab by its title alone', () => {
+    const { wrapper } = render(false)
+    expect(wrapper.get('#tab-one').attributes('aria-label')).toBe('Lessons')
+    expect(wrapper.get('#tab-home').attributes('aria-label')).toBe('Home')
+  })
+})
