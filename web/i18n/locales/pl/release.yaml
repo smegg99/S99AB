@@ -4,7 +4,7 @@ download:
   value: "Pobierz"
   description: "Every asset row's button"
 latest:
-  value: "Najnowsza"
+  value: "Najnowsza wersja"
   description: "Chip beside the newest version in the download card's header"
 yourSystem:
   value: "Twój system"
@@ -13,7 +13,7 @@ allReleases:
   value: "Wszystkie wydania"
   description: "Falls back to the repository's releases page"
 onGithub:
-  value: "Na GitHubie"
+  value: "Zobacz na GitHubie"
   description: "Link from a changelog entry to that release"
 downloads:
   value: "Pliki do pobrania"
@@ -22,11 +22,15 @@ copied:
   value: "Skopiowano"
   description: "The checksum button, just after it was clicked"
 copyHash:
-  value: "Kopiuj sumę kontrolną"
-  description: "The checksum button at rest"
+  value: "Skopiuj sumę kontrolną {algo}"
+  description: "The checksum button at rest; algo is the digest's algorithm, such as sha256"
+  placeholders:
+    algo: {type: string}
 olderBuild:
-  value: "Ta kompilacja jest starsza niż najnowsze wydanie."
-  description: "Why an asset row carries a version of its own"
+  value: "Najnowsza wersja na tę platformę to {version}"
+  description: "Tooltip on the version chip of a platform whose newest build is behind the newest release"
+  placeholders:
+    version: {type: string}
 noneTitle:
   value: "Brak plików do pobrania"
   description: "No release is published, or GitHub could not be reached"
@@ -34,11 +38,11 @@ noneText:
   value: "Dla tego repozytorium nic jeszcze nie opublikowano."
   description: "Shown under noneTitle"
 noHistory:
-  value: "Brak wydań"
+  value: "Nie opublikowano jeszcze żadnego wydania."
   description: "Changelog with nothing published. Its own key, not noneTitle: that
     one names files to download, which a changelog does not list."
 notTranslated:
-  value: "Te informacje nie są jeszcze dostępne w Twoim języku."
+  value: "Te informacje o wydaniu nie zostały przetłumaczone."
   description: "The release body carried no section for the reader's language"
 updateTitle:
   value: "Dostępna jest nowsza wersja"
@@ -74,6 +78,36 @@ starsForksLabel:
   placeholders:
     stars: {type: integer}
     forks: {type: integer}
+changelog:
+  value: "Lista zmian"
+  description: "Link from the download card to the changelog page"
+webBuild:
+  value: "Wersja przeglądarkowa"
+  description: "Row label of a web platform build"
+webBuildSub:
+  value: "Statyczna strona do postawienia u siebie"
+  description: "Line under webBuild"
+plannedNote:
+  value: "* Brak wersji na tę platformę."
+  description: "Under the download card when a platform tab is planned; the asterisk matches the tab marker"
+plannedReason:
+  value: "Brak wersji na tę platformę."
+  description: "Tooltip of a disabled, planned platform tab"
+experimentalNote:
+  value: "** Eksperymentalne."
+  description: "Under the download card when a platform tab is experimental; the two asterisks match the tab marker"
+loading:
+  value: "Wczytywanie wydań"
+  description: "Accessible label of the changelog while it loads"
+failed:
+  value: "Nie udało się wczytać wydań."
+  description: "Changelog error title"
+beta:
+  value: "Beta"
+  description: "Default title of the release notice"
+feedback:
+  value: "Podziel się uwagami lub zgłoś problem"
+  description: "Default link label of the release notice"
 
 platforms:
   linux:
@@ -87,8 +121,10 @@ platforms:
   ios:
     value: "iOS"
   extras:
-    value: "Pozostałe pliki"
+    value: "Źródła i pliki"
     description: "Source archives, checksums and signatures: not an OS build"
+  web:
+    value: "Web"
 
 kinds:
   appimage:
@@ -100,16 +136,29 @@ kinds:
   pkgtarzst:
     value: "Pakiet Arch"
   targz:
-    value: "Archiwum"
+    value: "Archiwum tar"
   installer:
     value: "Instalator"
   exe:
     value: "Wersja przenośna"
   msix:
-    value: "Pakiet MSIX"
+    value: "MSIX"
   zip:
-    value: "Archiwum"
+    value: "Archiwum ZIP"
   dmg:
     value: "Obraz dysku"
   binary:
-    value: "Plik binarny"
+    value: "Surowy plik binarny"
+  tarzst:
+    value: "Archiwum Zstandard"
+  apk:
+    value: "Android APK"
+  aab:
+    value: "Android App Bundle"
+
+# The source archives GitHub builds from the tag.
+source:
+  zip:
+    value: "Kod źródłowy (zip)"
+  targz:
+    value: "Kod źródłowy (tar.gz)"

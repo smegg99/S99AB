@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DownloadCard from '../src/components/releases/DownloadCard.vue'
 import DownloadAssetRow from '../src/components/releases/DownloadAssetRow.vue'
 import EmptyState from '../src/components/state/EmptyState.vue'
+import { configureReleases, resetReleasesConfig } from '../src/composables/releases/internal/api'
 import type { Downloads } from '../src/composables/releases/useReleases'
 import { vuetify } from './mount'
 
@@ -74,6 +75,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  resetReleasesConfig()
 })
 
 describe('UiDownloadCard', () => {
@@ -96,8 +98,8 @@ describe('UiDownloadCard', () => {
     const rows = wrapper.findAllComponents(DownloadAssetRow)
     expect(rows).toHaveLength(2)
     // AppImage is Linux's configured primary; the .deb beside it is not.
-    expect(rows[0]!.props('primary')).toBe(true)
-    expect(rows[1]!.props('primary')).toBe(false)
+    expect(rows[0]!.props('row').primary).toBe(true)
+    expect(rows[1]!.props('row').primary).toBe(false)
   })
 
   it('carries a version onto a platform that is a release behind', async () => {
@@ -109,7 +111,7 @@ describe('UiDownloadCard', () => {
 
     const row = wrapper.findComponent(DownloadAssetRow)
     // The header already says v2.0.0; only the platform that is behind names its build.
-    expect(row.props('version')).toBe('v1.0.0')
+    expect(row.props('row').version).toBe('v1.0.0')
   })
 
   it('offers the releases page when there is nothing published', async () => {
@@ -128,5 +130,36 @@ describe('UiDownloadCard', () => {
 
     // Unreachable and nothing published both point to the repository's releases.
     expect(wrapper.findComponent(EmptyState).exists()).toBe(true)
+  })
+
+  it('marks a planned platform and explains the marker under the card', async () => {
+    configureReleases({ planned: ['windows'] })
+    const wrapper = mountCard()
+    await flushPromises()
+
+    const windows = wrapper.findAll('.v-tab').find(t => t.text().includes('Windows'))!
+    expect(windows.text()).toContain('Windows*')
+    expect(windows.attributes('disabled')).toBeDefined()
+    expect(wrapper.text()).toContain('* No build for this platform yet.')
+  })
+
+  it('links the changelog and the releases page from config', async () => {
+    configureReleases({ releasesUrl: 'https://example.test/releases', changelogPath: '/changelog' })
+    const wrapper = mountCard()
+    await flushPromises()
+
+    // No router in a spec, so the changelog button keeps its route as a prop.
+    const buttons = wrapper.findAllComponents({ name: 'VBtn' }).filter(b => b.element.closest('.s99ab-downloads__foot'))
+    expect(buttons.map(b => b.props('to') ?? b.props('href'))).toEqual(['/changelog', 'https://example.test/releases'])
+  })
+
+  it('reports a download with its row and platform', async () => {
+    const wrapper = mountCard()
+    await flushPromises()
+
+    await wrapper.findComponent(DownloadAssetRow).find('a').trigger('click')
+    const [row, platform] = wrapper.emitted('download')![0] as [{ label: string }, string]
+    expect(row.label).toBe('appimage')
+    expect(platform).toBe('linux')
   })
 })

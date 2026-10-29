@@ -16,7 +16,7 @@ allReleases:
   value: "All releases"
   description: "Falls back to the repository's releases page"
 onGithub:
-  value: "On GitHub"
+  value: "View on GitHub"
   description: "Link from a changelog entry to that release"
 downloads:
   value: "Downloads"
@@ -25,11 +25,15 @@ copied:
   value: "Copied"
   description: "The checksum button, just after it was clicked"
 copyHash:
-  value: "Copy checksum"
-  description: "The checksum button at rest"
+  value: "Copy the {algo} checksum"
+  description: "The checksum button at rest; algo is the digest's algorithm, such as sha256"
+  placeholders:
+    algo: {type: string}
 olderBuild:
-  value: "This build is older than the newest release."
-  description: "Why an asset row carries a version of its own"
+  value: "This platform's newest build is {version}"
+  description: "Tooltip on the version chip of a platform whose newest build is behind the newest release"
+  placeholders:
+    version: {type: string}
 noneTitle:
   value: "No downloads yet"
   description: "No release is published, or GitHub could not be reached"
@@ -37,11 +41,11 @@ noneText:
   value: "Nothing has been published for this repository."
   description: "Shown under noneTitle"
 noHistory:
-  value: "No releases yet"
+  value: "No release has been published yet."
   description: "Changelog with nothing published. Its own key, not noneTitle: that
     one names files to download, which a changelog does not list."
 notTranslated:
-  value: "These notes are not available in your language yet."
+  value: "These notes have not been translated."
   description: "The release body carried no section for the reader's language"
 updateTitle:
   value: "A newer version is available"
@@ -77,6 +81,36 @@ starsForksLabel:
   placeholders:
     stars: {type: integer}
     forks: {type: integer}
+changelog:
+  value: "Changelog"
+  description: "Link from the download card to the changelog page"
+webBuild:
+  value: "Web edition"
+  description: "Row label of a web platform build"
+webBuildSub:
+  value: "Static site, host it yourself"
+  description: "Line under webBuild"
+plannedNote:
+  value: "* No build for this platform yet."
+  description: "Under the download card when a platform tab is planned; the asterisk matches the tab marker"
+plannedReason:
+  value: "No build for this platform yet."
+  description: "Tooltip of a disabled, planned platform tab"
+experimentalNote:
+  value: "** Experimental."
+  description: "Under the download card when a platform tab is experimental; the two asterisks match the tab marker"
+loading:
+  value: "Loading releases"
+  description: "Accessible label of the changelog while it loads"
+failed:
+  value: "The releases could not be loaded."
+  description: "Changelog error title"
+beta:
+  value: "Beta"
+  description: "Default title of the release notice"
+feedback:
+  value: "Share feedback or report a problem"
+  description: "Default link label of the release notice"
 
 platforms:
   linux:
@@ -90,10 +124,13 @@ platforms:
   ios:
     value: "iOS"
   extras:
-    value: "Other files"
+    value: "Source & files"
     description: "Source archives, checksums and signatures: not an OS build"
 
 # Package formats. A dot is a path step in vue-i18n, so tar.gz is targz.
+  web:
+    value: "Web"
+
 kinds:
   appimage:
     value: "AppImage"
@@ -104,16 +141,29 @@ kinds:
   pkgtarzst:
     value: "Arch package"
   targz:
-    value: "Archive"
+    value: "Tarball"
   installer:
     value: "Installer"
   exe:
     value: "Portable"
   msix:
-    value: "MSIX package"
+    value: "MSIX"
   zip:
-    value: "Archive"
+    value: "ZIP archive"
   dmg:
     value: "Disk image"
   binary:
-    value: "Binary"
+    value: "Raw binary"
+  tarzst:
+    value: "Zstandard archive"
+  apk:
+    value: "Android APK"
+  aab:
+    value: "Android App Bundle"
+
+# The source archives GitHub builds from the tag.
+source:
+  zip:
+    value: "Source code (zip)"
+  targz:
+    value: "Source code (tar.gz)"

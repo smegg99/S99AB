@@ -3,29 +3,38 @@
 import { reactive } from 'vue'
 import type { ReleasesConfig } from '../useReleases'
 
-export const config = reactive<ReleasesConfig>({
-  apiBase: '/api/v1',
-  order: ['linux', 'windows', 'macos', 'android', 'web', 'ios'],
-  // AppImage runs anywhere; Windows users expect the NSIS installer.
-  primaryKind: { linux: 'appimage', windows: 'installer', android: 'apk', web: 'tar.zst' },
-  icons: {
-    linux: 'mdi-linux',
-    windows: 'mdi-microsoft-windows',
-    macos: 'mdi-apple',
-    android: 'mdi-android',
-    ios: 'mdi-apple-ios',
-    web: 'mdi-web',
-    source: 'mdi-code-tags',
-    extras: 'mdi-file-document-outline',
-  },
-  planned: [],
-  experimental: [],
-  fallback: [],
-  releasesUrl: '',
-  changelogPath: '',
-  umami: false,
-  staleTime: 5 * 60_000,
-})
+function defaults(): ReleasesConfig {
+  return {
+    apiBase: '/api/v1',
+    order: ['linux', 'windows', 'macos', 'android', 'web', 'ios'],
+    // AppImage runs anywhere; Windows users expect the NSIS installer.
+    primaryKind: { linux: 'appimage', windows: 'installer', android: 'apk', web: 'tar.zst' },
+    icons: {
+      linux: 'mdi-linux',
+      windows: 'mdi-microsoft-windows',
+      macos: 'mdi-apple',
+      android: 'mdi-android',
+      ios: 'mdi-apple-ios',
+      web: 'mdi-web',
+      source: 'mdi-code-tags',
+      extras: 'mdi-file-document-outline',
+    },
+    planned: [],
+    experimental: [],
+    fallback: [],
+    releasesUrl: '',
+    changelogPath: '',
+    umami: false,
+    staleTime: 5 * 60_000,
+  }
+}
+
+export const config = reactive<ReleasesConfig>(defaults())
+
+/** Restores the defaults; for specs. */
+export function resetReleasesConfig() {
+  Object.assign(config, defaults())
+}
 
 /** Called by the layer's Nuxt plugin with the app's s99ab.releases config. */
 export function configureReleases(patch: Partial<ReleasesConfig>) {

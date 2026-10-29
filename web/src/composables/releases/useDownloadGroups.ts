@@ -1,95 +1,94 @@
 // web/src/composables/releases/useDownloadGroups.ts
 
-import { computed, type MaybeRefOrGetter, ref, toValue, watch } from 'vue'
+import { computed, type MaybeRefOrGetter, readonly, ref, toValue, watch } from 'vue'
 import { usePlatform } from '../usePlatform'
-import { type Downloads, type ReleaseAsset, useReleasesConfig } from './useReleases'
+import { type Downloads, useReleasesConfig } from './useReleases'
 import { PLATFORM_NAMES } from './internal/api'
+import { type DownloadGroup, extraRows, fallbackRows, liveRows } from './internal/rows'
 import { useTranslate } from '../useTranslate'
 
-/** One tab of the download card, and everything it offers. */
-export interface DownloadGroup {
-  key: string
-  name: string
-  icon: string
-  /** Set only when this platform is behind the newest release. */
-  version: string
-  primaryKind: string
-  assets: ReleaseAsset[]
-}
+export type { DownloadGroup, DownloadRow } from './internal/rows'
 
 /**
- * Turns a downloads payload into the card's tabs and holds the open one. Call
- * from setup: it reads i18n and detects the OS on mount.
+ * The download card's tabs and the open one: live builds, the configured fallback when there are none,
+ * and planned platforms as disabled tabs. Call from setup.
  */
 export function useDownloadGroups(source: MaybeRefOrGetter<Downloads | null>) {
   const t = useTranslate()
   const config = useReleasesConfig()
   const { os } = usePlatform()
 
-  const tab = ref('')
-  const userPicked = ref(false)
+  const live = computed(() => {
+    const d = toValue(source)
+    return !!d?.available && d.platforms.length > 0
+  })
 
-  // Platforms in configured order, then one tab for sources, checksums and signatures.
+  function group(key: string, rows: DownloadGroup['rows'], version = ''): DownloadGroup {
+    return {
+      key,
+      name: t(`release.platforms.${key}`, PLATFORM_NAMES[key] ?? key),
+      icon: config.icons[key] ?? '',
+      planned: rows.length === 0,
+      experimental: config.experimental.includes(key),
+      version,
+      rows,
+    }
+  }
+
+  function ordered(keys: string[]): string[] {
+    return [...config.order.filter(k => keys.includes(k)), ...keys.filter(k => !config.order.includes(k))]
+  }
+
   const groups = computed<DownloadGroup[]>(() => {
     const d = toValue(source)
-    if (!d?.available) return []
+    const built = new Map<string, DownloadGroup>()
 
-    const byPlatform = new Map(d.platforms.map(p => [p.platform, p]))
-    const ordered = [
-      ...config.order.filter(key => byPlatform.has(key)),
-      ...d.platforms.map(p => p.platform).filter(key => !config.order.includes(key)),
-    ]
-
-    const out: DownloadGroup[] = ordered.map((key) => {
-      const p = byPlatform.get(key)!
-      return {
-        key,
-        name: t(`release.platforms.${key}`, PLATFORM_NAMES[key] ?? key),
-        icon: config.icons[key] ?? '',
+    if (live.value && d) {
+      for (const p of d.platforms) {
         // Otherwise it would repeat the version in the header.
-        version: p.current ? '' : p.version,
-        primaryKind: config.primaryKind[key] ?? '',
-        assets: p.assets,
+        const version = p.current ? '' : p.version
+        built.set(p.platform, group(p.platform, liveRows(t, p.platform, p.assets, config.primaryKind[p.platform] ?? '', version), version))
       }
-    })
-
-    const extras = [...(d.extras ?? []), ...(d.source ?? [])]
-    if (extras.length) {
-      out.push({
-        key: 'extras',
-        name: t('release.platforms.extras', PLATFORM_NAMES.extras!),
-        icon: config.icons.extras ?? '',
-        version: '',
-        primaryKind: '',
-        assets: extras,
-      })
     }
+    else {
+      for (const f of config.fallback) {
+        built.set(f.platform, group(f.platform, fallbackRows(t, f, config.primaryKind[f.platform] ?? '', config.releasesUrl)))
+      }
+    }
+    if (live.value || built.size) {
+      for (const key of config.planned) if (!built.has(key)) built.set(key, group(key, []))
+    }
+
+    const out = ordered([...built.keys()]).map(k => built.get(k)!)
+    const extras = live.value && d ? extraRows(t, d.extras ?? [], d.source ?? []) : []
+    if (extras.length) out.push({ ...group('extras', extras), name: t('release.platforms.extras', PLATFORM_NAMES.extras!) })
     return out
   })
 
-  const detected = computed(() =>
-    groups.value.some(g => g.key === os.value) ? os.value : '',
-  )
+  const detected = computed(() => (groups.value.some(g => g.key === os.value) ? os.value : ''))
 
-  const current = computed(
-    () => groups.value.find(g => g.key === tab.value) ?? groups.value[0],
-  )
+  const tab = ref('')
+  let picked = false
 
-  // Follow the detected platform until the user picks a tab. A pick the newest
-  // payload does not offer is dropped, so v-tabs always has a selection.
-  watch(
-    [detected, groups],
-    () => {
-      if (userPicked.value && groups.value.some(g => g.key === tab.value)) return
-      userPicked.value = false
-      tab.value = detected.value || groups.value[0]?.key || ''
-    },
-    { immediate: true },
-  )
+  function firstOpen(): string {
+    const own = groups.value.find(g => g.key === detected.value && !g.planned)
+    return own?.key ?? groups.value.find(g => !g.planned)?.key ?? ''
+  }
 
-  watch(tab, (next) => {
-    if (next && next !== (detected.value || groups.value[0]?.key)) userPicked.value = true
-  })
+  // Follows the detected platform until the user picks a tab; a pick the payload no longer offers is dropped.
+  watch([detected, groups], () => {
+    if (picked && groups.value.some(g => g.key === tab.value && !g.planned)) return
+    picked = false
+    tab.value = firstOpen()
+  }, { immediate: true })
 
-  return { groups, detected, tab, current }
+  function pick(key: string) {
+    if (!groups.value.some(g => g.key === key && !g.planned)) return
+    picked = true
+    tab.value = key
+  }
+
+  const current = computed(() => groups.value.find(g => g.key === tab.value))
+
+  return { groups, detected, tab: readonly(tab), current, live, pick }
 }

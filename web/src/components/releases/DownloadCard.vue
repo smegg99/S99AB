@@ -8,10 +8,9 @@
       lines="one"
     />
 
-    <!-- Unavailable (nothing published, or GitHub unreachable) points to the
-         repository's releases page. -->
+    <!-- Nothing published or GitHub unreachable, and no configured fallback: point to the releases page. -->
     <slot
-      v-else-if="!downloads?.available"
+      v-else-if="!groups.length"
       name="unavailable"
     >
       <UiEmptyState
@@ -19,12 +18,15 @@
         :text="emptyText"
         :action-label="emptyAction"
         icon="mdi-package-variant"
-        @action="open(releasesUrl)"
+        @action="open(allReleasesUrl)"
       />
     </slot>
 
     <template v-else>
-      <div class="s99ab-downloads__head s99ab-controls">
+      <div
+        v-if="live && downloads"
+        class="s99ab-downloads__head s99ab-controls"
+      >
         <span class="font-weight-bold s99ab-downloads__version">{{ downloads.version }}</span>
         <v-chip
           size="small"
@@ -42,46 +44,62 @@
         <slot name="actions" />
       </div>
 
-      <!-- The strip height, so the tabs and the version strip match. -->
-      <v-tabs
-        v-model="tab"
-        :height="stripHeight"
-        color="accent"
-        class="s99ab-downloads__tabs"
-      >
-        <v-tab
-          v-for="group in groups"
-          :key="group.key"
-          :value="group.key"
-          :prepend-icon="group.icon"
-        >
-          {{ group.name }}
-          <!-- The detected system, as a label. -->
-          <v-chip
-            v-if="group.key === detected"
-            class="ms-2 s99ab-downloads__sys"
-            size="x-small"
-            variant="flat"
-            color="accent"
-          >
-            {{ yoursLabel }}
-          </v-chip>
-        </v-tab>
-      </v-tabs>
+      <UiDownloadTabs
+        :groups="groups"
+        :detected="detected"
+        :model-value="tab"
+        @select="select"
+      />
 
       <div
         v-if="current"
         class="s99ab-downloads__rows"
       >
         <UiDownloadAssetRow
-          v-for="asset in current.assets"
-          :key="asset.name"
-          :asset="asset"
-          :primary="asset.kind === current.primaryKind"
-          :version="current.version"
+          v-for="row in current.rows"
+          :key="row.key"
+          :row="row"
+          :platform="current.key"
+          @download="emit('download', row, current.key)"
+          @copy-digest="emit('copyDigest', row, current.key)"
         />
       </div>
+
+      <div
+        v-if="notes.length || changelogTo || allReleasesUrl"
+        class="s99ab-downloads__foot text-caption text-medium-emphasis"
+      >
+        <p
+          v-for="note in notes"
+          :key="note"
+        >
+          {{ note }}
+        </p>
+        <div class="d-flex flex-wrap ga-2">
+          <v-btn
+            v-if="changelogTo"
+            :to="changelogTo"
+            variant="text"
+            size="small"
+          >
+            {{ changelogLabel }}
+          </v-btn>
+          <v-btn
+            v-if="allReleasesUrl"
+            :href="allReleasesUrl"
+            :data-umami-event="config.umami ? 'all-releases' : undefined"
+            variant="text"
+            size="small"
+            append-icon="mdi-open-in-new"
+            target="_blank"
+            rel="noopener"
+          >
+            {{ allReleasesLabel }}
+          </v-btn>
+        </div>
+      </div>
     </template>
+    <slot name="foot" />
   </v-card>
 </template>
 
@@ -90,43 +108,64 @@ import { computed } from 'vue'
 import UiEmptyState from '../state/EmptyState.vue'
 import UiLoadingState from '../state/LoadingState.vue'
 import UiDownloadAssetRow from './DownloadAssetRow.vue'
+import UiDownloadTabs from './DownloadTabs.vue'
 import { useDelayed } from '../../composables/useDelay'
-import { useDownloadGroups } from '../../composables/releases/useDownloadGroups'
+import { type DownloadRow, useDownloadGroups } from '../../composables/releases/useDownloadGroups'
 import { formatReleaseDate } from '../../composables/releases/internal/date'
-import { useDownloads } from '../../composables/releases/useReleases'
+import { useDownloads, useReleasesConfig } from '../../composables/releases/useReleases'
 import { useLocale, useTranslate } from '../../composables/useTranslate'
-import { useCssNumber } from '../../composables/useCssNumber'
 import { inBrowser } from '../../browser/env'
 
-// The newest version, a tab per platform with the user's marked, and every
-// format that platform ships.
-const { releasesUrl = '' } = defineProps<{
-  /** Where "all releases" points when there is nothing to show. */
+// The newest version, a tab per platform with the user's marked, and every format that platform ships.
+const { releasesUrl, changelogPath, plannedNote = '', experimentalNote = '' } = defineProps<{
+  /** The releases page; overrides s99ab.releases.releasesUrl. */
   releasesUrl?: string
+  /** The changelog route; overrides s99ab.releases.changelogPath. */
+  changelogPath?: string
+  /** Shown under the card when a tab is planned; the layer's text when empty. */
+  plannedNote?: string
+  /** Shown under the card when a tab is experimental; the layer's text when empty. */
+  experimentalNote?: string
 }>()
-defineSlots<{ unavailable?: () => unknown, actions?: () => unknown }>()
+const emit = defineEmits<{
+  selectPlatform: [key: string]
+  download: [row: DownloadRow, platform: string]
+  copyDigest: [row: DownloadRow, platform: string]
+}>()
+defineSlots<{ unavailable?: () => unknown, actions?: () => unknown, foot?: () => unknown }>()
 
 const t = useTranslate()
+const locale = useLocale()
+const config = useReleasesConfig()
 const query = useDownloads()
-
-// The knob read live.
-const stripHeight = useCssNumber('--s99ab-strip-h', 44)
 
 const downloads = computed(() => query.data.value ?? null)
 const firstLoad = useDelayed(() => query.asyncStatus.value === 'loading' && !query.data.value)
 
-const { groups, detected, tab, current } = useDownloadGroups(downloads)
+const { groups, detected, tab, current, live, pick } = useDownloadGroups(downloads)
 
-const locale = useLocale()
+const allReleasesUrl = computed(() => releasesUrl ?? config.releasesUrl)
+const changelogTo = computed(() => changelogPath ?? config.changelogPath)
+
+const notes = computed(() => [
+  ...(groups.value.some(g => g.planned) ? [plannedNote || t('release.plannedNote', '* No build for this platform yet.')] : []),
+  ...(groups.value.some(g => g.experimental) ? [experimentalNote || t('release.experimentalNote', '** Experimental.')] : []),
+])
+
 const published = computed(() => formatReleaseDate(downloads.value?.published_at, locale.value))
 const latestLabel = computed(() => t('release.latest', 'Latest'))
-const yoursLabel = computed(() => t('release.yourSystem', 'Your system'))
 const allReleasesLabel = computed(() => t('release.allReleases', 'All releases'))
+const changelogLabel = computed(() => t('release.changelog', 'Changelog'))
 const emptyTitle = computed(() => t('release.noneTitle', 'No downloads yet'))
 const emptyText = computed(() => t('release.noneText', 'Nothing has been published for this repository.'))
 
 // No action without a URL to point to.
-const emptyAction = computed(() => (releasesUrl ? allReleasesLabel.value : undefined))
+const emptyAction = computed(() => (allReleasesUrl.value ? allReleasesLabel.value : undefined))
+
+function select(key: string) {
+  pick(key)
+  emit('selectPlatform', key)
+}
 
 function open(url: string) {
   if (url && inBrowser()) window.open(url, '_blank', 'noopener')

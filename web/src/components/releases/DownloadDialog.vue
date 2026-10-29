@@ -17,7 +17,10 @@
 
     <v-card-text class="pa-0">
       <!-- The same card the page embeds. -->
-      <UiDownloadCard :releases-url="releasesUrl" />
+      <UiDownloadCard
+        :releases-url="releasesUrl"
+        :changelog-path="changelogPath"
+      />
     </v-card-text>
   </v-card>
 </template>
@@ -28,9 +31,12 @@ import UiDownloadCard from './DownloadCard.vue'
 import { useDialog } from '../../composables/useDialog'
 import { useTranslate } from '../../composables/useTranslate'
 
-const { title = '', releasesUrl = '' } = defineProps<{
+const { title = '', releasesUrl, changelogPath } = defineProps<{
   title?: string
+  /** Overrides s99ab.releases.releasesUrl. */
   releasesUrl?: string
+  /** Overrides s99ab.releases.changelogPath. */
+  changelogPath?: string
 }>()
 
 const { close } = useDialog()

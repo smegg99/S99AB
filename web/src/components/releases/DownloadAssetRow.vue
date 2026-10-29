@@ -2,40 +2,51 @@
 <template>
   <!-- Not v-list-item, whose title/subtitle slots impose a type scale. -->
   <div
-    :class="{ 's99ab-asset--primary': primary }"
+    :class="{ 's99ab-asset--primary': row.primary }"
     class="s99ab-asset"
   >
     <div class="s99ab-asset__text">
       <div class="d-flex align-baseline flex-wrap ga-2">
-        <span class="font-weight-bold text-body-2">{{ label }}</span>
+        <span class="font-weight-bold text-body-2">{{ row.label }}</span>
         <span
-          v-if="asset.arch"
+          v-if="row.sub"
           class="text-caption text-medium-emphasis"
-        >{{ asset.arch }}</span>
+        >{{ row.sub }}</span>
 
         <!-- Only when this platform's build is behind the newest release. -->
         <v-chip
-          v-if="version"
-          :title="olderTitle"
+          v-if="row.version"
           size="x-small"
           variant="tonal"
           color="warning"
+          tabindex="0"
+          :aria-label="olderTitle"
         >
-          {{ version }}
+          <v-tooltip
+            :text="olderTitle"
+            activator="parent"
+            location="bottom"
+          />
+          {{ row.version }}
         </v-chip>
       </div>
 
-      <span class="text-caption text-medium-emphasis s99ab-asset__file">{{ asset.name }}</span>
+      <span
+        v-if="row.filename"
+        class="text-caption text-medium-emphasis s99ab-asset__file"
+      >{{ row.filename }}</span>
 
       <!-- GitHub reports no digest for source archives or older assets. -->
       <v-btn
         v-if="hex"
         :prepend-icon="copyIcon"
         :aria-label="copyTitle"
+        :data-umami-event="umami ? 'copy-checksum' : undefined"
+        :data-umami-event-os="umami ? platform : undefined"
         class="s99ab-asset__digest"
         variant="text"
         size="x-small"
-        @click="copy(hex)"
+        @click="copyDigest"
       >
         <v-tooltip
           :text="copyTitle"
@@ -44,21 +55,29 @@
         />
         {{ algo }} {{ short }}
       </v-btn>
+      <span
+        class="d-sr-only"
+        aria-live="polite"
+      >{{ copied ? copiedLabel : '' }}</span>
     </div>
 
     <span
-      v-if="size"
+      v-if="row.size"
       class="text-caption text-medium-emphasis d-none d-sm-block"
-    >{{ size }}</span>
+    >{{ row.size }}</span>
 
     <v-btn
       :color="downloadColor"
       :variant="downloadVariant"
-      :href="asset.download_url"
+      :href="row.url"
+      :data-umami-event="umami ? 'download' : undefined"
+      :data-umami-event-os="umami ? platform : undefined"
+      :data-umami-event-format="umami ? row.kind : undefined"
       size="small"
       prepend-icon="mdi-download"
       target="_blank"
       rel="noopener"
+      @click="emit('download')"
     >
       {{ downloadLabel }}
     </v-btn>
@@ -68,31 +87,29 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useCopy } from '../../composables/useCopy'
-import type { ReleaseAsset } from '../../composables/releases/useReleases'
-import { formatBytes, kindKey } from '../../composables/releases/internal/api'
+import type { DownloadRow } from '../../composables/releases/useDownloadGroups'
+import { useReleasesConfig } from '../../composables/releases/useReleases'
 import { useTranslate } from '../../composables/useTranslate'
 
-const { asset, primary, version = '' } = defineProps<{
-  asset: ReleaseAsset
-  /** The platform's default format, offered first. */
-  primary?: boolean
-  /** Set only when this build is older than the newest release. */
-  version?: string
+const { row, platform = '' } = defineProps<{
+  row: DownloadRow
+  /** The tab this row is in, for tracking. */
+  platform?: string
 }>()
+const emit = defineEmits<{ download: [], copyDigest: [] }>()
 
 const t = useTranslate()
+const config = useReleasesConfig()
 const { copied, copy } = useCopy()
 
-// An unknown kind falls back to its raw value.
-const label = computed(() => t(`release.kinds.${kindKey(asset.kind)}`, asset.kind))
-const size = computed(() => formatBytes(asset.size))
+const umami = computed(() => config.umami)
 const downloadLabel = computed(() => t('release.download', 'Download'))
-const downloadColor = computed(() => (primary ? 'accent' : undefined))
-const downloadVariant = computed(() => (primary ? 'flat' : 'outlined'))
+const downloadColor = computed(() => (row.primary ? 'accent' : undefined))
+const downloadVariant = computed(() => (row.primary ? 'flat' : 'outlined'))
 
 // The digest names its own algorithm.
-const algo = computed(() => asset.digest.split(':')[0] ?? '')
-const hex = computed(() => asset.digest.split(':')[1] ?? '')
+const algo = computed(() => row.digest.split(':')[0] ?? '')
+const hex = computed(() => row.digest.split(':')[1] ?? '')
 
 // Both ends, for comparing with sha256sum output.
 const short = computed(() =>
@@ -100,8 +117,16 @@ const short = computed(() =>
 )
 
 const copyIcon = computed(() => (copied.value ? 'mdi-check' : 'mdi-content-copy'))
+const copiedLabel = computed(() => t('release.copied', 'Copied'))
 const copyTitle = computed(() =>
-  copied.value ? t('release.copied', 'Copied') : t('release.copyHash', 'Copy checksum'),
+  copied.value ? copiedLabel.value : t('release.copyHash', 'Copy the {algo} checksum', { algo: algo.value }),
 )
-const olderTitle = computed(() => t('release.olderBuild', 'This build is older than the newest release.'))
+const olderTitle = computed(() =>
+  t('release.olderBuild', 'This platform\'s newest build is {version}', { version: row.version }),
+)
+
+function copyDigest() {
+  copy(hex.value)
+  emit('copyDigest')
+}
 </script>
