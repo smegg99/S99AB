@@ -156,3 +156,26 @@ func TestClosersAfterTheDeadlineStillRun(t *testing.T) {
 		t.Fatal("the closer after the deadline never ran")
 	}
 }
+
+func TestContextClosersCannotExhaustTheCleanupBudget(t *testing.T) {
+	release := make(chan struct{})
+	defer close(release)
+	flushed := make(chan struct{})
+	closers := []applife.Closer{applife.CloserFunc(func() error { close(flushed); return nil })}
+	for range 3 {
+		closers = append(closers, applife.WithContext(func(context.Context) error { <-release; return nil }))
+	}
+	start := time.Now()
+	err := applife.New(applife.Options{Timeout: 40 * time.Millisecond, Closers: closers}).Shutdown()
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("shutdown = %v", err)
+	}
+	if time.Since(start) > 500*time.Millisecond {
+		t.Fatal("shutdown exceeded the total budget")
+	}
+	select {
+	case <-flushed:
+	default:
+		t.Fatal("cleanup after blocked closers did not run")
+	}
+}
