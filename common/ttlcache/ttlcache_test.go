@@ -112,29 +112,37 @@ func TestErrorsWhenThereIsNothingToServe(t *testing.T) {
 }
 
 func TestCallerCancellationDoesNotPoisonTheSharedFetch(t *testing.T) {
-	started := make(chan struct{})
-	var fetchCtxErr error
+	started, release := make(chan struct{}), make(chan struct{})
 	c := New(time.Hour, func(ctx context.Context) (string, error) {
 		close(started)
-		time.Sleep(20 * time.Millisecond)
-		fetchCtxErr = ctx.Err()
-		return "fetched", nil
+		<-release
+		return "fetched", ctx.Err()
 	})
-
-	ctx, cancel := context.WithCancel(context.Background())
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		if v, err := c.Get(ctx); err != nil || v != "fetched" {
-			t.Errorf("Get = %q, %v; want the fetch to survive the cancel", v, err)
-		}
-	}()
-
+	ctx, cancel := context.WithCancel(t.Context())
+	done := make(chan error, 1)
+	go func() { _, err := c.Get(ctx); done <- err }()
 	<-started
-	cancel() // the reader walks away mid-fetch
-	<-done
+	cancel()
+	if err := <-done; !errors.Is(err, context.Canceled) {
+		t.Fatalf("cancel = %v", err)
+	}
+	close(release)
+	if value, err := c.Get(t.Context()); value != "fetched" || err != nil {
+		t.Fatalf("shared fetch = %q, %v", value, err)
+	}
+}
 
-	if fetchCtxErr != nil {
-		t.Errorf("the fetch saw ctx.Err() = %v, want nil: it must not inherit the caller's cancellation", fetchCtxErr)
+func TestRefreshHasItsOwnDeadline(t *testing.T) {
+	c := New(time.Hour, func(ctx context.Context) (int, error) { <-ctx.Done(); return 0, ctx.Err() })
+	c.refreshTimeout = 5 * time.Millisecond
+	if _, err := c.Get(t.Context()); !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("refresh = %v", err)
+	}
+}
+
+func TestNilInterfaceValueDoesNotPanic(t *testing.T) {
+	c := New(time.Hour, func(context.Context) (any, error) { return nil, nil })
+	if value, err := c.Get(t.Context()); value != nil || err != nil {
+		t.Fatalf("nil value = %v, %v", value, err)
 	}
 }
