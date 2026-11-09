@@ -4,6 +4,7 @@ package db_test
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"path/filepath"
 	"sync"
@@ -38,4 +39,28 @@ func TestConcurrentMigrationsKeepTheirOwnSets(t *testing.T) {
 		})
 	}
 	wg.Wait()
+}
+
+func TestSameSQLiteDatabaseSerializesMigrations(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "shared.db")
+	first, err := db.Open(t.Context(), db.Config{Driver: db.SQLite, DSN: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer first.Close()
+	second, err := db.Open(t.Context(), db.Config{Driver: db.SQLite, DSN: path})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer second.Close()
+	set := fstest.MapFS{"000001_init.sql": &fstest.MapFile{Data: []byte("-- +goose Up\nCREATE TABLE single (id INTEGER);\n")}}
+	done := make(chan error, 2)
+	for _, conn := range []*sql.DB{first, second} {
+		go func() { done <- db.Migrate(t.Context(), conn, set, db.SQLite) }()
+	}
+	for range 2 {
+		if err := <-done; err != nil {
+			t.Fatal(err)
+		}
+	}
 }
