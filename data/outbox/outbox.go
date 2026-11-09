@@ -11,12 +11,14 @@ import (
 	"time"
 
 	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/data/internal/migratelock"
 )
 
 var (
 	ErrNoHandler = errors.New("outbox: no handler for kind")
 	ErrKind      = errors.New("outbox: kind is required")
 	ErrNotFound  = errors.New("outbox: no such job")
+	ErrLeaseLost = errors.New("outbox: lease lost")
 	ErrClosed    = errors.New("outbox: worker is closed")
 )
 
@@ -43,8 +45,7 @@ type Options struct {
 	Now func() time.Time
 	// Driver selects the placeholder style. Empty means detect it from the pool.
 	Driver string
-	// Lease is how long a claimed job stays invisible to other workers; it must
-	// outlast the slowest handler. Zero means 5 minutes.
+	// Lease bounds each handler context and its claim; handlers must honor cancellation. Zero means 5 minutes.
 	Lease time.Duration
 	// OnError receives a background pass that failed (claiming, or recording a result). Nil drops it.
 	OnError func(error)
@@ -120,8 +121,18 @@ func Migrate(ctx context.Context, conn *sql.DB) error {
 }
 
 // migrateWith is Migrate with a known driver, skipping the probe.
-func migrateWith(ctx context.Context, conn *sql.DB, driver string) error {
-	if _, err := conn.ExecContext(ctx, schemaFor(driver)); err != nil {
+func migrateWith(ctx context.Context, conn *sql.DB, driver string) (err error) {
+	session, err := conn.Conn(ctx)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	locker := &migratelock.Locker{Driver: driver}
+	if err := locker.SessionLock(ctx, session); err != nil {
+		return fmt.Errorf("outbox: migration lock: %w", err)
+	}
+	defer func() { err = errors.Join(err, locker.SessionUnlock(ctx, session)) }()
+	if _, err := session.ExecContext(ctx, schemaFor(driver)); err != nil {
 		return fmt.Errorf("outbox: migrate: %w", err)
 	}
 	return nil

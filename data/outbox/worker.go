@@ -20,6 +20,7 @@ type Job struct {
 	Payload   []byte
 	Attempts  int
 	LastError string
+	lease     string
 }
 
 type Worker struct {
@@ -115,14 +116,24 @@ func (w *Worker) Drain(ctx context.Context) (int, error) {
 	if w.err != nil {
 		return 0, w.err
 	}
-	jobs, err := w.claim(ctx)
+	jobs, err := w.candidates(ctx)
 	if err != nil {
 		return 0, err
 	}
 
 	done := 0
 	var errs []error
-	for _, job := range jobs {
+	for _, candidate := range jobs {
+		if err := ctx.Err(); err != nil {
+			return done, errors.Join(append(errs, err)...)
+		}
+		job, claimed, err := w.claim(ctx, candidate)
+		if err != nil {
+			return done, errors.Join(append(errs, err)...)
+		}
+		if !claimed {
+			continue
+		}
 		ok, err := w.run(ctx, job)
 		if err != nil {
 			errs = append(errs, err)
@@ -134,67 +145,6 @@ func (w *Worker) Drain(ctx context.Context) (int, error) {
 	return done, errors.Join(errs...)
 }
 
-// claim takes due jobs with an optimistic update that leases next_try_at, since SQLite has no SKIP LOCKED.
-func (w *Worker) claim(ctx context.Context) ([]Job, error) {
-	now := w.opts.Now()
-	due := stamp(now)
-	lease := stamp(now.Add(w.opts.Lease))
-
-	rows, err := w.db.QueryContext(ctx, w.sql(
-		`SELECT id, kind, payload, attempts, COALESCE(last_error, ''), next_try_at
-		   FROM outbox
-		  WHERE done_at IS NULL AND attempts < ? AND next_try_at <= ?
-		  ORDER BY id
-		  LIMIT ?`),
-		w.opts.MaxAttempts, due, w.opts.BatchSize)
-	if err != nil {
-		return nil, fmt.Errorf("outbox: claim: %w", err)
-	}
-
-	type candidate struct {
-		job  Job
-		seen string
-	}
-	var found []candidate
-	for rows.Next() {
-		var c candidate
-		if err := rows.Scan(&c.job.ID, &c.job.Kind, &c.job.Payload, &c.job.Attempts, &c.job.LastError, &c.seen); err != nil {
-			rows.Close()
-			return nil, fmt.Errorf("outbox: scan: %w", err)
-		}
-		found = append(found, c)
-	}
-	if err := rows.Err(); err != nil {
-		rows.Close()
-		return nil, err
-	}
-	// Closed before the updates: SQLite will not write while a read cursor is
-	// open over the same table.
-	if err := rows.Close(); err != nil {
-		return nil, fmt.Errorf("outbox: claim: %w", err)
-	}
-
-	var jobs []Job
-	for _, c := range found {
-		res, err := w.db.ExecContext(ctx, w.sql(
-			`UPDATE outbox SET next_try_at = ?
-			  WHERE id = ? AND next_try_at = ? AND done_at IS NULL`),
-			lease, c.job.ID, c.seen)
-		if err != nil {
-			return nil, fmt.Errorf("outbox: claim %d: %w", c.job.ID, err)
-		}
-		// A driver that cannot count rows must not count as claimed.
-		n, err := res.RowsAffected()
-		if err != nil {
-			return nil, fmt.Errorf("outbox: claim %d: %w", c.job.ID, err)
-		}
-		if n == 1 {
-			jobs = append(jobs, c.job)
-		}
-	}
-	return jobs, nil
-}
-
 // run reports whether the job succeeded; the error is a result it could not record.
 func (w *Worker) run(ctx context.Context, job Job) (bool, error) {
 	handler, ok := w.handlers[job.Kind]
@@ -203,10 +153,17 @@ func (w *Worker) run(ctx context.Context, job Job) (bool, error) {
 		return false, w.fail(ctx, job, fmt.Errorf("%w: %q", ErrNoHandler, job.Kind))
 	}
 
-	if err := call(ctx, handler, job.Payload); err != nil {
+	runCtx, cancel := context.WithTimeout(ctx, w.opts.Lease)
+	defer cancel()
+	err := call(runCtx, handler, job.Payload)
+	if err == nil {
+		err = runCtx.Err()
+	}
+	if err != nil {
 		return false, w.fail(ctx, job, err)
 	}
-	return true, w.succeed(ctx, job)
+	err = w.succeed(ctx, job)
+	return err == nil, err
 }
 
 // call turns a handler's panic into its error, so one bad job is a failed attempt.
@@ -220,26 +177,27 @@ func call(ctx context.Context, handler Handler, payload []byte) (err error) {
 }
 
 func (w *Worker) succeed(ctx context.Context, job Job) error {
-	_, err := w.db.ExecContext(ctx, w.sql(
-		`UPDATE outbox SET done_at = ? WHERE id = ?`),
-		stamp(w.opts.Now()), job.ID)
+	res, err := w.db.ExecContext(ctx, w.sql(
+		`UPDATE outbox SET done_at = ? WHERE id = ? AND next_try_at = ? AND done_at IS NULL`),
+		stamp(w.opts.Now()), job.ID, job.lease)
 	if err != nil {
 		return fmt.Errorf("outbox: mark done %d: %w", job.ID, err)
 	}
-	return nil
+	return recorded(res, job.ID)
 }
 
 func (w *Worker) fail(ctx context.Context, job Job, cause error) error {
 	attempts := job.Attempts + 1
 	next := w.opts.Now().Add(w.backoff(attempts))
 
-	_, err := w.db.ExecContext(ctx, w.sql(
-		`UPDATE outbox SET attempts = ?, next_try_at = ?, last_error = ? WHERE id = ?`),
-		attempts, stamp(next), cause.Error(), job.ID)
+	res, err := w.db.ExecContext(ctx, w.sql(
+		`UPDATE outbox SET attempts = ?, next_try_at = ?, last_error = ?
+          WHERE id = ? AND next_try_at = ? AND done_at IS NULL`),
+		attempts, stamp(next), cause.Error(), job.ID, job.lease)
 	if err != nil {
 		return fmt.Errorf("outbox: mark failed %d: %w", job.ID, err)
 	}
-	return nil
+	return recorded(res, job.ID)
 }
 
 // backoff doubles per attempt, capped at MaxDelay.
@@ -251,52 +209,13 @@ func (w *Worker) backoff(attempt int) time.Duration {
 	return delay
 }
 
-// DeadLetters lists jobs that exhausted their attempts. They stay in the table.
-func DeadLetters(ctx context.Context, conn *sql.DB, maxAttempts int) ([]Job, error) {
-	if maxAttempts <= 0 {
-		maxAttempts = 5
-	}
-
-	driver, err := db.Detect(conn)
+func recorded(res sql.Result, id int64) error {
+	n, err := res.RowsAffected()
 	if err != nil {
-		return nil, fmt.Errorf("outbox: dead letters: %w", err)
+		return fmt.Errorf("outbox: record %d: %w", id, err)
 	}
-	rows, err := conn.QueryContext(ctx, db.Rebind(driver,
-		`SELECT id, kind, payload, attempts, COALESCE(last_error, '')
-		   FROM outbox
-		  WHERE done_at IS NULL AND attempts >= ?
-		  ORDER BY id`), maxAttempts)
-	if err != nil {
-		return nil, fmt.Errorf("outbox: dead letters: %w", err)
-	}
-	defer rows.Close()
-
-	var jobs []Job
-	for rows.Next() {
-		var job Job
-		if err := rows.Scan(&job.ID, &job.Kind, &job.Payload, &job.Attempts, &job.LastError); err != nil {
-			return nil, fmt.Errorf("outbox: scan: %w", err)
-		}
-		jobs = append(jobs, job)
-	}
-	return jobs, rows.Err()
-}
-
-// Retry puts a dead letter back in the queue. An unknown id is an error.
-func Retry(ctx context.Context, conn *sql.DB, id int64) error {
-	driver, err := db.Detect(conn)
-	if err != nil {
-		return fmt.Errorf("outbox: retry %d: %w", id, err)
-	}
-	res, err := conn.ExecContext(ctx, db.Rebind(driver,
-		`UPDATE outbox SET attempts = 0, next_try_at = ?, last_error = NULL
-		  WHERE id = ? AND done_at IS NULL`),
-		stamp(time.Now()), id)
-	if err != nil {
-		return fmt.Errorf("outbox: retry %d: %w", id, err)
-	}
-	if n, err := res.RowsAffected(); err == nil && n == 0 {
-		return fmt.Errorf("%w: %d", ErrNotFound, id)
+	if n != 1 {
+		return fmt.Errorf("%w: %d", ErrLeaseLost, id)
 	}
 	return nil
 }
