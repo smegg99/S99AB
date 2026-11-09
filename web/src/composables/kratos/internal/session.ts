@@ -1,68 +1,138 @@
 // web/src/composables/kratos/internal/session.ts
 
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { config } from './types'
-import { kratosFetch } from './transport'
+import { kratosFetch, KRATOS_TIMEOUT_MS } from './transport'
 import { inBrowser } from '../../../browser/env'
 import type { SessionIdentity, SessionStore, SessionHost } from '../useSession'
 
 let host: SessionHost | null = null
 
-/** Called by the layer's Nuxt plugin. Passing null restores the module state. */
 export function configureSession(next: SessionHost | null) {
   host = next
 }
 
-// Fallback state without a host. Module-level refs are safe only in a browser.
+// Only browser callers use these refs; server callers supply request-local state.
 export const identity = ref<SessionIdentity | null>(null)
-
 export const loaded = ref(false)
-
 export const pending = ref(false)
 
 export function store(): SessionStore {
   return host ? host.store() : { identity, loaded, pending }
 }
 
-// Shares one request between concurrent browser callers. Browser only: on a
-// server a module-scope promise would leak across requests.
-let inFlight: Promise<void> | null = null
+type Request = { controller: AbortController, promise?: Promise<void> }
+const requests = new WeakMap<SessionStore['identity'], {
+  current: Request | null
+  error: ReturnType<typeof shallowRef<unknown>>
+}>()
 
-export async function whoami(): Promise<SessionIdentity | null> {
-  const res = await kratosFetch(`${config.basePath}/sessions/whoami`)
-  // 401 means signed out.
-  return res.ok
-    ? ((await res.json()) as { identity: SessionIdentity }).identity
-    : null
+export function sessionRequest(state: SessionStore) {
+  let value = requests.get(state.identity)
+  if (!value) {
+    value = { current: null, error: shallowRef(null) }
+    requests.set(state.identity, value)
+  }
+  return value
 }
 
-/** Resolves the session once; the host plugin awaits it before a server render. */
-export async function loadSession(force = false): Promise<void> {
-  const state = store()
-  if (state.loaded.value && !force) return
+function record(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === 'object' && !Array.isArray(value)
+}
 
+async function sessionBody(response: Response): Promise<unknown> {
+  if (!response.body) throw new Error('kratos: empty session response')
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let size = 0
+  let text = ''
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      size += value.byteLength
+      if (size > 1024 * 1024) {
+        await reader.cancel()
+        throw new Error('kratos: session response too large')
+      }
+      text += decoder.decode(value, { stream: true })
+    }
+    return JSON.parse(text + decoder.decode())
+  }
+  finally {
+    reader.releaseLock()
+  }
+}
+
+export async function whoami(signal?: AbortSignal, base = config.basePath, cookie?: string): Promise<SessionIdentity | null> {
+  const res = await kratosFetch(`${base}/sessions/whoami`, {
+    signal, redirect: 'error', headers: cookie ? { cookie } : undefined,
+  })
+  if (res.status === 401) return null
+  if (!res.ok) throw new Error(`kratos: whoami returned ${res.status}`)
+  const body = await sessionBody(res)
+  if (!record(body) || typeof body.active !== 'boolean') throw new Error('kratos: invalid session')
+  if (!body.active) return null
+  const value = body.identity
+  if (typeof body.id !== 'string' || !body.id || !record(value)
+    || typeof value.id !== 'string' || !value.id || !record(value.traits)
+    || (value.metadata_public != null && !record(value.metadata_public))) {
+    throw new Error('kratos: incomplete session')
+  }
+  return { id: value.id, traits: value.traits, metadata_public: value.metadata_public ?? undefined } as SessionIdentity
+}
+
+export function forgetSession(state: SessionStore) {
+  const request = sessionRequest(state)
+  const old = request.current
+  request.current = null
+  old?.controller.abort()
+  request.error.value = null
+  state.identity.value = null
+  state.loaded.value = false
+  state.pending.value = false
+}
+
+/** Resolves once; only the latest request may update this store. */
+export function loadSession(force = false, state = store()): Promise<void> {
+  if (state.loaded.value && !force) return Promise.resolve()
   const read = inBrowser() ? whoami : host?.read
-  // No window and no host reader: stay unloaded, so `ready` means unknown.
-  if (!read) return
-
-  if (inBrowser() && inFlight && !force) return inFlight
-
-  const run = (async () => {
-    state.pending.value = true
+  if (!read) return Promise.resolve()
+  const shared = sessionRequest(state)
+  if (shared.current && !force) return shared.current.promise ?? Promise.resolve()
+  shared.current?.controller.abort()
+  const request: Request = { controller: new AbortController() }
+  shared.current = request
+  shared.error.value = null
+  state.pending.value = true
+  const signal = request.controller.signal
+  const timer = setTimeout(() => request.controller.abort(new Error('kratos: session timed out')), KRATOS_TIMEOUT_MS)
+  let abort: () => void = () => {}
+  const aborted = new Promise<never>((_, reject) => {
+    abort = () => reject(signal.reason)
+    signal.addEventListener('abort', abort, { once: true })
+  })
+  request.promise = (async () => {
     try {
-      state.identity.value = await read()
+      const value = await Promise.race([read(signal), aborted])
+      if (shared.current !== request) return
+      state.identity.value = value
       state.loaded.value = true
     }
-    catch {
-      // Unreachable Kratos: render signed out, stay unloaded so the next call retries.
+    catch (error) {
+      if (shared.current !== request) return
       state.identity.value = null
+      state.loaded.value = false
+      shared.error.value = error
     }
     finally {
-      state.pending.value = false
-      if (inBrowser()) inFlight = null
+      clearTimeout(timer)
+      signal.removeEventListener('abort', abort)
+      if (shared.current === request) {
+        state.pending.value = false
+        shared.current = null
+      }
     }
   })()
-
-  if (inBrowser()) inFlight = run
-  return run
+  return request.promise
 }

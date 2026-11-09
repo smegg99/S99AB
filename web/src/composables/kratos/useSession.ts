@@ -1,7 +1,7 @@
 // web/src/composables/kratos/useSession.ts
 
 import { computed, type Ref } from 'vue'
-import { store, loadSession } from './internal/session'
+import { store, loadSession, forgetSession, sessionRequest } from './internal/session'
 
 /** The parts of a Kratos session an app renders or authorizes on. */
 export interface SessionIdentity {
@@ -22,7 +22,7 @@ export interface SessionHost {
   /** Per-request state, called at use time so requests never share refs. */
   store: () => SessionStore
   /** Server-side whoami with the request cookie forwarded; null is signed out. */
-  read?: () => Promise<SessionIdentity | null>
+  read?: (signal: AbortSignal) => Promise<SessionIdentity | null>
 }
 
 /**
@@ -31,13 +31,14 @@ export interface SessionHost {
  */
 export function useSession() {
   const state = store()
-  void loadSession()
+  void loadSession(false, state)
 
   return {
     identity: computed(() => state.identity.value),
     signedIn: computed(() => state.identity.value !== null),
     ready: computed(() => state.loaded.value),
     pending: computed(() => state.pending.value),
+    error: computed(() => sessionRequest(state).error.value),
 
     trait: <T = string>(name: string): T | undefined =>
       state.identity.value?.traits?.[name] as T | undefined,
@@ -47,12 +48,9 @@ export function useSession() {
       state.identity.value?.metadata_public?.[name] as T | undefined,
 
     /** Re-reads the session, e.g. after a settings flow changed a trait. */
-    refresh: () => loadSession(true),
+    refresh: () => loadSession(true, state),
 
     /** Forgets the cached session, for a sign-out that stays on the page. */
-    forget: () => {
-      state.identity.value = null
-      state.loaded.value = false
-    },
+    forget: () => forgetSession(state),
   }
 }

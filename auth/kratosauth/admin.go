@@ -4,7 +4,6 @@ package kratosauth
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -24,10 +23,15 @@ func NewAdmin(baseURL string, client *http.Client) (*Admin, error) {
 	if baseURL == "" {
 		return nil, fmt.Errorf("kratosauth: admin base URL is required")
 	}
-	if client == nil {
-		client = &http.Client{Timeout: 10 * time.Second}
+	base, err := endpoint(baseURL)
+	if err != nil {
+		return nil, err
 	}
-	return &Admin{baseURL: baseURL, client: client}, nil
+	client = clientFor(client)
+	if client.Timeout <= 0 {
+		client.Timeout = 10 * time.Second
+	}
+	return &Admin{baseURL: base, client: client}, nil
 }
 
 // Account is the part of an identity a sharing screen needs.
@@ -54,7 +58,9 @@ func (a *Admin) FindByEmail(ctx context.Context, email string) (*Account, error)
 
 // Get resolves an identity ID to an account.
 func (a *Admin) Get(ctx context.Context, id string) (*Account, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+	requestCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(requestCtx, http.MethodGet,
 		a.baseURL+"/admin/identities/"+url.PathEscape(id), nil)
 	if err != nil {
 		return nil, fmt.Errorf("kratosauth: request: %w", err)
@@ -74,14 +80,19 @@ func (a *Admin) Get(ctx context.Context, id string) (*Account, error) {
 	}
 
 	var raw identityJSON
-	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+	if err := decodeResponse(ctx, resp, &raw); err != nil {
 		return nil, fmt.Errorf("kratosauth: decode identity: %w", err)
+	}
+	if raw.ID == "" {
+		return nil, fmt.Errorf("%w: identity ID is missing", ErrUpstream)
 	}
 	return raw.account(), nil
 }
 
 func (a *Admin) list(ctx context.Context, query url.Values) ([]Account, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+	requestCtx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(requestCtx, http.MethodGet,
 		a.baseURL+"/admin/identities?"+query.Encode(), nil)
 	if err != nil {
 		return nil, fmt.Errorf("kratosauth: request: %w", err)
@@ -98,12 +109,18 @@ func (a *Admin) list(ctx context.Context, query url.Values) ([]Account, error) {
 	}
 
 	var raw []identityJSON
-	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+	if err := decodeResponse(ctx, resp, &raw); err != nil {
 		return nil, fmt.Errorf("kratosauth: decode identities: %w", err)
+	}
+	if raw == nil {
+		return nil, fmt.Errorf("%w: identity list is not an array", ErrUpstream)
 	}
 
 	out := make([]Account, 0, len(raw))
 	for _, r := range raw {
+		if r.ID == "" {
+			return nil, fmt.Errorf("%w: identity ID is missing", ErrUpstream)
+		}
 		out = append(out, *r.account())
 	}
 	return out, nil

@@ -6,7 +6,7 @@
 import { defineNuxtPlugin, useNuxtApp, useRequestHeaders, useRuntimeConfig, useState } from 'nuxt/app'
 import { config } from '../src/composables/kratos/internal/types'
 import type { SessionIdentity } from '../src/composables/kratos/useSession'
-import { configureSession, loadSession } from '../src/composables/kratos/internal/session'
+import { configureSession, loadSession, whoami } from '../src/composables/kratos/internal/session'
 
 /**
  * Absolute Kratos address for server-side reads. The browser's proxy path
@@ -37,21 +37,13 @@ export default defineNuxtPlugin({
 
       // Without a server address the browser resolves the session.
       read: base
-        ? async () => {
-          // No session cookie means signed out, without asking Kratos.
-          const cookie = useRequestHeaders(['cookie']).cookie ?? ''
-          if (!cookie.includes(`${config.sessionCookie}=`)) return null
-
-          // Nuxt does not forward cookies cross-origin, so pass it by hand. An
-          // expired session answers 401 and renders signed out instead of a 500.
-          const res = await $fetch<{ identity: SessionIdentity }>(
-            `${base}/sessions/whoami`,
-            {
-              headers: { accept: 'application/json', cookie },
-              ignoreResponseError: true,
-            },
-          )
-          return res?.identity ?? null
+        ? async (signal) => {
+          const incoming = useRequestHeaders(['cookie']).cookie ?? ''
+          const cookie = incoming.split(';').map(value => value.trim()).filter((value) => {
+            const name = value.slice(0, value.indexOf('='))
+            return name === config.sessionCookie || name.startsWith('ory_session_')
+          }).join('; ')
+          return cookie ? whoami(signal, base, cookie) : null
         }
         : undefined,
     })

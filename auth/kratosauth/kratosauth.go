@@ -81,7 +81,8 @@ func (i Identity) Email() string {
 type Options struct {
 	// PublicURL is Kratos's public endpoint, e.g. http://127.0.0.1:4433.
 	PublicURL string
-	Client    *http.Client
+	// Client is copied; cookie jars and redirects are disabled for credentialed calls.
+	Client *http.Client
 	// Timeout bounds the whoami call.
 	Timeout time.Duration
 	// SessionCookie is the session cookie's name. Empty means ory_kratos_session; Ory Network's
@@ -96,9 +97,7 @@ func (o *Options) defaults() {
 	if o.SessionCookie == "" {
 		o.SessionCookie = "ory_kratos_session"
 	}
-	if o.Client == nil {
-		o.Client = &http.Client{Timeout: o.Timeout}
-	}
+	o.Client = clientFor(o.Client)
 }
 
 // Client talks to Kratos.
@@ -110,6 +109,11 @@ func New(opts Options) (*Client, error) {
 	if opts.PublicURL == "" {
 		return nil, fmt.Errorf("kratosauth: PublicURL is required")
 	}
+	base, err := endpoint(opts.PublicURL)
+	if err != nil {
+		return nil, err
+	}
+	opts.PublicURL = base
 	opts.defaults()
 	return &Client{opts: opts}, nil
 }
@@ -127,19 +131,24 @@ func (c *Client) credentialed(r *http.Request) bool {
 	return false
 }
 
-// Whoami validates the session cookie or token with Kratos; a request with neither is ErrNoSession without a call.
+// Whoami forwards only session cookies and explicit token/auth headers; requests without them return ErrNoSession.
 func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error) {
 	if !c.credentialed(r) {
 		return nil, ErrNoSession
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
+	requestCtx, cancel := context.WithTimeout(ctx, c.opts.Timeout)
+	defer cancel()
+	req, err := http.NewRequestWithContext(requestCtx, http.MethodGet,
 		c.opts.PublicURL+"/sessions/whoami", nil)
 	if err != nil {
 		return nil, fmt.Errorf("kratosauth: request: %w", err)
 	}
 
-	if cookie := r.Header.Get("Cookie"); cookie != "" {
-		req.Header.Set("Cookie", cookie)
+	req.Header.Set("Accept", "application/json")
+	for _, cookie := range r.Cookies() {
+		if cookie.Name == c.opts.SessionCookie || strings.HasPrefix(cookie.Name, "ory_session_") {
+			req.AddCookie(cookie)
+		}
 	}
 	if token := r.Header.Get("X-Session-Token"); token != "" {
 		req.Header.Set("X-Session-Token", token)
@@ -156,7 +165,7 @@ func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error)
 
 	switch resp.StatusCode {
 	case http.StatusOK:
-	case http.StatusUnauthorized, http.StatusForbidden:
+	case http.StatusUnauthorized:
 		return nil, ErrNoSession
 	default:
 		return nil, fmt.Errorf("%w: whoami returned %d", ErrUpstream, resp.StatusCode)
@@ -164,20 +173,28 @@ func (c *Client) Whoami(ctx context.Context, r *http.Request) (*Identity, error)
 
 	var session struct {
 		ID       string `json:"id"`
-		Active   bool   `json:"active"`
+		Active   *bool  `json:"active"`
 		Identity struct {
 			ID             string          `json:"id"`
 			Traits         json.RawMessage `json:"traits"`
 			MetadataPublic json.RawMessage `json:"metadata_public"`
 		} `json:"identity"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&session); err != nil {
-		return nil, fmt.Errorf("kratosauth: decode session: %w", err)
+	if err := decodeResponse(ctx, resp, &session); err != nil {
+		return nil, err
+	}
+	if session.Active == nil {
+		return nil, fmt.Errorf("%w: session active flag is missing", ErrUpstream)
 	}
 
 	// Kratos answers 200 for an inactive session.
-	if !session.Active {
+	if !*session.Active {
 		return nil, ErrNoSession
+	}
+
+	var traits map[string]json.RawMessage
+	if session.ID == "" || session.Identity.ID == "" || json.Unmarshal(session.Identity.Traits, &traits) != nil || traits == nil {
+		return nil, fmt.Errorf("%w: incomplete session", ErrUpstream)
 	}
 
 	return &Identity{

@@ -19,11 +19,7 @@ const identity = {
 }
 
 function answerWith(status: number, body?: unknown) {
-  return vi.fn().mockResolvedValue({
-    ok: status >= 200 && status < 300,
-    status,
-    json: async () => body,
-  })
+  return vi.fn().mockImplementation(() => Promise.resolve(new Response(JSON.stringify(body), { status })))
 }
 
 describe('useSession', () => {
@@ -37,7 +33,7 @@ describe('useSession', () => {
   })
 
   it('reads the identity out of a live session', async () => {
-    vi.stubGlobal('fetch', answerWith(200, { identity }))
+    vi.stubGlobal('fetch', answerWith(200, { id: 'session', active: true, identity }))
     const use = await fresh()
 
     const s = use()
@@ -65,7 +61,7 @@ describe('useSession', () => {
 
   // Concurrent callers in one paint share one request.
   it('shares one request between concurrent callers', async () => {
-    const fetcher = answerWith(200, { identity })
+    const fetcher = answerWith(200, { id: 'session', active: true, identity })
     vi.stubGlobal('fetch', fetcher)
     const use = await fresh()
 
@@ -80,7 +76,7 @@ describe('useSession', () => {
 
   // A settings flow changes a trait, so the page can ask again.
   it('refreshes on demand', async () => {
-    const fetcher = answerWith(200, { identity })
+    const fetcher = answerWith(200, { id: 'session', active: true, identity })
     vi.stubGlobal('fetch', fetcher)
     const use = await fresh()
 
@@ -166,7 +162,7 @@ describe('useSession with a host', () => {
 
   // The payload already carries the answer, so the browser does not ask again.
   it('does not re-ask when the host store arrives already loaded', async () => {
-    const fetcher = answerWith(200, { identity })
+    const fetcher = answerWith(200, { id: 'session', active: true, identity })
     vi.stubGlobal('window', {})
     vi.stubGlobal('fetch', fetcher)
 

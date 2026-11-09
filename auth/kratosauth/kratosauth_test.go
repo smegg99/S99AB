@@ -78,7 +78,7 @@ func TestWhoamiResolvesAnActiveSession(t *testing.T) {
 
 // Kratos answers 200 for an ended session, so the active flag decides.
 func TestWhoamiInactiveSessionIsNoSession(t *testing.T) {
-	client := whoami(t, http.StatusOK, `{"active":false,"identity":{"id":"id-1"}}`)
+	client := whoami(t, http.StatusOK, `{"active":false,"identity":{"id":"id-1","traits":{}}}`)
 
 	if _, err := client.Whoami(context.Background(), request()); !errors.Is(err, kratosauth.ErrNoSession) {
 		t.Fatalf("err = %v, want ErrNoSession", err)
@@ -152,7 +152,7 @@ func TestWhoamiWithOnlyUnrelatedCookiesMakesNoCall(t *testing.T) {
 }
 
 func TestWhoamiSeesAnOryNetworkSessionCookie(t *testing.T) {
-	client := whoami(t, http.StatusOK, `{"id":"s","active":true,"identity":{"id":"id-1"}}`)
+	client := whoami(t, http.StatusOK, `{"id":"s","active":true,"identity":{"id":"id-1","traits":{}}}`)
 	r := httptest.NewRequest(http.MethodGet, "/", nil)
 	r.Header.Set("Cookie", "ory_session_coolproject=abc")
 
