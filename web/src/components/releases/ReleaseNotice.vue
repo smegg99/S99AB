@@ -1,38 +1,41 @@
 <!-- web/src/components/releases/ReleaseNotice.vue -->
 <template>
-  <!-- A standing notice, so a note rather than Vuetify's assertive alert. -->
-  <v-alert
-    :type="tone"
+  <v-card
+    :color="tone"
     :style="{ '--s99ab-notice': `var(--v-theme-${tone})` }"
+    tag="aside"
     role="note"
     variant="tonal"
-    class="notice pa-5"
+    class="notice d-flex align-start ga-4 pa-5"
   >
-    <p class="text-subtitle-1 font-weight-bold mt-0 mb-2">
-      {{ heading }}
-    </p>
-    <!-- The app's paragraphs; text is the one-paragraph shorthand. -->
-    <slot>
-      <p
-        v-if="text"
-        class="text-body-2 mt-0 mb-3"
-      >
-        {{ text }}
+    <v-icon :icon="`$${tone}`" />
+    <div class="notice__body">
+      <p class="text-title-medium font-weight-bold mt-0 mb-2">
+        {{ heading }}
       </p>
-    </slot>
-    <v-btn
-      v-if="linkTo || linkHref"
-      :to="linkTo || undefined"
-      :href="linkHref || undefined"
-      :target="linkHref ? '_blank' : undefined"
-      :rel="linkHref ? 'noopener' : undefined"
-      class="px-0"
-      variant="text"
-      size="small"
-    >
-      {{ linkText }}
-    </v-btn>
-  </v-alert>
+      <!-- The app's paragraphs; text is the one-paragraph shorthand. -->
+      <slot>
+        <p
+          v-if="text"
+          class="text-body-medium mt-0 mb-3"
+        >
+          {{ text }}
+        </p>
+      </slot>
+      <v-btn
+        v-if="linkTo || linkHref"
+        :to="linkTo || undefined"
+        :href="linkHref || undefined"
+        :target="linkHref ? '_blank' : undefined"
+        :rel="linkHref ? 'noopener' : undefined"
+        class="px-0"
+        variant="text"
+        size="small"
+      >
+        {{ linkText }}
+      </v-btn>
+    </div>
+  </v-card>
 </template>
 
 <script setup lang="ts">
@@ -58,6 +61,10 @@ const linkText = computed(() => linkLabel || t('release.feedback', 'Share feedba
 </script>
 
 <style scoped>
+.notice__body {
+  min-width: 0;
+}
+
 .notice {
   overflow: hidden;
   border: 1px solid rgb(var(--v-theme-edge));

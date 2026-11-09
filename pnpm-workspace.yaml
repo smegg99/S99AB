@@ -1,9 +1,10 @@
-allowBuilds:
-  esbuild: set this to true or false
-  unrs-resolver: set this to true or false
 # pnpm-workspace.yaml
-onlyBuiltDependencies:
-  - esbuild
-  - unrs-resolver
-  - '@parcel/watcher'
+allowBuilds:
+  esbuild: true
+  unrs-resolver: true
+  '@parcel/watcher': true
 verifyDepsBeforeRun: false
+# Patched floors for transitive tool dependencies whose parents still allow older releases.
+overrides:
+  'glob@<14.0.2': 14.0.2
+  'minimatch@<11.0.1': 11.0.1

@@ -12,20 +12,13 @@ import Panel from '../src/components/primitives/Panel.vue'
 import Stat from '../src/components/primitives/Stat.vue'
 import ToolGroup from '../src/components/primitives/ToolGroup.vue'
 import { vuetify, vuetifyWith } from './mount'
+import type { Window } from 'happy-dom'
 
-// Vuetify's display service samples window.innerWidth when the plugin is
-// created, so the width is set first; a later resize flips `permanent` and force-opens the drawer.
+// Update matchMedia as well as innerWidth before creating the display service.
 function setViewport(width: number) {
-  Object.defineProperty(window, 'innerWidth', {
-    value: width,
-    configurable: true,
-  })
+  const browser = window as unknown as Window
+  browser.happyDOM.setWindowSize({ width })
 }
-
-setViewport(1600)
-
-setViewport(700)
-const narrowVuetify = vuetifyWith({})
 
 // AppShell's drawer renders v-list-item with `to`, which resolves a route.
 const router = createRouter({
@@ -37,9 +30,10 @@ const router = createRouter({
 })
 
 function mountShell(props: Record<string, unknown> = {}, wide = true) {
+  setViewport(wide ? 1600 : 700)
   return mount(AppShell, {
     props,
-    global: { plugins: [wide ? vuetify : narrowVuetify, router] },
+    global: { plugins: [vuetifyWith({}), router] },
   })
 }
 
