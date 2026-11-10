@@ -4,11 +4,10 @@ import { useTranslate, type TranslateParams } from './useTranslate'
 import { DEFAULT_MESSAGES, FALLBACK, fieldSchema } from '../internal/zod'
 
 /** The slice of zod used here, typed structurally because zod is an optional peer. */
-export interface ZodLike {
-  safeParse: (value: unknown) => {
-    success: boolean
-    error?: { issues: ZodIssue[] }
-  }
+export interface ZodLike<T = unknown> {
+  safeParse: (value: unknown) =>
+    | { success: true, data: T }
+    | { success: false, error: { issues: ZodIssue[] } }
 }
 
 export interface ZodIssue {
@@ -93,14 +92,14 @@ export interface ZodFormResult<T> {
 }
 
 /** Whole-object validation for submit, from the same schema as the field rules. */
-export function useZodForm<T>(schema: ZodLike, options: ZodRulesOptions = {}) {
+export function useZodForm<T>(schema: ZodLike<T>, options: ZodRulesOptions = {}) {
   const t = useTranslate()
   const messages = { ...DEFAULT_MESSAGES, ...options.messages }
 
   return function validate(value: unknown): ZodFormResult<T> {
     const parsed = schema.safeParse(value)
     if (parsed.success) {
-      return { validate: () => true, errors: {}, parsed: value as T }
+      return { validate: () => true, errors: {}, parsed: parsed.data }
     }
 
     const errors: Record<string, string> = {}

@@ -4,7 +4,7 @@ import { defineComponent, h } from 'vue'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-import { useZodForm, useZodRules, type ZodLike } from '../src/composables/useZodRules'
+import { useZodForm, useZodRules } from '../src/composables/useZodRules'
 import { fieldSchema } from '../src/internal/zod'
 import { fakeI18n } from './fake-i18n'
 
@@ -12,14 +12,14 @@ import { fakeI18n } from './fake-i18n'
 const zCreateItem = z.object({
   name: z.string().min(1).max(80),
   status: z.enum(['active', 'paused', 'archived']).optional().default('active'),
-}) as unknown as ZodLike
+})
 
 const zNested = z.object({
   address: z.object({ city: z.string().min(2) }),
-}) as unknown as ZodLike
+})
 
 const zIntersection = z.object({ total: z.int().gte(0) })
-  .and(z.object({ items: z.array(z.string()) })) as unknown as ZodLike
+  .and(z.object({ items: z.array(z.string()) }))
 
 function inComponent<T>(fn: () => T): T {
   let out!: T
@@ -171,4 +171,13 @@ describe('useZodForm', () => {
 
     expect(Object.keys(errors).filter(k => k === 'name')).toHaveLength(1)
   })
+})
+
+it('returns the schema output with coercion, transforms, defaults and stripping', () => {
+  const validate = inComponent(() => useZodForm(z.object({
+    count: z.coerce.number().int(), title: z.string().trim(), enabled: z.boolean().default(true),
+  })))
+  const result = validate({ count: '7', title: ' hello ', extra: 'discard' })
+  expect(result.parsed).toEqual({ count: 7, title: 'hello', enabled: true })
+  expect(validate({ count: 'not a number' }).parsed).toBeUndefined()
 })
