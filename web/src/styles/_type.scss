@@ -65,7 +65,7 @@ samp,
 }
 
 /* Small tracked capitals for a panel head or section label. Vuetify's
-   .text-overline is 0.75rem/2 with looser tracking. */
+   Use the layer eyebrow token for compact labels. */
 .s99ab-eyebrow {
   display: block;
   color: rgb(var(--v-theme-ink3));

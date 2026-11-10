@@ -41,7 +41,7 @@
         <time
           v-if="published"
           :datetime="downloads.published_at"
-          class="text-caption text-medium-emphasis"
+          class="text-body-small text-medium-emphasis"
         >{{ published }}</time>
         <v-spacer />
         <slot name="actions" />
@@ -71,7 +71,7 @@
 
       <div
         v-if="notes.length || changelogTo || allReleasesUrl"
-        class="s99ab-downloads__foot text-caption text-medium-emphasis"
+        class="s99ab-downloads__foot text-body-small text-medium-emphasis"
       >
         <p
           v-for="note in notes"

@@ -5,7 +5,7 @@
 
 /* The scrim stays Vuetify's black; only its strength is set, as
    `overlay-opacity` in src/theme/index.ts. */
-.v-overlay .v-card {
+.v-dialog .v-card {
   background: rgb(var(--v-theme-chrome));
   border: 1px solid rgb(var(--v-theme-line));
 }
@@ -19,7 +19,8 @@
 }
 
 /* The menu draws the border, so its list must not draw a second one. */
-.v-menu > .v-overlay__content > .v-list {
+.v-menu > .v-overlay__content > .v-list,
+.v-menu > .v-overlay__content > .v-card {
   border: 0;
 }
 
@@ -49,11 +50,14 @@
   line-height: 1.3;
 }
 
-/* Vuetify's prepend column is sized for a 24px icon plus margin. */
+/* Rich prepend content sizes itself; icon columns retain the shared minimum. */
 .v-menu .v-list-item__prepend,
 .v-select__content .v-list-item__prepend,
 .v-autocomplete__content .v-list-item__prepend {
-  width: var(--s99ab-menu-prepend-w);
+  width: auto;
+  min-width: var(--s99ab-menu-prepend-w);
+  padding-inline-end: var(--s99ab-control-gap);
+  flex-shrink: 0;
   margin-inline-end: 0;
 }
 

@@ -7,7 +7,7 @@
     variant="tonal"
   >
     <div class="d-flex flex-wrap align-center ga-4">
-      <span class="text-body-2">{{ body }}</span>
+      <span class="text-body-medium">{{ body }}</span>
 
       <v-spacer />
 

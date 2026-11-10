@@ -7,10 +7,10 @@
   >
     <div class="s99ab-asset__text">
       <div class="d-flex align-baseline flex-wrap ga-2">
-        <span class="font-weight-bold text-body-2">{{ row.label }}</span>
+        <span class="font-weight-bold text-body-medium">{{ row.label }}</span>
         <span
           v-if="row.sub"
-          class="text-caption text-medium-emphasis"
+          class="text-body-small text-medium-emphasis"
         >{{ row.sub }}</span>
 
         <!-- Only when this platform's build is behind the newest release. -->
@@ -33,7 +33,7 @@
 
       <span
         v-if="row.filename"
-        class="text-caption text-medium-emphasis s99ab-asset__file"
+        class="text-body-small text-medium-emphasis s99ab-asset__file"
       >{{ row.filename }}</span>
 
       <!-- GitHub reports no digest for source archives or older assets. -->
@@ -63,7 +63,7 @@
 
     <span
       v-if="row.size"
-      class="text-caption text-medium-emphasis d-none d-sm-block"
+      class="text-body-small text-medium-emphasis d-none d-sm-block"
     >{{ row.size }}</span>
 
     <v-btn
