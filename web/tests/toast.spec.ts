@@ -497,3 +497,19 @@ describe('on a server', () => {
     }
   })
 })
+
+it.each(['dedupe', 'update', 'resume'] as const)('keeps a hidden toast queued after %s', (operation) => {
+  configureToast({ maxVisible: 1, stagger: 0 })
+  const toast = useToast()
+  const blocker = toast.info('visible', { timeout: 0 })
+  const queued = toast.info('queued', { timeout: 100 })
+  if (operation === 'dedupe') toast.info('queued')
+  if (operation === 'update') toast.update(queued, { text: 'updated' })
+  if (operation === 'resume') toast.resume(queued)
+  vi.advanceTimersByTime(500)
+  expect(queueDepth('bottom-end')).toBe(1)
+  toast.dismiss(blocker)
+  expect(visibleAt('bottom-end')[0]?.id).toBe(queued)
+  vi.advanceTimersByTime(100)
+  expect(visibleAt('bottom-end')).toHaveLength(0)
+})

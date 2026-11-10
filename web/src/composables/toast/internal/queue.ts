@@ -43,7 +43,7 @@ function clearTimer(id: number) {
 let lastDue = 0
 
 function startTimer(t: Toast) {
-  if (t.timeout <= 0 || timers.has(t.id)) return
+  if (t.timeout <= 0 || timers.has(t.id) || !visibleAt(t.position).some(row => row.id === t.id)) return
 
   const now = Date.now()
   // Its own timeout, or a stagger after the last booking, whichever is later.
