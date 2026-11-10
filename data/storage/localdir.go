@@ -4,6 +4,8 @@ package storage
 
 import (
 	"context"
+	"crypto/rand"
+	"errors"
 	"fmt"
 	"io"
 	"net/url"
@@ -24,49 +26,81 @@ func NewLocalDir(root, base string) *LocalDir {
 	return &LocalDir{root: root, base: base}
 }
 
-func (l *LocalDir) path(key string) (string, error) {
-	if err := checkKey(key); err != nil {
-		return "", err
+func (l *LocalDir) open(ctx context.Context, key string, create bool) (*os.Root, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
 	}
-	return filepath.Join(l.root, filepath.FromSlash(key)), nil
+	if err := checkKey(key); err != nil {
+		return nil, err
+	}
+	if create {
+		if err := os.MkdirAll(l.root, 0o755); err != nil {
+			return nil, err
+		}
+	}
+	return os.OpenRoot(l.root)
 }
 
-func (l *LocalDir) Put(_ context.Context, key string, r io.Reader, _ string) error {
-	path, err := l.path(key)
+// Put flushes file data before an atomic rename; callers must supply a reader that can stop on cancellation.
+func (l *LocalDir) Put(ctx context.Context, key string, r io.Reader, _ string) error {
+	root, err := l.open(ctx, key, true)
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
-		return fmt.Errorf("storage: create %s: %w", filepath.Dir(path), err)
+	defer root.Close()
+	path := filepath.FromSlash(key)
+	dir := filepath.Dir(path)
+	if err := root.MkdirAll(dir, 0o755); err != nil {
+		return fmt.Errorf("storage: create directory: %w", err)
 	}
-
-	// Temp file and rename, so a crash cannot leave a truncated object.
-	tmp, err := os.CreateTemp(filepath.Dir(path), ".put-*")
+	name := filepath.Join(dir, ".put-"+rand.Text())
+	tmp, err := root.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
 	if err != nil {
 		return fmt.Errorf("storage: temp file: %w", err)
 	}
-	defer os.Remove(tmp.Name())
-
-	if _, err := io.Copy(tmp, r); err != nil {
-		tmp.Close()
+	defer root.Remove(name)
+	_, copyErr := io.Copy(tmp, &cancelReader{ctx: ctx, reader: r})
+	if copyErr == nil {
+		copyErr = ctx.Err()
+	}
+	if copyErr == nil {
+		copyErr = tmp.Sync()
+	}
+	closeErr := tmp.Close()
+	if err := errors.Join(copyErr, closeErr); err != nil {
 		return fmt.Errorf("storage: write %s: %w", key, err)
 	}
-	if err := tmp.Close(); err != nil {
-		return fmt.Errorf("storage: close %s: %w", key, err)
+	if err := ctx.Err(); err != nil {
+		return err
 	}
-	if err := os.Rename(tmp.Name(), path); err != nil {
+	if err := root.Rename(name, path); err != nil {
 		return fmt.Errorf("storage: commit %s: %w", key, err)
 	}
 	return nil
 }
 
-func (l *LocalDir) Get(_ context.Context, key string) (io.ReadCloser, error) {
-	path, err := l.path(key)
+type cancelReader struct {
+	ctx    context.Context
+	reader io.Reader
+}
+
+func (r *cancelReader) Read(p []byte) (int, error) {
+	if err := r.ctx.Err(); err != nil {
+		return 0, err
+	}
+	return r.reader.Read(p)
+}
+
+func (l *LocalDir) Get(ctx context.Context, key string) (io.ReadCloser, error) {
+	root, err := l.open(ctx, key, false)
+	if os.IsNotExist(err) {
+		return nil, fmt.Errorf("%w: %q", ErrNotFound, key)
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	f, err := os.Open(path)
+	defer root.Close()
+	f, err := root.Open(filepath.FromSlash(key))
 	if os.IsNotExist(err) {
 		return nil, fmt.Errorf("%w: %q", ErrNotFound, key)
 	}
@@ -90,24 +124,31 @@ func (l *LocalDir) URL(_ context.Context, key string, _ time.Duration) (string, 
 	return l.base + "/" + strings.Join(parts, "/"), nil
 }
 
-func (l *LocalDir) Delete(_ context.Context, key string) error {
-	path, err := l.path(key)
+func (l *LocalDir) Delete(ctx context.Context, key string) error {
+	root, err := l.open(ctx, key, false)
+	if os.IsNotExist(err) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}
-	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+	defer root.Close()
+	if err := root.Remove(filepath.FromSlash(key)); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("storage: delete %s: %w", key, err)
 	}
-	// Deleting a missing object succeeds.
 	return nil
 }
 
-func (l *LocalDir) Exists(_ context.Context, key string) (bool, error) {
-	path, err := l.path(key)
+func (l *LocalDir) Exists(ctx context.Context, key string) (bool, error) {
+	root, err := l.open(ctx, key, false)
+	if os.IsNotExist(err) {
+		return false, nil
+	}
 	if err != nil {
 		return false, err
 	}
-	_, err = os.Stat(path)
+	defer root.Close()
+	_, err = root.Stat(filepath.FromSlash(key))
 	if os.IsNotExist(err) {
 		return false, nil
 	}
