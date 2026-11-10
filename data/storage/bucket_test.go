@@ -4,15 +4,14 @@ package storage_test
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"io"
-	"net/http"
 	"os"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -20,50 +19,31 @@ import (
 	"github.com/smegg99/s99ab/data/storage"
 )
 
-// Bucket tests need a real S3 endpoint (MinIO on 127.0.0.1:9400, or S99AB_MINIO_ENDPOINT) and skip without one.
-const defaultEndpoint = "127.0.0.1:9400"
-
-func endpoint() string {
-	if v := os.Getenv("S99AB_MINIO_ENDPOINT"); v != "" {
-		return v
-	}
-	return defaultEndpoint
-}
-
-func reachable(addr string) bool {
-	client := http.Client{Timeout: 750 * time.Millisecond}
-
-	resp, err := client.Get("http://" + addr + "/minio/health/live")
-	if err != nil {
-		return false
-	}
-	resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
-}
-
 // bucket returns a Bucket backed by a freshly created, uniquely named bucket.
+func s3Endpoint(t *testing.T) string {
+	t.Helper()
+	addr := os.Getenv("S99AB_TEST_S3_ENDPOINT")
+	if addr == "" {
+		if os.Getenv("S99AB_REQUIRE_INTEGRATION") == "1" {
+			t.Fatal("S99AB_TEST_S3_ENDPOINT is required")
+		}
+		t.Skip("run just test-services for SeaweedFS coverage")
+	}
+	return addr
+}
+
 func bucket(t *testing.T) *storage.Bucket {
 	t.Helper()
-
-	addr := endpoint()
-	if !reachable(addr) {
-		t.Skipf("no S3 endpoint at %s; see the comment in bucket_test.go", addr)
-	}
-
-	name := "test-" + strings.ToLower(strings.ReplaceAll(t.Name(), "_", "-"))
-	if len(name) > 60 {
-		name = name[:60]
-	}
-
+	addr := s3Endpoint(t)
+	name := "s99ab-" + strings.ToLower(rand.Text())
 	ctx := context.Background()
 	admin, err := minio.New(addr, &minio.Options{
-		Creds: credentials.NewStaticV4("minioadmin", "minioadmin", ""),
+		Creds: credentials.NewStaticV4(os.Getenv("S99AB_TEST_S3_ACCESS_KEY"), os.Getenv("S99AB_TEST_S3_SECRET_KEY"), ""),
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_ = admin.RemoveBucket(ctx, name)
 	if err := admin.MakeBucket(ctx, name, minio.MakeBucketOptions{}); err != nil {
 		t.Fatalf("create bucket %s: %v", name, err)
 	}
@@ -71,14 +51,16 @@ func bucket(t *testing.T) *storage.Bucket {
 		for obj := range admin.ListObjects(ctx, name, minio.ListObjectsOptions{Recursive: true}) {
 			_ = admin.RemoveObject(ctx, name, obj.Key, minio.RemoveObjectOptions{})
 		}
-		_ = admin.RemoveBucket(ctx, name)
+		if err := admin.RemoveBucket(ctx, name); err != nil {
+			t.Errorf("remove owned bucket: %v", err)
+		}
 	})
 
 	b, err := storage.NewBucket(ctx, storage.BucketConfig{
 		Endpoint:  addr,
 		Bucket:    name,
-		AccessKey: "minioadmin",
-		SecretKey: "minioadmin",
+		AccessKey: os.Getenv("S99AB_TEST_S3_ACCESS_KEY"),
+		SecretKey: os.Getenv("S99AB_TEST_S3_SECRET_KEY"),
 	})
 	if err != nil {
 		t.Fatal(err)

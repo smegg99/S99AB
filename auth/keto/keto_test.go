@@ -4,9 +4,11 @@ package keto_test
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"slices"
 	"testing"
 	"time"
@@ -14,13 +16,7 @@ import (
 	"github.com/smegg99/s99ab/auth/keto"
 )
 
-// A real Keto on ports other than Ory's 4466/4467, so the tests cannot reach another project's Keto.
-const (
-	readURL  = "http://127.0.0.1:4566"
-	writeURL = "http://127.0.0.1:4567"
-)
-
-func reachable() bool {
+func reachable(readURL string) bool {
 	client := http.Client{Timeout: 750 * time.Millisecond}
 
 	resp, err := client.Get(readURL + "/health/ready")
@@ -33,10 +29,16 @@ func reachable() bool {
 
 func client(t *testing.T) *keto.Client {
 	t.Helper()
-	if !reachable() {
-		t.Skipf("no Keto at %s; run `docker compose up -d keto` in S99ABDemo", readURL)
+	readURL, writeURL := os.Getenv("S99AB_TEST_KETO_READ_URL"), os.Getenv("S99AB_TEST_KETO_WRITE_URL")
+	if readURL == "" || writeURL == "" {
+		if os.Getenv("S99AB_REQUIRE_INTEGRATION") == "1" {
+			t.Fatal("Keto test URLs are required")
+		}
+		t.Skip("run just test-services for Keto coverage")
 	}
-
+	if !reachable(readURL) {
+		t.Fatal("configured Keto is unavailable")
+	}
 	c, err := keto.New(keto.Options{ReadURL: readURL, WriteURL: writeURL})
 	if err != nil {
 		t.Fatal(err)
@@ -45,7 +47,7 @@ func client(t *testing.T) *keto.Client {
 }
 
 // object names each test's own object, so tests never see each other's tuples.
-func object(t *testing.T) string { return "item-" + t.Name() }
+func object(t *testing.T) string { return "item-" + t.Name() + "-" + rand.Text() }
 
 func grant(t *testing.T, c *keto.Client, obj, subject string, rel keto.Relation) {
 	t.Helper()
@@ -235,7 +237,7 @@ func TestUnreachableKetoIsAnErrorNotAllow(t *testing.T) {
 }
 
 func TestMissingURLsAreRejected(t *testing.T) {
-	if _, err := keto.New(keto.Options{ReadURL: readURL}); err == nil {
+	if _, err := keto.New(keto.Options{ReadURL: "http://127.0.0.1:1"}); err == nil {
 		t.Fatal("a client with no write URL was accepted")
 	}
 }

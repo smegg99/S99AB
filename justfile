@@ -2,12 +2,19 @@
 default:
     @just --list
 
-# Format, vet and test everything, both halves.
-check: fmt vet test lint typecheck test-web check-version check-locales
+# Check both halves without rewriting source files.
+check: check-fmt vet test lint typecheck test-web check-version check-locales contracts check-package
+
+# Release gate, including disposable services and a real Nuxt browser consumer.
+release-check: check test-services test-browser audit
 
 # Format all Go files.
 fmt:
     gofmt -l -w .
+
+# Fail on unformatted Go files without changing them.
+check-fmt:
+    @files=$(gofmt -l .); test -z "$files" || { printf '%s\n' "$files"; exit 1; }
 
 # Run go vet.
 vet:
@@ -15,7 +22,7 @@ vet:
 
 # Run all tests.
 test:
-    go test ./...
+    go test -race ./...
 
 # Lint and check formatting on the web half.
 lint:
@@ -57,4 +64,23 @@ check-locales:
 
 # Lint the shared contract fragments against a probe document.
 contracts:
-    pnpm --package=@redocly/cli dlx redocly lint contracts/probe.yaml
+    pnpm exec redocly lint contracts/probe.yaml
+
+# Validate published paths, licenses and exclusions without creating a tarball.
+check-package:
+    node scripts/check-package.mjs
+
+# PostgreSQL, SeaweedFS, Keto and Kratos on random loopback ports; removed afterwards.
+test-services:
+    python3 scripts/test-services.py
+
+# Build the SSR consumer, then use a fresh Chromium profile on an owned virtual display.
+test-browser:
+    pnpm exec nuxt build tests/consumer
+    pnpm exec vue-tsc --noEmit -p tests/consumer/.nuxt/tsconfig.app.json
+    xvfb-run -a -s '-screen 0 1440x1100x24' pnpm exec playwright test --config tests/browser/playwright.config.ts --headed
+
+# Keep all severities visible; unresolved advisories fail the release gate.
+audit:
+    go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+    pnpm audit

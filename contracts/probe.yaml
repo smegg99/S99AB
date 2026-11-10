@@ -7,6 +7,9 @@ openapi: 3.1.0
 
 info:
   title: s99ab contract probe
+  license:
+    name: MIT
+    identifier: MIT
   version: 1.0.0
   description: Compile target for the shared fragments. Never served.
 

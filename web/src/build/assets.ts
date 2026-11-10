@@ -23,12 +23,7 @@ export interface IconSubsetOptions {
   disabled?: boolean
 }
 
-/**
- * s99abIconSubset drops the Material Design Icons rules nothing references.
- * Every chunk and every stylesheet (minus the icon rules themselves) is scanned
- * for names. The font file is untouched. When the scan finds no icons or a
- * runtime-built name, it leaves the bundle alone and logs why.
- */
+/** Drops unreferenced icon rules only when all names can be found statically. */
 export function s99abIconSubset(options: IconSubsetOptions = {}): Plugin {
   const safelist = new Set(
     (options.safelist ?? []).map(name => (name.startsWith('mdi-') ? name : `mdi-${name}`)),
@@ -69,7 +64,7 @@ export function s99abIconSubset(options: IconSubsetOptions = {}): Plugin {
       if (dynamic) {
         this.warn(
           's99ab:icon-subset: an icon name is built at runtime, so a static scan cannot see it. '
-          + 'Left the stylesheet whole. Pass the names through the plugin\'s safelist to subset anyway.',
+          + 'Left the stylesheet whole; a safelist cannot establish all possible runtime names.',
         )
         return
       }
@@ -111,11 +106,7 @@ export interface ModernFontsOptions {
   disabled?: boolean
 }
 
-/**
- * s99abModernFonts keeps only the woff2 of each font. Legacy entries are dropped
- * per @font-face src list; a face left empty is restored untouched, and a font
- * file is deleted only when no stylesheet or chunk mentions it.
- */
+/** Keeps woff2 sources and removes unused alternatives without emptying a font face. */
 export function s99abModernFonts(options: ModernFontsOptions = {}): Plugin {
   return {
     name: 's99ab:modern-fonts',

@@ -4,31 +4,18 @@ package outbox_test
 
 import (
 	"context"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/data/internal/testservice"
 	"github.com/smegg99/s99ab/data/outbox"
 )
 
 // Covers what SQLite accepts and Postgres rejects; set S99AB_TEST_PG_DSN to run it.
 func TestQueueOnPostgres(t *testing.T) {
-	dsn := os.Getenv("S99AB_TEST_PG_DSN")
-	if dsn == "" {
-		t.Skip("S99AB_TEST_PG_DSN not set")
-	}
-
-	ctx := context.Background()
-	conn, err := db.Open(context.Background(), db.Config{Driver: db.Postgres, DSN: dsn})
-	if err != nil {
-		t.Fatalf("open: %v", err)
-	}
-	defer conn.Close()
-
-	if _, err := conn.ExecContext(ctx, `DROP TABLE IF EXISTS outbox`); err != nil {
-		t.Fatalf("drop: %v", err)
-	}
+	ctx := t.Context()
+	conn := testservice.Postgres(t)
 
 	// The driver is detected, not passed.
 	if err := outbox.Migrate(ctx, conn); err != nil {
@@ -92,4 +79,13 @@ func TestQueueOnPostgres(t *testing.T) {
 	if attempts != 1 {
 		t.Fatalf("attempts = %d, want 1", attempts)
 	}
+}
+
+func TestPostgresExpiredWorkerCannotChangeNewResult(t *testing.T) {
+	conn := testservice.Postgres(t)
+	if err := outbox.Migrate(t.Context(), conn); err != nil {
+		t.Fatal(err)
+	}
+	ownership(t, conn)
+	staleRetry(t, conn)
 }

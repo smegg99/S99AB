@@ -105,12 +105,30 @@ Nuxt such as a desktop bridge, import from a subpath:
 
 ## Development
 
+Use Go 1.27, Node.js 24 or newer, pnpm 11.3.0 and `just`. Install dependencies
+with `pnpm install --frozen-lockfile`.
+
 ```sh
 just check
+just release-check
 ```
 
-That runs formatting, vet/tests, ESLint, Vue typechecking, Vitest, version parity
-and locale parity.
+`check` verifies formatting without changing files, runs Go vet and race tests,
+ESLint, Vue typechecking, Vitest, version and locale parity, contract linting and
+package contents. Use `just fmt` or `just fix` to apply formatting.
+
+`release-check` also needs Docker, Python 3, Xvfb and Chromium installed with
+`pnpm exec playwright install chromium`. It creates disposable PostgreSQL,
+SeaweedFS, Keto and Kratos containers on loopback ports, builds an SSR Nuxt consumer,
+checks desktop/phone layouts in EN/PL and light/dark with normal/high contrast,
+then runs dependency audits. No existing browser session is used. Browser
+artifacts go to `$TMPDIR/s99ab-browser-results` (or `/tmp`); set
+`S99AB_BROWSER_ARTIFACTS` to keep them elsewhere.
+
+The stages can also run separately: `just test-services`, `just test-browser`
+and `just audit`. Unit tests skip external services; `test-services` requires
+them and fails if they are unavailable. Audits report all severities and fail
+on unresolved advisories.
 
 ## License
 

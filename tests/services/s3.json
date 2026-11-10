@@ -1,0 +1,7 @@
+{
+  "identities": [{
+    "name": "integration",
+    "credentials": [{"accessKey": "s99ab-test", "secretKey": "s99ab-test-only"}],
+    "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+  }]
+}

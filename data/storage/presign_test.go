@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -92,16 +93,13 @@ func TestBucketRejectsBadKeys(t *testing.T) {
 }
 
 func TestMissingBucketFailsAtConstruction(t *testing.T) {
-	addr := endpoint()
-	if !reachable(addr) {
-		t.Skipf("no S3 endpoint at %s", addr)
-	}
+	addr := s3Endpoint(t)
 
 	_, err := storage.NewBucket(context.Background(), storage.BucketConfig{
 		Endpoint:  addr,
 		Bucket:    "does-not-exist-at-all",
-		AccessKey: "minioadmin",
-		SecretKey: "minioadmin",
+		AccessKey: os.Getenv("S99AB_TEST_S3_ACCESS_KEY"),
+		SecretKey: os.Getenv("S99AB_TEST_S3_SECRET_KEY"),
 	})
 	if err == nil {
 		t.Fatal("a missing bucket was accepted; the failure would surface under a user's upload")

@@ -17,7 +17,7 @@ export default createConfigForNuxt({
   })
   .append({
     // The Nuxt preset exempts layouts only at the lint root, not under web/.
-    files: ['web/src/components/**/*.vue', 'web/layouts/**/*.vue'],
+    files: ['web/src/components/**/*.vue', 'web/layouts/**/*.vue', 'tests/consumer/app/pages/**/*.vue'],
     rules: {
       // Components get the 'Ui' prefix (Panel.vue is UiPanel); layouts are
       // named by file.
