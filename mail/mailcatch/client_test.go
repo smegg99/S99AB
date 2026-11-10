@@ -4,7 +4,9 @@ package mailcatch
 
 import (
 	"bytes"
+	"errors"
 	"io"
+	"strings"
 	"testing"
 
 	"github.com/emersion/go-imap/v2"
@@ -14,7 +16,10 @@ import (
 func TestParseBodyExtractsTextPlainFromMultipart(t *testing.T) {
 	raw := buildMultipartMail(t, "your code is 445566", "<p>your code is 445566</p>")
 
-	got := parseBody(raw)
+	got, err := parseBody(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if got != "your code is 445566" {
 		t.Fatalf("got %q, want the text/plain part", got)
 	}
@@ -23,7 +28,10 @@ func TestParseBodyExtractsTextPlainFromMultipart(t *testing.T) {
 func TestParseBodyNonMIMEIsReturnedAsIs(t *testing.T) {
 	raw := []byte("plain unstructured body 123456")
 
-	got := parseBody(raw)
+	got, err := parseBody(raw)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if got != string(raw) {
 		t.Fatalf("got %q, want the raw body back unchanged", got)
 	}
@@ -100,4 +108,43 @@ func buildMultipartMail(t *testing.T, plain, html string) []byte {
 	}
 
 	return b.Bytes()
+}
+
+func TestHTMLBeforePlainDoesNotHidePlainText(t *testing.T) {
+	raw := "MIME-Version: 1.0\r\nContent-Type: multipart/alternative; boundary=x\r\n\r\n--x\r\nContent-Type: text/html\r\n\r\n<b>wrong 111111</b>\r\n--x\r\nContent-Type: text/plain\r\n\r\nright 222222\r\n--x--\r\n"
+	value, err := parseBody([]byte(raw))
+	if err != nil || value != "right 222222" {
+		t.Fatalf("body = %q, %v", value, err)
+	}
+}
+
+func TestReadBodyRejectsOversizeAndReadErrors(t *testing.T) {
+	if _, err := readBody(strings.NewReader(strings.Repeat("x", maxMessageBytes+1))); err == nil {
+		t.Fatal("accepted oversized message")
+	}
+	if _, err := readBody(brokenReader{}); !errors.Is(err, io.ErrUnexpectedEOF) {
+		t.Fatalf("read error=%v", err)
+	}
+}
+
+type brokenReader struct{}
+
+func (brokenReader) Read([]byte) (int, error) { return 0, io.ErrUnexpectedEOF }
+
+func TestMalformedMultipartIsAnError(t *testing.T) {
+	raw := "MIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=x\r\n\r\n--x\r\nContent-Type: text/plain\r\n\r\ntruncated"
+	if _, err := parseBody([]byte(raw)); err == nil {
+		t.Fatal("accepted truncated MIME body")
+	}
+}
+
+func TestMalformedHeaderDoesNotBecomeRawBody(t *testing.T) {
+	for _, raw := range []string{
+		"Subject: code\r\nInvalid header\r\n\r\n123456",
+		"Content-Type: text/plain; charset=does-not-exist\r\n\r\n123456",
+	} {
+		if _, err := parseBody([]byte(raw)); err == nil {
+			t.Fatal("accepted malformed MIME headers")
+		}
+	}
 }

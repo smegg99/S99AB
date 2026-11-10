@@ -4,6 +4,7 @@ package mailcatch
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -116,7 +117,13 @@ func (s *imapSource) fetchMails(uids []imap.UID) ([]fetchedMail, error) {
 		if msg == nil {
 			break
 		}
-		results = append(results, parseFetchedMessage(msg))
+		parsed, err := parseFetchedMessage(msg)
+		if err != nil {
+			// Stop an oversized or broken literal rather than draining an unbounded stream.
+			s.c.Close()
+			return results, errors.Join(err, fetchCmd.Close())
+		}
+		results = append(results, parsed)
 	}
 
 	if err := fetchCmd.Close(); err != nil {
@@ -129,7 +136,7 @@ func (s *imapSource) close() error {
 	return s.c.Close()
 }
 
-func parseFetchedMessage(msg *imapclient.FetchMessageData) fetchedMail {
+func parseFetchedMessage(msg *imapclient.FetchMessageData) (fetchedMail, error) {
 	var fm fetchedMail
 	var envelope *imap.Envelope
 	var bodyBytes []byte
@@ -145,15 +152,20 @@ func parseFetchedMessage(msg *imapclient.FetchMessageData) fetchedMail {
 		case imapclient.FetchItemDataEnvelope:
 			envelope = d.Envelope
 		case imapclient.FetchItemDataBodySection:
-			bodyBytes, _ = io.ReadAll(d.Literal)
+			var err error
+			bodyBytes, err = readBody(d.Literal)
+			if err != nil {
+				return fm, err
+			}
 		}
 	}
 
 	if envelope != nil {
 		fm.To = extractAddresses(envelope.To)
 	}
-	fm.Body = parseBody(bodyBytes)
-	return fm
+	var err error
+	fm.Body, err = parseBody(bodyBytes)
+	return fm, err
 }
 
 func extractAddresses(addrs []imap.Address) []string {
@@ -164,31 +176,71 @@ func extractAddresses(addrs []imap.Address) []string {
 	return result
 }
 
-// parseBody returns the text/plain part, or the raw bytes when they are not MIME.
-func parseBody(bodyBytes []byte) string {
+const maxMessageBytes = 1 << 20
+
+func readBody(r io.Reader) ([]byte, error) {
+	data, err := io.ReadAll(io.LimitReader(r, maxMessageBytes+1))
+	if err != nil {
+		return nil, fmt.Errorf("mailcatch: read message: %w", err)
+	}
+	if len(data) > maxMessageBytes {
+		return nil, fmt.Errorf("mailcatch: message exceeds %d bytes", maxMessageBytes)
+	}
+	return data, nil
+}
+
+// parseBody prefers inline text/plain, then HTML, and accepts unstructured text.
+func parseBody(bodyBytes []byte) (string, error) {
+	if len(bodyBytes) > maxMessageBytes {
+		return "", fmt.Errorf("mailcatch: message exceeds %d bytes", maxMessageBytes)
+	}
 	if len(bodyBytes) == 0 {
-		return ""
+		return "", nil
 	}
 	mr, err := mail.CreateReader(bytes.NewReader(bodyBytes))
 	if err != nil {
-		return string(bodyBytes)
+		first, _, _ := bytes.Cut(bodyBytes, []byte("\n"))
+		field, _, colon := bytes.Cut(first, []byte(":"))
+		header := colon && len(field) > 0 && !bytes.ContainsAny(field, " \t\r")
+		if header || bytes.Contains(bodyBytes, []byte("\r\n\r\n")) || bytes.Contains(bodyBytes, []byte("\n\n")) {
+			return "", fmt.Errorf("mailcatch: MIME header: %w", err)
+		}
+		return string(bodyBytes), nil
 	}
+	defer mr.Close()
 	return extractTextBody(mr)
 }
 
-// extractTextBody returns the first inline (non-attachment) part's content.
-func extractTextBody(mr *mail.Reader) string {
+func extractTextBody(mr *mail.Reader) (string, error) {
+	html := ""
 	for {
 		p, err := mr.NextPart()
-		if err != nil {
-			break
+		if errors.Is(err, io.EOF) {
+			return html, nil
 		}
-		if _, ok := p.Header.(*mail.InlineHeader); ok {
-			body, err := io.ReadAll(p.Body)
-			if err == nil && len(body) > 0 {
-				return string(body)
-			}
+		if err != nil {
+			return "", fmt.Errorf("mailcatch: MIME part: %w", err)
+		}
+		header, ok := p.Header.(*mail.InlineHeader)
+		if !ok {
+			continue
+		}
+		mediaType, _, err := header.ContentType()
+		if err != nil {
+			return "", fmt.Errorf("mailcatch: content type: %w", err)
+		}
+		if mediaType != "text/plain" && mediaType != "text/html" {
+			continue
+		}
+		body, err := readBody(p.Body)
+		if err != nil {
+			return "", err
+		}
+		if mediaType == "text/plain" {
+			return string(body), nil
+		}
+		if html == "" {
+			html = string(body)
 		}
 	}
-	return ""
 }

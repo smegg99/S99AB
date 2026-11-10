@@ -24,6 +24,8 @@ type Config struct {
 	PollInterval time.Duration
 	// DialTimeout bounds connecting to the server. Zero means 10s.
 	DialTimeout time.Duration
+	// OnError receives polling and message parsing failures.
+	OnError func(error)
 }
 
 func (c Config) pollInterval() time.Duration {

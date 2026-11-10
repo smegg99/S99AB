@@ -24,6 +24,7 @@ type Catcher struct {
 	src          mailSource
 	codeRegex    *regexp.Regexp
 	pollInterval time.Duration
+	onError      func(error)
 
 	// mu guards waiters and processed.
 	mu sync.Mutex
@@ -62,6 +63,7 @@ func newCatcher(cfg Config, src mailSource) (*Catcher, error) {
 		src:          src,
 		codeRegex:    cfg.CodeRegex,
 		pollInterval: cfg.pollInterval(),
+		onError:      cfg.OnError,
 		waiters:      make(map[string][]chan string),
 		processed:    processed,
 		stop:         make(chan struct{}),
@@ -149,8 +151,8 @@ func (c *Catcher) poll() {
 	c.mu.Unlock()
 
 	mails, err := c.src.fetchUnseen(skip)
-	if err != nil {
-		return
+	if err != nil && c.onError != nil {
+		c.onError(err)
 	}
 	for _, m := range mails {
 		c.dispatch(m)
