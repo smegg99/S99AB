@@ -48,3 +48,13 @@ it('keeps a transferring source until release and deduplicates only within one c
   })
   scope.stop()
 })
+
+it('allocates IDs that do not collide with adopted tabs', () => {
+  const scope = effectScope()
+  const tabs = scope.run(create)!
+  tabs.adopt({ id: 'remote', file: 'imported', part: 'text' }, 'tab:1', 1)
+  const added = tabs.add({ file: 'new', part: 'text' }, 2)
+  expect(added.file).toBe('new')
+  expect(new Set(tabs.tabs.value.map(tab => tab.id)).size).toBe(tabs.tabs.value.length)
+  scope.stop()
+})

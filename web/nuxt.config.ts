@@ -36,10 +36,13 @@ export default defineNuxtConfig({
 
   // fonts.scss first; it corrects Overpass's vertical metrics over fontsource's files.
   css: [join(here, 'src/styles/fonts.scss'), join(here, 'src/styles/index.scss')],
+  build: { transpile: ['vuetify'] },
 
   // Texture masks at /s99ab/textures/<name>.svg. Nuxt does not document merging a
   // layer's public/ dir; Nitro publicAssets do merge. $tex-base in _config.scss must match.
   nitro: {
+    // The colour package uses extensionless ESM imports; bundle it for Node SSR.
+    externals: { inline: ['@material/material-color-utilities'] },
     publicAssets: [
       { baseURL: 's99ab/textures', dir: join(here, 'public/textures') },
     ],
@@ -63,8 +66,6 @@ export default defineNuxtConfig({
       __INTLIFY_PROD_DEVTOOLS__: false,
     },
 
-    // modulePreload polyfill stays: Nuxt overrides it here, and forcing it from
-    // vite:extendConfig makes the client build larger.
   },
 
   hooks: {

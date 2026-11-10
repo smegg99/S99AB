@@ -52,7 +52,10 @@ export function useTabs<T extends WorkspaceTab, P>(options: TabsOptions<T, P>) {
     remove(new Set(twins.map(other => other.id)))
   }
   function add(place: P, slot: number): T {
-    const id = `tab:${++made}`
+    let id: string
+    do {
+      id = `tab:${++made}`
+    } while (tabs.value.some(tab => tab.id === id))
     tabs.value.splice(Math.max(slot, pinnedCount.value), 0, { ...options.make(place), id } as T)
     return tabs.value.find(tab => tab.id === id)!
   }

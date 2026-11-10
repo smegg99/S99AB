@@ -34,12 +34,12 @@ export function useNativeStrip<T extends WorkspaceTab>(host: NativeStripHost<T>)
     return tab.id === INCOMING ? incomingFace.value?.title ?? '' : host.titleOf(tab)
   }
 
-  watch(() => !!host.native()?.incoming, (on) => {
+  onMounted(() => watch(() => !!host.native()?.incoming, (on) => {
     host.dropping.value = on
     cancelAnimationFrame(slotFrame)
     if (on) slotFrame = requestAnimationFrame(measureSlot)
     else host.dropSlot.value = null
-  }, { immediate: true })
+  }, { immediate: true }))
 
   // Measured every frame while dropping: the slot slides and the strip scrolls.
   function measureSlot() {
@@ -113,8 +113,10 @@ export function useNativeStrip<T extends WorkspaceTab>(host: NativeStripHost<T>)
   }, { deep: true })
   onScopeDispose(() => {
     observer?.disconnect()
-    cancelAnimationFrame(frame)
-    cancelAnimationFrame(slotFrame)
+    if (typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(frame)
+      cancelAnimationFrame(slotFrame)
+    }
     host.list.value?.removeEventListener('scroll', queueStrip)
   })
 
