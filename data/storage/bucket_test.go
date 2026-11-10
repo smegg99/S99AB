@@ -13,13 +13,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/minio/minio-go/v7"
-	"github.com/minio/minio-go/v7/pkg/credentials"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/credentials"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
 	"github.com/smegg99/s99ab/data/storage"
 )
 
-// bucket returns a Bucket backed by a freshly created, uniquely named bucket.
 func s3Endpoint(t *testing.T) string {
 	t.Helper()
 	addr := os.Getenv("S99AB_TEST_S3_ENDPOINT")
@@ -32,36 +32,49 @@ func s3Endpoint(t *testing.T) string {
 	return addr
 }
 
-func bucket(t *testing.T) *storage.Bucket {
+func bucketConfig(t *testing.T) storage.BucketConfig {
 	t.Helper()
 	addr := s3Endpoint(t)
 	name := "s99ab-" + strings.ToLower(rand.Text())
 	ctx := context.Background()
-	admin, err := minio.New(addr, &minio.Options{
-		Creds: credentials.NewStaticV4(os.Getenv("S99AB_TEST_S3_ACCESS_KEY"), os.Getenv("S99AB_TEST_S3_SECRET_KEY"), ""),
+	admin := s3.New(s3.Options{
+		BaseEndpoint: aws.String("http://" + addr), Region: "us-east-1", UsePathStyle: true,
+		Credentials: credentials.NewStaticCredentialsProvider(os.Getenv("S99AB_TEST_S3_ACCESS_KEY"), os.Getenv("S99AB_TEST_S3_SECRET_KEY"), ""),
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if err := admin.MakeBucket(ctx, name, minio.MakeBucketOptions{}); err != nil {
+	if _, err := admin.CreateBucket(ctx, &s3.CreateBucketInput{Bucket: aws.String(name)}); err != nil {
 		t.Fatalf("create bucket %s: %v", name, err)
 	}
 	t.Cleanup(func() {
-		for obj := range admin.ListObjects(ctx, name, minio.ListObjectsOptions{Recursive: true}) {
-			_ = admin.RemoveObject(ctx, name, obj.Key, minio.RemoveObjectOptions{})
+		pages := s3.NewListObjectsV2Paginator(admin, &s3.ListObjectsV2Input{Bucket: aws.String(name)})
+		for pages.HasMorePages() {
+			page, err := pages.NextPage(ctx)
+			if err != nil {
+				t.Errorf("list owned bucket: %v", err)
+				break
+			}
+			for _, obj := range page.Contents {
+				if _, err := admin.DeleteObject(ctx, &s3.DeleteObjectInput{Bucket: aws.String(name), Key: obj.Key}); err != nil {
+					t.Errorf("delete owned object: %v", err)
+				}
+			}
 		}
-		if err := admin.RemoveBucket(ctx, name); err != nil {
+		if _, err := admin.DeleteBucket(ctx, &s3.DeleteBucketInput{Bucket: aws.String(name)}); err != nil {
 			t.Errorf("remove owned bucket: %v", err)
 		}
 	})
 
-	b, err := storage.NewBucket(ctx, storage.BucketConfig{
+	return storage.BucketConfig{
 		Endpoint:  addr,
 		Bucket:    name,
 		AccessKey: os.Getenv("S99AB_TEST_S3_ACCESS_KEY"),
 		SecretKey: os.Getenv("S99AB_TEST_S3_SECRET_KEY"),
-	})
+	}
+}
+
+func bucket(t *testing.T) *storage.Bucket {
+	t.Helper()
+	b, err := storage.NewBucket(t.Context(), bucketConfig(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -100,7 +113,6 @@ func TestBucketPutGet(t *testing.T) {
 	}
 }
 
-// GetObject is lazy, so Get must force the round trip.
 func TestBucketGetMissingIsNotFound(t *testing.T) {
 	b := bucket(t)
 
