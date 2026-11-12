@@ -165,3 +165,21 @@ source:
     value: "Kod źródłowy (zip)"
   targz:
     value: "Kod źródłowy (tar.gz)"
+
+notesTitle:
+  value: "Co nowego w wersji {version}"
+  description: "Release-notes dialog heading; version is the running application version"
+  placeholders:
+    version: {type: string}
+
+updateDownload:
+  value: "Pobierz"
+  description: "Update dialog download action"
+
+updateIgnore:
+  value: "Pomiń tę wersję"
+  description: "Update dialog action that ignores only this version"
+
+updateLater:
+  value: "Później"
+  description: "Update dialog action that dismisses the prompt for this run"

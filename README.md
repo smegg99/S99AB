@@ -44,7 +44,8 @@ Unix-socket daemons, TTL caching, worker pools, GitHub releases and localized Ma
   optional native window hooks.
 - Ory Kratos self-service flow UI.
 - Release/download/update UI: download card with planned and experimental
-  platforms and fallback rows, changelog, release notice, repository counter.
+  platforms and fallback rows, changelog, release notice, repository counter,
+  update and first-launch release-notes dialogs.
 - Markdown rendering and lightweight syntax highlighting.
 - Keyboard shortcuts, motion and auto-height transitions.
 - Shared palettes, Vuetify defaults, textures and appearance preferences.
