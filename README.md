@@ -26,10 +26,12 @@ Built with Go 1.27, Gin, Nuxt 4, Vue 3, Vuetify 4 and Pinia Colada.
 - Mail: SMTP delivery/templates and IMAP verification-code capture.
 - Networking: rate limits, request-size caps, host probes and framework-free
   Server-Sent Events.
-- Releases: GitHub Releases ingestion, localized Markdown notes and
-  application-facing download models.
-- Work: graceful application lifetime, cron jobs and Unix-socket daemons.
-- Common: bounded worker pools and last-good-value TTL caching.
+- Releases: application-facing download models, using S99Base for GitHub
+  ingestion and localized notes.
+- Work: cron jobs.
+
+[S99Base](https://github.com/smegg99/S99Base) provides application lifetime,
+Unix-socket daemons, TTL caching, worker pools, GitHub releases and localized Markdown.
 
 ### Nuxt
 

@@ -8,9 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/smegg99/s99ab/common/ttlcache"
-	"github.com/smegg99/s99ab/release/ghreleases"
-	"github.com/smegg99/s99ab/release/mdlocale"
+	"github.com/smegg99/s99base/common/ttlcache"
+	"github.com/smegg99/s99base/release/ghreleases"
+	"github.com/smegg99/s99base/release/mdlocale"
 )
 
 const (

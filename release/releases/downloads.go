@@ -5,7 +5,7 @@ package releases
 import (
 	"context"
 
-	"github.com/smegg99/s99ab/release/ghreleases"
+	"github.com/smegg99/s99base/release/ghreleases"
 )
 
 /*

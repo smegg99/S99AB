@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/smegg99/s99ab/release/ghreleases"
-	"github.com/smegg99/s99ab/release/mdlocale"
+	"github.com/smegg99/s99base/release/ghreleases"
+	"github.com/smegg99/s99base/release/mdlocale"
 )
 
 func rel(version string, platforms ...string) parsed {
