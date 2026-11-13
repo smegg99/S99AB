@@ -13,22 +13,46 @@ nuxt.config:  extends: ['@smegg99/s99ab']
 
 Built with Go 1.27, Gin, Nuxt 4, Vue 3, Vuetify 4 and Pinia Colada.
 
+## Architecture
+
+![S99AB Go packages and Nuxt capabilities](docs/contents.svg)
+
+Diagram sources: [`docs/contents.dot`](docs/contents.dot).
+Render with Graphviz: `dot -Tsvg docs/contents.dot -o docs/contents.svg`.
+
+The [shared relationship graph](https://github.com/smegg99/S99Base/blob/main/docs/relations.svg)
+shows how S99AB, S99Wails and S99Base connect.
+
+| Boundary | Relationship | Source |
+| --- | --- | --- |
+| Go: `release/releases` | Imports S99Base `release/ghreleases`, `release/mdlocale`, `common/ttlcache` | [releases.go](release/releases/releases.go), [downloads.go](release/releases/downloads.go) |
+| Nuxt: `/appearance` | Optional S99Wails bridge registers the OS theme/accent source | [appearance.ts](web/src/appearance.ts) |
+| Nuxt: `/tabs` | Optional S99Wails bridge connects tabs to native windows | [tabs.ts](web/src/tabs.ts) |
+
+The Go module requires S99Base v1.0.0. It has no S99Wails Go dependency, and the
+Nuxt layer does not require a desktop runtime. A desktop app opts into the
+bridges with S99Wails `frontendgen --s99ab`. The application owns startup,
+domain routes, configuration, navigation, locale messages and feature UI.
+
 ## What is here
 
 ### Go
 
-- API: shared errors, health/readiness/version endpoints, API mounting,
-  pagination, scalar query helpers and release endpoints.
-- Auth: Ory Kratos identity/session integration and Ory Keto object
-  permissions.
-- Data: SQLite/Postgres setup and migrations, transactional outbox work,
-  local/S3-compatible object storage and image handling.
-- Mail: SMTP delivery/templates and IMAP verification-code capture.
-- Networking: rate limits, request-size caps, host probes and framework-free
-  Server-Sent Events.
-- Releases: application-facing download models, using S99Base for GitHub
-  ingestion and localized notes.
-- Work: cron jobs.
+Package paths are relative to `github.com/smegg99/s99ab/v2`.
+
+| Packages | Purpose |
+| --- | --- |
+| [`api/apierr`](api/apierr), [`api/apihealth`](api/apihealth), [`api/apimount`](api/apimount) | Error envelopes, health/readiness/version endpoints and Gin API group wiring. |
+| [`api/apipage`](api/apipage), [`api/apiquery`](api/apiquery), [`api/apireleases`](api/apireleases) | Pagination/sort parsing, scalar query helpers and release endpoints. |
+| [`auth/kratosauth`](auth/kratosauth), [`auth/kratosgin`](auth/kratosgin) | Kratos session resolution and Gin guards. |
+| [`auth/kratosclient`](auth/kratosclient), [`auth/keto`](auth/keto) | Native Kratos API flows and Keto object permissions. |
+| [`data/db`](data/db), [`data/outbox`](data/outbox) | SQLite/Postgres connections and migrations; transactional durable work with retries and dead letters. |
+| [`data/storage`](data/storage) | Local/S3-compatible object storage, upload acceptance and image handling. |
+| [`mail/mailer`](mail/mailer), [`mail/mailcatch`](mail/mailcatch) | SMTP delivery/templates and IMAP verification-code capture. |
+| [`net/httpmw`](net/httpmw), [`net/netprobe`](net/netprobe), [`net/sse`](net/sse) | Rate/body-size limits, ICMP/TCP host probes and framework-free Server-Sent Events. |
+| [`release/releases`](release/releases) | Cached application downloads, localized notes and repository stats. |
+| [`work/jobs`](work/jobs) | In-process cron jobs without overlap; durable work belongs in `data/outbox`. |
+| [`contracts`](contracts) | Shared OpenAPI schemas and parameters for app-owned contracts. |
 
 [S99Base](https://github.com/smegg99/S99Base) provides application lifetime,
 Unix-socket daemons, TTL caching, worker pools, GitHub releases and localized Markdown.
@@ -52,7 +76,8 @@ to S99Base keep their relative paths; change those imports to
   update and first-launch release-notes dialogs.
 - Markdown rendering and lightweight syntax highlighting.
 - Keyboard shortcuts, motion and auto-height transitions.
-- Shared palettes, Vuetify defaults, textures and appearance preferences.
+- Shared palettes, Vuetify defaults, textures, appearance preferences and
+  build-time icon/font subsetting.
 - Browser `EventSource` integration.
 - English/Polish layer-localized strings and validation helpers.
 
@@ -61,7 +86,8 @@ therefore released together.
 
 ## Quick start
 
-The repository is private. Configure Go and git together:
+If your checkout requires private-repository access, configure Go and Git for
+an account with access:
 
 ```sh
 go env -w GOPRIVATE='github.com/smegg99/*'
@@ -78,7 +104,9 @@ Consume the Nuxt layer from a sibling checkout:
 
 ```json
 {
-  "@smegg99/s99ab": "link:../S99AB"
+  "dependencies": {
+    "@smegg99/s99ab": "link:../S99AB"
+  }
 }
 ```
 
@@ -112,7 +140,8 @@ Nuxt such as a desktop bridge, import from a subpath:
 
 ## Development
 
-Use Go 1.27, Node.js 24 or newer, pnpm 11.3.0 and `just`. Install dependencies
+Use Go 1.27, a C compiler for the race detector, Node.js 24 or newer,
+pnpm 11.3.0 and `just`. Install dependencies
 with `pnpm install --frozen-lockfile`.
 
 ```sh

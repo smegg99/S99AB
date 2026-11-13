@@ -1,0 +1,11 @@
+// docs/contents.dot
+// Render: dot -Tsvg docs/contents.dot -o docs/contents.svg
+digraph contents {
+  graph [bgcolor="white", pad=0.25, nodesep=0.4, ranksep=0.65];
+  node [shape=record, fontname="Arial", fontsize=12, margin="0.15,0.1"];
+  edge [fontname="Arial", fontsize=10, arrowsize=0.7];
+  root [label="S99AB", shape=box];
+  go [label="{Go: github.com/smegg99/s99ab/v2|api: errors, health, mounting, pagination, releases\lauth: Kratos sessions + flows, Keto permissions\ldata: SQLite/Postgres, outbox, local/S3 storage\lmail: SMTP delivery + IMAP codes\lnet: middleware, host probes, SSE\lrelease: downloads, notes, repository stats\lwork: cron jobs\lcontracts: shared OpenAPI fragments\l}"];
+  web [label="{Nuxt: @smegg99/s99ab|App shell, navigation, panels\lTabs, history, context menus, explorer\lAsync, error, empty, signed-out states\lDialogs, prompts, toasts, server tables\lKratos self-service flows\lDownloads, changelog, update dialogs\lThemes, textures, motion, browser helpers\lMarkdown, EN/PL catalogs, validation\l}"];
+  root -> { go web } [dir=none];
+}
