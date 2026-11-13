@@ -6,9 +6,9 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/smegg99/s99ab/data/db"
-	"github.com/smegg99/s99ab/data/internal/testservice"
-	"github.com/smegg99/s99ab/data/outbox"
+	"github.com/smegg99/s99ab/v2/data/db"
+	"github.com/smegg99/s99ab/v2/data/internal/testservice"
+	"github.com/smegg99/s99ab/v2/data/outbox"
 )
 
 func TestPostgresConcurrentSchemaStartup(t *testing.T) {

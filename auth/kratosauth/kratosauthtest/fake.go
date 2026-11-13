@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
 )
 
 // Fake is a Client whose whoami maps a credential (session cookie value, X-Session-Token or Authorization) to an account.

@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apimount"
-	"github.com/smegg99/s99ab/auth/kratosauth"
-	"github.com/smegg99/s99ab/auth/kratosgin"
+	"github.com/smegg99/s99ab/v2/api/apimount"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosgin"
 )
 
 func init() { gin.SetMode(gin.TestMode) }

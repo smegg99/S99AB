@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/auth/kratosauth"
-	"github.com/smegg99/s99ab/auth/kratosauth/kratosauthtest"
-	"github.com/smegg99/s99ab/auth/kratosgin"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth/kratosauthtest"
+	"github.com/smegg99/s99ab/v2/auth/kratosgin"
 )
 
 // router mounts Session for everyone and a role gate on /admin.

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/smegg99/s99ab/mail/mailer"
+	"github.com/smegg99/s99ab/v2/mail/mailer"
 )
 
 func templates(t *testing.T, files fstest.MapFS) *mailer.Templates {

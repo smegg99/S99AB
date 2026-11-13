@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apipage"
+	"github.com/smegg99/s99ab/v2/api/apipage"
 )
 
 func init() { gin.SetMode(gin.TestMode) }

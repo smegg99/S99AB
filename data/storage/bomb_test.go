@@ -9,7 +9,7 @@ import (
 	"hash/crc32"
 	"testing"
 
-	"github.com/smegg99/s99ab/data/storage"
+	"github.com/smegg99/s99ab/v2/data/storage"
 )
 
 // bombPNG is a PNG header that declares a width x height canvas and carries no pixels.

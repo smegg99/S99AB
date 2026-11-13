@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/net/httpmw"
+	"github.com/smegg99/s99ab/v2/net/httpmw"
 )
 
 func TestRequestSizeRejectsByContentLength(t *testing.T) {

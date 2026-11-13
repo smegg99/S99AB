@@ -11,7 +11,7 @@ import (
 	"testing"
 	"testing/fstest"
 
-	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/v2/data/db"
 )
 
 // Two apps in one process (tests, a daemon and its admin tool) migrate at the same time.

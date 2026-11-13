@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/smegg99/s99ab/api/apierr"
-	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/api/apierr"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
 )
 
 // Session resolves a session when present and lets every request through; Require rejects anonymous ones.

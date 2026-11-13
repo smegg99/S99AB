@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smegg99/s99ab/auth/keto"
+	"github.com/smegg99/s99ab/v2/auth/keto"
 )
 
 func reachable(readURL string) bool {

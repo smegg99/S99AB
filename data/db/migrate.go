@@ -9,7 +9,7 @@ import (
 	"io/fs"
 
 	"github.com/pressly/goose/v3"
-	"github.com/smegg99/s99ab/data/internal/migratelock"
+	"github.com/smegg99/s99ab/v2/data/internal/migratelock"
 )
 
 // Migrate applies embedded SQL under a database-scoped migration lock.

@@ -7,7 +7,7 @@ same API conventions, persistence helpers, auth integration, background work,
 storage, application shell and UI behaviour instead of rebuilding them.
 
 ```text
-go.mod:       github.com/smegg99/s99ab
+go.mod:       github.com/smegg99/s99ab/v2
 nuxt.config:  extends: ['@smegg99/s99ab']
 ```
 
@@ -32,6 +32,10 @@ Built with Go 1.27, Gin, Nuxt 4, Vue 3, Vuetify 4 and Pinia Colada.
 
 [S99Base](https://github.com/smegg99/S99Base) provides application lifetime,
 Unix-socket daemons, TTL caching, worker pools, GitHub releases and localized Markdown.
+
+Version 2 uses the Go module path `github.com/smegg99/s99ab/v2`. The packages moved
+to S99Base keep their relative paths; change those imports to
+`github.com/smegg99/s99base/...`. The Nuxt package name remains `@smegg99/s99ab`.
 
 ### Nuxt
 
@@ -67,7 +71,7 @@ git config --global url."ssh://git@github.com/smegg99/".insteadOf "https://githu
 Install the Go module:
 
 ```sh
-go get github.com/smegg99/s99ab
+go get github.com/smegg99/s99ab/v2
 ```
 
 Consume the Nuxt layer from a sibling checkout:

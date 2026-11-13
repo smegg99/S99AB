@@ -9,7 +9,7 @@ import (
 
 	"github.com/pressly/goose/v3"
 	"github.com/pressly/goose/v3/database"
-	"github.com/smegg99/s99ab/data/internal/migratelock"
+	"github.com/smegg99/s99ab/v2/data/internal/migratelock"
 )
 
 // Goose's Up checks for pending migrations before taking its session lock.

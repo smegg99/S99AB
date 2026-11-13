@@ -1,4 +1,4 @@
-module github.com/smegg99/s99ab
+module github.com/smegg99/s99ab/v2
 
 go 1.27
 
@@ -76,5 +76,3 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
-
-replace github.com/smegg99/s99base => ../S99Base

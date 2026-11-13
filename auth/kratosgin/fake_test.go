@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smegg99/s99ab/auth/kratosauth"
-	"github.com/smegg99/s99ab/auth/kratosauth/kratosauthtest"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth/kratosauthtest"
 )
 
 var fakeAccounts = map[string]kratosauth.Identity{

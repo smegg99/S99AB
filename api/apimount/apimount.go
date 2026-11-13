@@ -7,10 +7,10 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apihealth"
-	"github.com/smegg99/s99ab/auth/kratosauth"
-	"github.com/smegg99/s99ab/auth/kratosgin"
-	"github.com/smegg99/s99ab/net/httpmw"
+	"github.com/smegg99/s99ab/v2/api/apihealth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosgin"
+	"github.com/smegg99/s99ab/v2/net/httpmw"
 )
 
 const defaultPrefix = "/api/v1"

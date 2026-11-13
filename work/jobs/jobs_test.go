@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smegg99/s99ab/work/jobs"
+	"github.com/smegg99/s99ab/v2/work/jobs"
 )
 
 // recorder collects runs, since Observe fires from cron's goroutines.

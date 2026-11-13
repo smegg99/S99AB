@@ -9,7 +9,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smegg99/s99ab/auth/kratosclient"
+	"github.com/smegg99/s99ab/v2/auth/kratosclient"
 )
 
 // kratos fakes a Kratos public endpoint mounted under a path, as behind a proxy.

@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/smegg99/s99ab/api/apipage"
+	"github.com/smegg99/s99ab/v2/api/apipage"
 )
 
 // Every parameter named in the contract fragment must change what Parse returns.

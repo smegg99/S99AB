@@ -5,7 +5,7 @@ package db_test
 import (
 	"testing"
 
-	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/v2/data/db"
 )
 
 func TestRebind(t *testing.T) {

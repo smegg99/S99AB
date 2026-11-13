@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smegg99/s99ab/net/netprobe"
+	"github.com/smegg99/s99ab/v2/net/netprobe"
 )
 
 func TestPingTCPConnectsToOpenPort(t *testing.T) {

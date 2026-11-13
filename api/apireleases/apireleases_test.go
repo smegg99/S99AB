@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apireleases"
-	"github.com/smegg99/s99ab/release/releases"
+	"github.com/smegg99/s99ab/v2/api/apireleases"
+	"github.com/smegg99/s99ab/v2/release/releases"
 )
 
 func init() { gin.SetMode(gin.TestMode) }

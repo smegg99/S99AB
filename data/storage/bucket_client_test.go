@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/smegg99/s99ab/data/storage"
+	"github.com/smegg99/s99ab/v2/data/storage"
 )
 
 func TestBucketStreamsMultipartAndEmptyObjects(t *testing.T) {

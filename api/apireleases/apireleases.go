@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/smegg99/s99ab/release/releases"
+	"github.com/smegg99/s99ab/v2/release/releases"
 )
 
 // Register mounts /releases, /releases/latest, /downloads and /repo, answering 200 with empty results when GitHub is unreachable.

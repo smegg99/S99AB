@@ -13,7 +13,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apierr"
+	"github.com/smegg99/s99ab/v2/api/apierr"
 )
 
 var errDomain = errors.New("datastore: row is gone")

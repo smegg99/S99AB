@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smegg99/s99ab/data/outbox"
+	"github.com/smegg99/s99ab/v2/data/outbox"
 )
 
 func TestBatchSizeBoundsOnePass(t *testing.T) {

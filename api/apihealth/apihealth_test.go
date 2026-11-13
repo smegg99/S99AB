@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/smegg99/s99ab/api/apihealth"
+	"github.com/smegg99/s99ab/v2/api/apihealth"
 )
 
 func TestHealthIgnoresDependencies(t *testing.T) {

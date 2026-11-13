@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/v2/data/db"
 )
 
 // DeadLetters lists jobs that exhausted their attempts. They stay in the table.

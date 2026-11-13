@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/smegg99/s99ab/api/apipage"
+	"github.com/smegg99/s99ab/v2/api/apipage"
 )
 
 var columns = []string{"name", "created_at", "size"}

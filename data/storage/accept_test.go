@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/disintegration/imaging"
-	"github.com/smegg99/s99ab/data/storage"
+	"github.com/smegg99/s99ab/v2/data/storage"
 )
 
 func TestAcceptStoresAndHashes(t *testing.T) {

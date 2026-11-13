@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
 )
 
 // whoami returns a client whose Kratos answers every call with status and body.

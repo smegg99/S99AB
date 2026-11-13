@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/smegg99/s99ab/data/db"
+	"github.com/smegg99/s99ab/v2/data/db"
 )
 
 type Job struct {

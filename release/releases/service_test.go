@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/smegg99/s99ab/release/releases"
+	"github.com/smegg99/s99ab/v2/release/releases"
 )
 
 const body = `Untagged preamble.

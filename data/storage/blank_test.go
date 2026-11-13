@@ -7,7 +7,7 @@ import (
 	"image/color"
 	"testing"
 
-	"github.com/smegg99/s99ab/data/storage"
+	"github.com/smegg99/s99ab/v2/data/storage"
 )
 
 // a single flat colour has ~zero variance and reads as blank

@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/smegg99/s99ab/auth/kratosauth"
+	"github.com/smegg99/s99ab/v2/auth/kratosauth"
 )
 
 func TestMalformedSessionsAreUpstreamFailures(t *testing.T) {
